@@ -1,0 +1,153 @@
+// ============================================
+// Design Tokens - 基于 SDD 规格
+// ============================================
+
+// ---------- 颜色系统 ----------
+
+// 主色
+$primary: #FF6B00;
+$primary-light: #FFF0E6;
+$primary-bg: #FFF9F2;
+
+// 次要色
+$secondary: #4A90E2;
+$secondary-light: #EBF3FF;
+$secondary-bg: #F0F7FF;
+
+// 成功色
+$success: #4CAF50;
+$success-light: #E8F5E9;
+$success-bg: #F1F8F4;
+
+// 警告色
+$warning: #FFB800;
+$warning-light: #FFF5E6;
+$warning-bg: #FFFBF0;
+
+// 文字颜色
+$text-primary: #333333;
+$text-secondary: #666666;
+$text-tertiary: #999999;
+
+// 边框背景
+$border-color: #F0F0F0;
+$bg-white: #FFFFFF;
+$bg-secondary: #F9F9F9;
+$bg-tertiary: #FAFAFA;
+$overlay: rgba(0, 0, 0, 0.4);
+
+// VIP 渐变
+$vip-gradient: linear-gradient(135deg, rgba(255, 197, 97, 1) 0%, rgba(245, 117, 117, 1) 100%);
+$gold-gradient: linear-gradient(135deg, #FFD700 0%, #FFAA00 100%);
+
+// ---------- 字体规格 ----------
+$font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+
+$font-size-xl: 18px;
+$font-size-lg: 16px;
+$font-size-md: 14px;
+$font-size-sm: 13px;
+$font-size-xs: 12px;
+$font-size-xxs: 11px;
+$font-size-xxxs: 10px;
+
+$font-weight-normal: 400;
+$font-weight-medium: 500;
+$font-weight-semibold: 600;
+$font-weight-bold: 700;
+
+// ---------- 间距系统 ----------
+$spacing-xxs: 2px;
+$spacing-xs: 4px;
+$spacing-sm: 6px;
+$spacing-md: 8px;
+$spacing-lg: 10px;
+$spacing-xl: 12px;
+$spacing-xxl: 16px;
+$spacing-xxxl: 24px;
+
+// ---------- 圆角规格 ----------
+$radius-sm: 4px;
+$radius-md: 6px;
+$radius-lg: 8px;
+$radius-xl: 12px;
+$radius-pill: 16px;
+$radius-circle: 50%;
+
+// ---------- 阴影 ----------
+$shadow-card: 0 2px 8px rgba(0, 0, 0, 0.04);
+$shadow-dropdown: 0 4px 12px rgba(0, 0, 0, 0.15);
+$shadow-badge: -1px 1px 4px rgba(0, 0, 0, 0.1);
+
+// ---------- 过渡 ----------
+$transition-fast: 0.2s;
+$transition-normal: 0.3s;
+$transition-slow: 0.6s;
+
+// ---------- 响应式断点 ----------
+$breakpoint-mobile: 768px;
+$breakpoint-small-mobile: 600px;
+$breakpoint-tiny-mobile: 380px;
+$breakpoint-micro-mobile: 360px;
+
+// ---------- 布局尺寸 ----------
+$sidebar-width: 260px;
+$header-height: 40px;
+$function-bar-height: 44px;
+
+// ============================================
+// 响应式 Mixins
+// ============================================
+
+@mixin desktop {
+  @media (min-width: $breakpoint-mobile) {
+    @content;
+  }
+}
+
+@mixin mobile {
+  @media (max-width: #{$breakpoint-mobile - 1px}) {
+    @content;
+  }
+}
+
+@mixin small-mobile {
+  @media (max-width: #{$breakpoint-small-mobile - 1px}) {
+    @content;
+  }
+}
+
+@mixin tiny-mobile {
+  @media (max-width: #{$breakpoint-tiny-mobile - 1px}) {
+    @content;
+  }
+}
+
+@mixin micro-mobile {
+  @media (max-width: #{$breakpoint-micro-mobile - 1px}) {
+    @content;
+  }
+}
+
+// 折叠屏/平板竖屏
+@mixin tablet-portrait {
+  @media (min-width: 640px) and (min-height: 640px) {
+    @content;
+  }
+}
+
+// 手机横屏
+@mixin phone-landscape {
+  @media (max-height: 639px) {
+    @content;
+  }
+}
+
+// 平板横屏
+@mixin tablet-landscape {
+  @media (min-width: 1024px) {
+    @content;
+  }
+}
+
+
