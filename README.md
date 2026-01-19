@@ -4,6 +4,10 @@
 > **创建日期**：2025-12-31  
 > **技术栈**：Vue 3 + TypeScript + Vite + Pinia + SCSS
 
+## 🌐 在线预览
+
+**👉 [点击访问在线原型](https://chapter-list-redesign.vercel.app/)**
+
 ---
 
 ## ⚠️ 重要声明
