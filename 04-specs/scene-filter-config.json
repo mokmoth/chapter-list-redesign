@@ -1,0 +1,1320 @@
+{
+  "version": "1.0.0",
+  "meta": {
+    "description": "章节列表页 - 分学科场景Tab、内容卡片、筛选逻辑完整配置",
+    "source": "章节列表页2026改版-分学科筛选逻辑汇总.xlsx",
+    "generatedAt": "2026-03-11",
+    "notes": "filterRules.groups 之间为 OR 关系；每个 group 内 contentTags 与 sceneTags 为 AND 关系；tags 数组内各项为 OR 关系（匹配任一即可）"
+  },
+
+  "enums": {
+    "cardTypes": {
+      "video": "视频课程",
+      "sync-quiz": "同步刷题",
+      "premium-hook": "培优课钩子（付费引流卡片）",
+      "study-guide": "学案",
+      "note-card": "笔记卡",
+      "vocabulary": "背单词"
+    },
+    "levels": {
+      "elementary": "小学",
+      "junior": "初中",
+      "senior": "高中"
+    },
+    "categories": {
+      "science": "理科",
+      "liberal-arts": "文科",
+      "minor": "小四门"
+    }
+  },
+
+  "sceneGroups": [
+    {
+      "id": "elementary",
+      "name": "小学",
+      "appliesTo": ["小数", "小语", "小英"],
+      "scenes": [
+        { "id": "pre-study", "name": "课前学习", "baseCategory": "预习", "description": "提前学和预习看这里，有学有练（包含大多数视频课程）" },
+        { "id": "after-practice", "name": "课后加练", "baseCategory": "复习", "description": "学完练一练，知识记得牢，通过课后额外练习和少量视频，达到复习效果" },
+        { "id": "daily-accumulation", "name": "日常积累", "baseCategory": "日常积累", "description": "文科的积累性内容，每天积累一小步" },
+        { "id": "reading-writing", "name": "阅读写作", "baseCategory": "加餐", "description": "文科的阅读写作模块" }
+      ]
+    },
+    {
+      "id": "middle-liberal-arts",
+      "name": "中学文科",
+      "appliesTo": ["初语", "高语", "初英", "高英"],
+      "scenes": [
+        { "id": "text-analysis", "name": "课文精讲", "baseCategory": "预习", "description": "语言结构化与内化，解构经典文章，习得阅读策略和情感逻辑" },
+        { "id": "skill-mastery", "name": "能力通关", "baseCategory": "复习", "description": "语言应用和输出" },
+        { "id": "daily-accumulation", "name": "日常积累", "baseCategory": "日常积累", "description": "语言感知、基础积累，解决字词、语法等底座问题" }
+      ]
+    },
+    {
+      "id": "middle-science",
+      "name": "中学理科",
+      "appliesTo": ["初数", "高数", "初物", "高物", "初化", "高化", "高生"],
+      "scenes": [
+        { "id": "concept-preview", "name": "预习理解", "baseCategory": "预习", "description": "凡是偏基础的学习内容，均可归到此类" },
+        { "id": "problem-solving", "name": "解题指导", "baseCategory": "解题指导", "description": "夯实基础/技巧打磨，学习基础题目的做题技巧，指向能够解决作业问题的任何资源" },
+        { "id": "drill-practice", "name": "刷题实战", "baseCategory": "刷题", "description": "纯练习模块" },
+        { "id": "thinking-extension", "name": "思维拓展", "baseCategory": "拓展", "deprecated": true, "description": "概念拓展，不指向课内同步知识的内容（已标记去掉）" }
+      ]
+    },
+    {
+      "id": "minor-subjects",
+      "name": "小四门",
+      "appliesTo": ["初生", "初地", "高地", "初历", "高历", "道法", "高政"],
+      "scenes": [
+        { "id": "sync-lecture", "name": "同步精讲", "baseCategory": "预习", "description": "和课内日常预习复习强绑定的、知识点梳理性质的同步课" },
+        { "id": "intensive-training", "name": "强化训练", "baseCategory": "复习", "description": "偏备考冲刺的、可能会有点上强度的内容" }
+      ]
+    }
+  ],
+
+  "subjects": [
+    {
+      "id": "elementary-math",
+      "shortName": "小数",
+      "fullName": "小学数学",
+      "level": "elementary",
+      "subject": "数学",
+      "category": "science",
+      "sceneGroup": "elementary",
+      "confirmed": true,
+      "enabled": true,
+      "notes": "筛选逻辑只有【课前学习】【课后加练】",
+      "scenes": [
+        {
+          "sceneId": "pre-study",
+          "enabled": true,
+          "cards": [
+            { "type": "video", "priority": "primary", "description": "概念课、进阶理解、解题课视频" },
+            { "type": "sync-quiz", "difficulty": "easy", "description": "简单同步刷题" }
+          ],
+          "filterRules": {
+            "isExample": true,
+            "groups": [
+              {
+                "contentTags": { "include": ["概念课", "进阶理解", "解题课"] },
+                "sceneTags": { "include": ["课前预习", "课后巩固", "单元复习", "作业精讲", "期中期末重点", "新题型标签"] }
+              }
+            ]
+          },
+          "hiddenTags": {
+            "scene": ["课前预习", "课后巩固", "单元复习", "作业精讲"]
+          }
+        },
+        {
+          "sceneId": "after-practice",
+          "enabled": true,
+          "cards": [
+            { "type": "sync-quiz", "priority": "primary", "difficulty": "medium-hard", "description": "中难度同步刷题（主要）" },
+            { "type": "video", "priority": "secondary", "description": "解题课视频（次要）" },
+            { "type": "premium-hook" }
+          ],
+          "filterRules": {
+            "isExample": true,
+            "groups": [
+              {
+                "contentTags": { "include": ["概念课", "进阶理解", "解题课"] },
+                "sceneTags": { "include": ["课前预习", "课后巩固", "单元复习", "作业精讲", "期中期末重点", "新题型标签"] }
+              }
+            ]
+          },
+          "hiddenTags": {
+            "scene": ["课前预习", "课后巩固", "单元复习", "作业精讲"]
+          }
+        }
+      ]
+    },
+
+    {
+      "id": "elementary-chinese",
+      "shortName": "小语",
+      "fullName": "小学语文",
+      "level": "elementary",
+      "subject": "语文",
+      "category": "liberal-arts",
+      "sceneGroup": "elementary",
+      "confirmed": true,
+      "enabled": false,
+      "notes": "当前内容较少，筛选逻辑暂不上线",
+      "scenes": [
+        {
+          "sceneId": "pre-study",
+          "enabled": false,
+          "cards": [
+            { "type": "video", "priority": "primary" },
+            { "type": "sync-quiz", "difficulty": "easy" }
+          ],
+          "filterRules": {
+            "groups": [
+              {
+                "contentTags": { "include": ["基础知识", "课文阅读", "必备古诗", "趣味拓展"] },
+                "sceneTags": { "include": ["课前预习"] }
+              }
+            ]
+          },
+          "hiddenTags": {}
+        },
+        {
+          "sceneId": "after-practice",
+          "enabled": false,
+          "cards": [
+            { "type": "sync-quiz", "priority": "primary", "difficulty": "medium-hard" },
+            { "type": "video", "priority": "secondary" }
+          ],
+          "filterRules": {
+            "groups": [
+              {
+                "contentTags": { "include": ["必备古诗"] },
+                "sceneTags": { "include": ["课后巩固"] }
+              }
+            ]
+          },
+          "hiddenTags": {}
+        },
+        {
+          "sceneId": "daily-accumulation",
+          "enabled": false,
+          "cards": [
+            { "type": "video", "description": "积累性学习视频" }
+          ],
+          "filterRules": {
+            "groups": [
+              {
+                "contentTags": { "include": ["文言积累", "必备古诗"] }
+              }
+            ]
+          },
+          "hiddenTags": {
+            "scene": ["*"]
+          },
+          "hiddenTagsNote": "隐藏所有场景标签"
+        },
+        {
+          "sceneId": "reading-writing",
+          "enabled": false,
+          "cards": [
+            { "type": "video", "description": "讲阅读写作的视频" },
+            { "type": "study-guide" }
+          ],
+          "filterRules": {
+            "groups": [
+              {
+                "contentTags": { "include": ["课文阅读", "名著阅读", "习作表达"] },
+                "sceneTags": { "include": ["课后巩固"] }
+              }
+            ]
+          },
+          "hiddenTags": {}
+        }
+      ]
+    },
+
+    {
+      "id": "elementary-english",
+      "shortName": "小英",
+      "fullName": "小学英语",
+      "level": "elementary",
+      "subject": "英语",
+      "category": "liberal-arts",
+      "sceneGroup": "elementary",
+      "confirmed": true,
+      "enabled": false,
+      "notes": "当前内容较少，筛选逻辑暂不上线；筛选规则尚未填写",
+      "scenes": [
+        {
+          "sceneId": "pre-study",
+          "enabled": false,
+          "cards": [
+            { "type": "video", "priority": "primary" },
+            { "type": "sync-quiz", "difficulty": "easy" }
+          ],
+          "filterRules": null
+        },
+        {
+          "sceneId": "after-practice",
+          "enabled": false,
+          "cards": [
+            { "type": "sync-quiz", "priority": "primary", "difficulty": "medium-hard" },
+            { "type": "video", "priority": "secondary" }
+          ],
+          "filterRules": null
+        },
+        {
+          "sceneId": "daily-accumulation",
+          "enabled": false,
+          "cards": [
+            { "type": "video", "description": "积累性学习视频" },
+            { "type": "vocabulary" }
+          ],
+          "filterRules": null
+        },
+        {
+          "sceneId": "reading-writing",
+          "enabled": false,
+          "cards": [
+            { "type": "video", "description": "讲阅读写作的视频" }
+          ],
+          "filterRules": null
+        }
+      ]
+    },
+
+    {
+      "id": "junior-chinese",
+      "shortName": "初语",
+      "fullName": "初中语文",
+      "level": "junior",
+      "subject": "语文",
+      "category": "liberal-arts",
+      "sceneGroup": "middle-liberal-arts",
+      "confirmed": true,
+      "enabled": true,
+      "scenes": [
+        {
+          "sceneId": "text-analysis",
+          "enabled": true,
+          "cards": [
+            { "type": "video", "description": "同步课文讲解视频" },
+            { "type": "study-guide" },
+            { "type": "note-card" }
+          ],
+          "filterRules": {
+            "groups": [
+              {
+                "contentTags": { "include": ["课文朗读", "课文精讲", "文言文翻译"] },
+                "sceneTags": { "include": ["课前预习"] }
+              }
+            ]
+          },
+          "hiddenTags": {
+            "scene": ["课前预习"]
+          }
+        },
+        {
+          "sceneId": "skill-mastery",
+          "enabled": true,
+          "cards": [
+            { "type": "video", "description": "能力向视频" },
+            { "type": "study-guide" },
+            { "type": "sync-quiz" },
+            { "type": "premium-hook" }
+          ],
+          "filterRules": {
+            "groups": [
+              {
+                "contentTags": { "include": ["阅读方法", "写作"] },
+                "sceneTags": { "include": ["课后巩固"] }
+              }
+            ]
+          },
+          "hiddenTags": {
+            "scene": ["课后巩固"]
+          }
+        },
+        {
+          "sceneId": "daily-accumulation",
+          "enabled": true,
+          "cards": [
+            { "type": "video", "description": "积累性学习视频" }
+          ],
+          "filterRules": {
+            "groups": [
+              {
+                "contentTags": { "include": ["文学文化常识", "艺术手法", "语法知识", "名著导读"] },
+                "sceneTags": { "include": ["课前预习"] }
+              }
+            ]
+          },
+          "hiddenTags": {
+            "scene": ["课前预习"]
+          }
+        }
+      ]
+    },
+
+    {
+      "id": "senior-chinese",
+      "shortName": "高语",
+      "fullName": "高中语文",
+      "level": "senior",
+      "subject": "语文",
+      "category": "liberal-arts",
+      "sceneGroup": "middle-liberal-arts",
+      "confirmed": true,
+      "enabled": true,
+      "scenes": [
+        {
+          "sceneId": "text-analysis",
+          "enabled": true,
+          "cards": [
+            { "type": "video", "description": "同步课文讲解视频" },
+            { "type": "study-guide" },
+            { "type": "note-card" }
+          ],
+          "filterRules": {
+            "groups": [
+              {
+                "contentTags": { "include": ["课文理解"] },
+                "sceneTags": { "include": ["课前预习"] }
+              }
+            ]
+          },
+          "hiddenTags": {
+            "scene": ["课前预习"]
+          }
+        },
+        {
+          "sceneId": "skill-mastery",
+          "enabled": true,
+          "cards": [
+            { "type": "video", "description": "能力向视频" },
+            { "type": "study-guide" },
+            { "type": "sync-quiz" },
+            { "type": "premium-hook" }
+          ],
+          "filterRules": {
+            "groups": [
+              {
+                "contentTags": { "include": ["能力提升"] },
+                "sceneTags": { "include": ["课后巩固"] }
+              }
+            ]
+          },
+          "hiddenTags": {
+            "scene": ["课后巩固"]
+          }
+        },
+        {
+          "sceneId": "daily-accumulation",
+          "enabled": true,
+          "cards": [
+            { "type": "video", "description": "积累性学习视频" }
+          ],
+          "filterRules": {
+            "groups": [
+              {
+                "contentTags": { "include": ["知识梳理"] },
+                "sceneTags": { "include": ["课后巩固"] }
+              }
+            ]
+          },
+          "hiddenTags": {}
+        }
+      ]
+    },
+
+    {
+      "id": "junior-english",
+      "shortName": "初英",
+      "fullName": "初中英语",
+      "level": "junior",
+      "subject": "英语",
+      "category": "liberal-arts",
+      "sceneGroup": "middle-liberal-arts",
+      "confirmed": true,
+      "enabled": true,
+      "scenes": [
+        {
+          "sceneId": "text-analysis",
+          "enabled": true,
+          "cards": [
+            { "type": "video", "description": "同步课文讲解视频" },
+            { "type": "study-guide" }
+          ],
+          "filterRules": {
+            "groups": [
+              {
+                "contentTags": { "include": ["课文精读"] },
+                "sceneTags": { "include": ["课前预习"] }
+              }
+            ]
+          },
+          "hiddenTags": {}
+        },
+        {
+          "sceneId": "skill-mastery",
+          "enabled": true,
+          "cards": [
+            { "type": "video", "description": "能力向视频" },
+            { "type": "sync-quiz" },
+            { "type": "premium-hook" }
+          ],
+          "filterRules": {
+            "groups": [
+              {
+                "contentTags": { "include": ["情景交际"] },
+                "sceneTags": { "include": ["课后巩固"] }
+              },
+              {
+                "contentTags": { "include": ["语法概念"] },
+                "sceneTags": { "include": ["期中期末重点", "课后巩固"] }
+              }
+            ]
+          },
+          "hiddenTags": {}
+        },
+        {
+          "sceneId": "daily-accumulation",
+          "enabled": true,
+          "cards": [
+            { "type": "video", "description": "积累性学习视频" },
+            { "type": "vocabulary" }
+          ],
+          "filterRules": {
+            "groups": [
+              {
+                "contentTags": { "include": ["词汇精讲", "词汇串讲", "趣味词汇", "音标教学", "语法概念"] },
+                "sceneTags": { "include": ["课前预习"] }
+              }
+            ]
+          },
+          "hiddenTags": {}
+        }
+      ]
+    },
+
+    {
+      "id": "senior-english",
+      "shortName": "高英",
+      "fullName": "高中英语",
+      "level": "senior",
+      "subject": "英语",
+      "category": "liberal-arts",
+      "sceneGroup": "middle-liberal-arts",
+      "confirmed": true,
+      "enabled": true,
+      "notes": "没有课文内容，筛选逻辑只有【日常积累】【能力通关】",
+      "scenes": [
+        {
+          "sceneId": "text-analysis",
+          "enabled": false,
+          "disabledReason": "高英没有课文精讲内容"
+        },
+        {
+          "sceneId": "skill-mastery",
+          "enabled": true,
+          "cards": [
+            { "type": "video", "description": "能力向视频" },
+            { "type": "sync-quiz" },
+            { "type": "premium-hook" }
+          ],
+          "filterRules": {
+            "groups": [
+              {
+                "contentTags": { "include": ["语法应用", "语法习题"] },
+                "sceneTags": { "include": ["课后巩固"] }
+              },
+              {
+                "contentTags": { "include": ["语法复习"] },
+                "sceneTags": { "include": ["期中期末重点"] }
+              },
+              {
+                "contentTags": { "include": ["思路拓展", "内容和表达", "英文表达"] },
+                "sceneTags": { "include": ["期中期末重点"] }
+              }
+            ]
+          },
+          "hiddenTags": {}
+        },
+        {
+          "sceneId": "daily-accumulation",
+          "enabled": true,
+          "cards": [
+            { "type": "video", "description": "积累性学习视频" },
+            { "type": "vocabulary" }
+          ],
+          "filterRules": {
+            "groups": [
+              {
+                "contentTags": { "include": ["词汇精讲", "词汇串讲", "语法概念"] },
+                "sceneTags": { "include": ["课前预习"] }
+              }
+            ]
+          },
+          "hiddenTags": {}
+        }
+      ]
+    },
+
+    {
+      "id": "junior-math",
+      "shortName": "初数",
+      "fullName": "初中数学",
+      "level": "junior",
+      "subject": "数学",
+      "category": "science",
+      "sceneGroup": "middle-science",
+      "confirmed": false,
+      "enabled": true,
+      "notes": "筛选规则待最终确认",
+      "scenes": [
+        {
+          "sceneId": "concept-preview",
+          "enabled": true,
+          "cards": [
+            { "type": "video", "description": "概念课 + 少量基础解题课" }
+          ],
+          "filterRules": {
+            "groups": [
+              {
+                "sceneTags": { "include": ["课前预习", "课后巩固"] }
+              }
+            ],
+            "note": "sceneTags 内为 OR 关系，匹配任一即可"
+          },
+          "hiddenTags": {
+            "scene": ["课前预习", "课后巩固"]
+          }
+        },
+        {
+          "sceneId": "problem-solving",
+          "enabled": true,
+          "cards": [
+            { "type": "video", "description": "主要是解题课" }
+          ],
+          "filterRules": {
+            "groups": [
+              {
+                "sceneTags": { "include": ["作业精讲"] }
+              }
+            ]
+          },
+          "hiddenTags": {}
+        },
+        {
+          "sceneId": "drill-practice",
+          "enabled": true,
+          "cards": [
+            { "type": "sync-quiz" }
+          ],
+          "filterRules": null,
+          "filterRulesNote": "纯练习模块，筛选规则待补充"
+        },
+        {
+          "sceneId": "thinking-extension",
+          "enabled": false,
+          "deprecated": true,
+          "cards": [
+            { "type": "video", "description": "拓展类非必看" },
+            { "type": "premium-hook" }
+          ],
+          "filterRules": null
+        }
+      ]
+    },
+
+    {
+      "id": "senior-math",
+      "shortName": "高数",
+      "fullName": "高中数学",
+      "level": "senior",
+      "subject": "数学",
+      "category": "science",
+      "sceneGroup": "middle-science",
+      "confirmed": true,
+      "enabled": true,
+      "notes": "思维拓展的内容较少，可后期人工调整（和内容、场景、难度无关，主要是新旧课标更替产生的冗余视频）",
+      "scenes": [
+        {
+          "sceneId": "concept-preview",
+          "enabled": true,
+          "cards": [
+            { "type": "video", "description": "概念课 + 少量基础解题课" }
+          ],
+          "filterRules": {
+            "groups": [
+              {
+                "sceneTags": { "include": ["课前预习"] }
+              }
+            ]
+          },
+          "hiddenTags": {
+            "scene": ["课前预习"]
+          }
+        },
+        {
+          "sceneId": "problem-solving",
+          "enabled": true,
+          "cards": [
+            { "type": "video", "description": "主要是解题课" }
+          ],
+          "filterRules": {
+            "groups": [
+              {
+                "sceneTags": { "include": ["作业精讲"] }
+              },
+              {
+                "sceneTags": { "include": ["期中期末重点"] }
+              }
+            ]
+          },
+          "hiddenTags": {
+            "scene": ["课前预习"]
+          }
+        },
+        {
+          "sceneId": "drill-practice",
+          "enabled": true,
+          "cards": [
+            { "type": "sync-quiz" }
+          ],
+          "filterRules": null,
+          "filterRulesNote": "纯练习模块，筛选规则待补充"
+        },
+        {
+          "sceneId": "thinking-extension",
+          "enabled": false,
+          "deprecated": true,
+          "cards": [
+            { "type": "video", "description": "拓展类非必看" },
+            { "type": "premium-hook" }
+          ],
+          "filterRules": null
+        }
+      ]
+    },
+
+    {
+      "id": "junior-physics",
+      "shortName": "初物",
+      "fullName": "初中物理",
+      "level": "junior",
+      "subject": "物理",
+      "category": "science",
+      "sceneGroup": "middle-science",
+      "confirmed": true,
+      "enabled": true,
+      "notes": "思维拓展课无法通过现有标签的交叉筛选得出，计划新增一个内容标签【思维拓展】进行筛选",
+      "scenes": [
+        {
+          "sceneId": "concept-preview",
+          "enabled": true,
+          "cards": [
+            { "type": "video", "description": "概念课 + 少量基础解题课" }
+          ],
+          "filterRules": {
+            "groups": [
+              {
+                "contentTags": { "include": ["概念课"] },
+                "sceneTags": { "include": ["课前预习"] }
+              }
+            ]
+          },
+          "hiddenTags": {}
+        },
+        {
+          "sceneId": "problem-solving",
+          "enabled": true,
+          "cards": [
+            { "type": "video", "description": "主要是解题课" }
+          ],
+          "filterRules": {
+            "groups": [
+              {
+                "contentTags": { "include": ["解题课", "实验操作"] }
+              }
+            ],
+            "note": "contentTags 内为 OR 关系"
+          },
+          "hiddenTags": {}
+        },
+        {
+          "sceneId": "drill-practice",
+          "enabled": true,
+          "cards": [
+            { "type": "sync-quiz" }
+          ],
+          "filterRules": null
+        },
+        {
+          "sceneId": "thinking-extension",
+          "enabled": false,
+          "deprecated": true,
+          "cards": [
+            { "type": "video", "description": "拓展类非必看" },
+            { "type": "premium-hook" }
+          ],
+          "filterRules": null,
+          "filterRulesNote": "计划新增【思维拓展】内容标签"
+        }
+      ]
+    },
+
+    {
+      "id": "senior-physics",
+      "shortName": "高物",
+      "fullName": "高中物理",
+      "level": "senior",
+      "subject": "物理",
+      "category": "science",
+      "sceneGroup": "middle-science",
+      "confirmed": true,
+      "enabled": true,
+      "notes": "内容较少，筛选逻辑只有【预习理解】【解题指导】",
+      "scenes": [
+        {
+          "sceneId": "concept-preview",
+          "enabled": true,
+          "cards": [
+            { "type": "video", "description": "概念课 + 少量基础解题课" }
+          ],
+          "filterRules": {
+            "groups": [
+              {
+                "contentTags": { "include": ["概念课"] },
+                "sceneTags": { "include": ["课前预习"] }
+              }
+            ]
+          },
+          "hiddenTags": {}
+        },
+        {
+          "sceneId": "problem-solving",
+          "enabled": true,
+          "cards": [
+            { "type": "video", "description": "主要是解题课" }
+          ],
+          "filterRules": {
+            "groups": [
+              {
+                "sceneTags": { "include": ["课后巩固", "作业精讲", "单元复习", "期中期末重点"] }
+              }
+            ],
+            "note": "sceneTags 内为 OR 关系"
+          },
+          "hiddenTags": {
+            "content": ["概念课"]
+          }
+        },
+        {
+          "sceneId": "drill-practice",
+          "enabled": false,
+          "disabledReason": "内容较少，暂不上线"
+        },
+        {
+          "sceneId": "thinking-extension",
+          "enabled": false,
+          "deprecated": true
+        }
+      ]
+    },
+
+    {
+      "id": "junior-chemistry",
+      "shortName": "初化",
+      "fullName": "初中化学",
+      "level": "junior",
+      "subject": "化学",
+      "category": "science",
+      "sceneGroup": "middle-science",
+      "confirmed": true,
+      "enabled": true,
+      "scenes": [
+        {
+          "sceneId": "concept-preview",
+          "enabled": true,
+          "cards": [
+            { "type": "video", "description": "概念课 + 少量基础解题课" }
+          ],
+          "filterRules": {
+            "groups": [
+              {
+                "contentTags": { "include": ["概念课", "进阶理解"] },
+                "sceneTags": { "include": ["课前预习", "课后巩固", "作业精讲"] }
+              },
+              {
+                "contentTags": { "include": ["实验操作"] },
+                "note": "仅标注了实验操作的内容，无需场景标签"
+              }
+            ],
+            "note": "contentTags OR + sceneTags contains any"
+          },
+          "hiddenTags": {}
+        },
+        {
+          "sceneId": "problem-solving",
+          "enabled": true,
+          "cards": [
+            { "type": "video", "description": "主要是解题课" }
+          ],
+          "filterRules": {
+            "groups": [
+              {
+                "contentTags": { "include": ["解题课"] },
+                "sceneTags": { "include": ["单元复习", "期中期末重点"] }
+              }
+            ],
+            "note": "sceneTags contains any"
+          },
+          "hiddenTags": {}
+        },
+        {
+          "sceneId": "drill-practice",
+          "enabled": true,
+          "cards": [
+            { "type": "sync-quiz" }
+          ],
+          "filterRules": null
+        },
+        {
+          "sceneId": "thinking-extension",
+          "enabled": false,
+          "deprecated": true,
+          "cards": [
+            { "type": "video", "description": "拓展类非必看" },
+            { "type": "premium-hook" }
+          ],
+          "filterRules": null
+        }
+      ]
+    },
+
+    {
+      "id": "senior-chemistry",
+      "shortName": "高化",
+      "fullName": "高中化学",
+      "level": "senior",
+      "subject": "化学",
+      "category": "science",
+      "sceneGroup": "middle-science",
+      "confirmed": true,
+      "enabled": true,
+      "notes": "内容较少，筛选逻辑只有【预习理解】【解题指导】",
+      "scenes": [
+        {
+          "sceneId": "concept-preview",
+          "enabled": true,
+          "cards": [
+            { "type": "video", "description": "概念课 + 少量基础解题课" }
+          ],
+          "filterRules": {
+            "groups": [
+              {
+                "sceneTags": { "include": ["课前预习"] }
+              }
+            ]
+          },
+          "hiddenTags": {
+            "scene": ["课前预习"]
+          },
+          "hiddenTagsNote": "考虑到和「预习理解」重复，场景标签隐藏"
+        },
+        {
+          "sceneId": "problem-solving",
+          "enabled": true,
+          "cards": [
+            { "type": "video", "description": "主要是解题课" }
+          ],
+          "filterRules": {
+            "groups": [
+              {
+                "sceneTags": { "include": ["作业精讲"] }
+              }
+            ]
+          },
+          "hiddenTags": {}
+        },
+        {
+          "sceneId": "drill-practice",
+          "enabled": false,
+          "disabledReason": "内容较少，暂不上线"
+        },
+        {
+          "sceneId": "thinking-extension",
+          "enabled": false,
+          "deprecated": true
+        }
+      ]
+    },
+
+    {
+      "id": "senior-biology",
+      "shortName": "高生",
+      "fullName": "高中生物",
+      "level": "senior",
+      "subject": "生物",
+      "category": "science",
+      "sceneGroup": "middle-science",
+      "confirmed": true,
+      "enabled": true,
+      "notes": "内容较少，筛选逻辑只有【预习理解】【解题指导】",
+      "scenes": [
+        {
+          "sceneId": "concept-preview",
+          "enabled": true,
+          "cards": [
+            { "type": "video", "priority": "primary" },
+            { "type": "sync-quiz", "difficulty": "easy" }
+          ],
+          "filterRules": {
+            "groups": [
+              {
+                "contentTags": { "include": ["概念课"] }
+              }
+            ]
+          },
+          "hiddenTags": {}
+        },
+        {
+          "sceneId": "problem-solving",
+          "enabled": true,
+          "cards": [
+            { "type": "sync-quiz", "priority": "primary", "difficulty": "medium-hard" },
+            { "type": "video", "priority": "secondary" }
+          ],
+          "filterRules": {
+            "groups": [
+              {
+                "contentTags": { "include": ["解题课"] }
+              }
+            ]
+          },
+          "hiddenTags": {}
+        },
+        {
+          "sceneId": "drill-practice",
+          "enabled": false,
+          "disabledReason": "内容较少，暂不上线"
+        },
+        {
+          "sceneId": "thinking-extension",
+          "enabled": false,
+          "deprecated": true
+        }
+      ]
+    },
+
+    {
+      "id": "junior-biology",
+      "shortName": "初生",
+      "fullName": "初中生物",
+      "level": "junior",
+      "subject": "生物",
+      "category": "minor",
+      "sceneGroup": "minor-subjects",
+      "confirmed": true,
+      "enabled": true,
+      "scenes": [
+        {
+          "sceneId": "sync-lecture",
+          "enabled": true,
+          "cards": [
+            { "type": "video", "description": "概念课 + 少量解题课" },
+            { "type": "sync-quiz", "difficulty": "easy" }
+          ],
+          "filterRules": {
+            "groups": [
+              {
+                "contentTags": { "include": ["基础概念课", "实验操作", "进阶理解课"] }
+              },
+              {
+                "contentTags": { "include": ["解题课"] },
+                "sceneTags": { "include": ["作业精讲"] }
+              }
+            ]
+          },
+          "hiddenTags": {
+            "scene": ["*"]
+          },
+          "hiddenTagsNote": "隐藏所有场景标签"
+        },
+        {
+          "sceneId": "intensive-training",
+          "enabled": true,
+          "cards": [
+            { "type": "video", "description": "大多解题课" },
+            { "type": "sync-quiz", "difficulty": "medium-hard" },
+            { "type": "premium-hook" }
+          ],
+          "filterRules": {
+            "groups": [
+              {
+                "contentTags": { "include": ["解题课"] },
+                "sceneTags": { "exclude": ["作业精讲"] }
+              },
+              {
+                "contentTags": { "include": ["基础概念课", "实验操作", "进阶理解课"] },
+                "sceneTags": { "include": ["期中期末重点"] }
+              }
+            ]
+          },
+          "hiddenTags": {
+            "content": ["基础概念课", "实验操作", "进阶理解课"]
+          }
+        }
+      ]
+    },
+
+    {
+      "id": "junior-geography",
+      "shortName": "初地",
+      "fullName": "初中地理",
+      "level": "junior",
+      "subject": "地理",
+      "category": "minor",
+      "sceneGroup": "minor-subjects",
+      "confirmed": true,
+      "enabled": true,
+      "scenes": [
+        {
+          "sceneId": "sync-lecture",
+          "enabled": true,
+          "cards": [
+            { "type": "video", "description": "绝大多数概念课" }
+          ],
+          "filterRules": {
+            "groups": [
+              {
+                "contentTags": { "include": ["基础概念课"] }
+              },
+              {
+                "contentTags": { "include": ["进阶理解课"] },
+                "sceneTags": { "include": ["期中期末重点", "课前预习", "课后巩固"] }
+              }
+            ]
+          },
+          "hiddenTags": {
+            "content": ["解题课"],
+            "scene": ["日常积累"]
+          }
+        },
+        {
+          "sceneId": "intensive-training",
+          "enabled": true,
+          "cards": [
+            { "type": "video", "description": "少量有难度的解题课" },
+            { "type": "sync-quiz" },
+            { "type": "premium-hook" }
+          ],
+          "filterRules": {
+            "groups": [
+              {
+                "contentTags": { "include": ["解题课"] }
+              },
+              {
+                "contentTags": { "include": ["进阶理解课"] },
+                "sceneTags": { "include": ["日常积累"] }
+              }
+            ]
+          },
+          "hiddenTags": {
+            "content": ["基础概念课"],
+            "scene": ["期中期末重点", "课前预习", "课后巩固"]
+          }
+        }
+      ]
+    },
+
+    {
+      "id": "senior-geography",
+      "shortName": "高地",
+      "fullName": "高中地理",
+      "level": "senior",
+      "subject": "地理",
+      "category": "minor",
+      "sceneGroup": "minor-subjects",
+      "confirmed": false,
+      "enabled": false,
+      "notes": "当前内容较少，筛选逻辑暂不上线",
+      "scenes": [
+        {
+          "sceneId": "sync-lecture",
+          "enabled": false,
+          "cards": [
+            { "type": "video", "description": "绝大多数概念课" }
+          ],
+          "filterRules": null
+        },
+        {
+          "sceneId": "intensive-training",
+          "enabled": false,
+          "cards": [
+            { "type": "video", "description": "少量有难度的解题课" },
+            { "type": "sync-quiz" }
+          ],
+          "filterRules": null
+        }
+      ]
+    },
+
+    {
+      "id": "junior-history",
+      "shortName": "初历",
+      "fullName": "初中历史",
+      "level": "junior",
+      "subject": "历史",
+      "category": "minor",
+      "sceneGroup": "minor-subjects",
+      "confirmed": true,
+      "enabled": false,
+      "notes": "当前内容较少，筛选逻辑暂不上线",
+      "scenes": [
+        {
+          "sceneId": "sync-lecture",
+          "enabled": false,
+          "cards": [
+            { "type": "video", "description": "绝大多数概念课" }
+          ],
+          "filterRules": {
+            "groups": [
+              {
+                "contentTags": { "include": ["基础史实", "进阶理解"] },
+                "sceneTags": { "include": ["课前预习", "课后巩固", "期中期末重点"] }
+              }
+            ]
+          },
+          "hiddenTags": {
+            "content": ["基础史实", "进阶理解"],
+            "scene": ["课前预习", "课后巩固", "期中期末重点"]
+          },
+          "hiddenTagsNote": "上述所有涉及到的旧标签均隐藏"
+        },
+        {
+          "sceneId": "intensive-training",
+          "enabled": false,
+          "cards": [
+            { "type": "video", "description": "少量有难度的解题课" },
+            { "type": "sync-quiz" }
+          ],
+          "filterRules": null
+        }
+      ]
+    },
+
+    {
+      "id": "senior-history",
+      "shortName": "高历",
+      "fullName": "高中历史",
+      "level": "senior",
+      "subject": "历史",
+      "category": "minor",
+      "sceneGroup": "minor-subjects",
+      "confirmed": true,
+      "enabled": false,
+      "notes": "当前内容较少，筛选逻辑暂不上线",
+      "scenes": [
+        {
+          "sceneId": "sync-lecture",
+          "enabled": false,
+          "cards": [
+            { "type": "video", "description": "绝大多数概念课" }
+          ],
+          "filterRules": {
+            "groups": [
+              {
+                "contentTags": { "include": ["基础史实", "进阶理解"] },
+                "sceneTags": { "include": ["课前预习", "课后巩固", "期中期末重点", "日常积累"] }
+              }
+            ]
+          },
+          "hiddenTags": {
+            "content": ["基础史实", "进阶理解"],
+            "scene": ["课前预习", "课后巩固", "期中期末重点", "日常积累"]
+          },
+          "hiddenTagsNote": "上述所有涉及到的旧标签均隐藏"
+        },
+        {
+          "sceneId": "intensive-training",
+          "enabled": false,
+          "cards": [
+            { "type": "video", "description": "少量有难度的解题课" },
+            { "type": "sync-quiz" }
+          ],
+          "filterRules": null
+        }
+      ]
+    },
+
+    {
+      "id": "junior-politics",
+      "shortName": "道法",
+      "fullName": "道德与法治",
+      "level": "junior",
+      "subject": "政治",
+      "category": "minor",
+      "sceneGroup": "minor-subjects",
+      "confirmed": true,
+      "enabled": false,
+      "notes": "当前内容较少，筛选逻辑暂不上线",
+      "scenes": [
+        {
+          "sceneId": "sync-lecture",
+          "enabled": false,
+          "cards": [
+            { "type": "video", "description": "绝大多数概念课" }
+          ],
+          "filterRules": {
+            "groups": [
+              {
+                "contentTags": { "include": ["基础概念", "进阶理解"] },
+                "sceneTags": { "include": ["课前预习", "课后巩固", "期中期末重点"] }
+              }
+            ]
+          },
+          "hiddenTags": {
+            "content": ["基础概念", "进阶理解"],
+            "scene": ["课前预习", "课后巩固", "期中期末重点"]
+          },
+          "hiddenTagsNote": "上述所有涉及到的旧标签均隐藏"
+        },
+        {
+          "sceneId": "intensive-training",
+          "enabled": false,
+          "cards": [
+            { "type": "video", "description": "少量有难度的解题课" },
+            { "type": "sync-quiz" }
+          ],
+          "filterRules": null
+        }
+      ]
+    },
+
+    {
+      "id": "senior-politics",
+      "shortName": "高政",
+      "fullName": "高中政治",
+      "level": "senior",
+      "subject": "政治",
+      "category": "minor",
+      "sceneGroup": "minor-subjects",
+      "confirmed": true,
+      "enabled": false,
+      "notes": "当前内容较少，筛选逻辑暂不上线",
+      "scenes": [
+        {
+          "sceneId": "sync-lecture",
+          "enabled": false,
+          "cards": [
+            { "type": "video", "description": "绝大多数概念课" }
+          ],
+          "filterRules": {
+            "groups": [
+              {
+                "contentTags": { "include": ["基础概念", "进阶理解"] },
+                "sceneTags": { "include": ["课前预习", "课后巩固", "期中期末重点", "日常积累"] }
+              }
+            ]
+          },
+          "hiddenTags": {
+            "content": ["基础概念", "进阶理解"],
+            "scene": ["课前预习", "课后巩固", "期中期末重点", "日常积累"]
+          },
+          "hiddenTagsNote": "上述所有涉及到的旧标签均隐藏"
+        },
+        {
+          "sceneId": "intensive-training",
+          "enabled": false,
+          "cards": [
+            { "type": "video", "description": "少量有难度的解题课" },
+            { "type": "sync-quiz" }
+          ],
+          "filterRules": null
+        }
+      ]
+    }
+  ]
+}

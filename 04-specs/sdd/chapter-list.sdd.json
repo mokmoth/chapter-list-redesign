@@ -1,0 +1,588 @@
+{
+  "$schema": "https://pm-workflow.io/sdd-schema/v1.0.0",
+  "meta": {
+    "name": "chapter-list-redesign",
+    "version": "1.0.0",
+    "description": "章节列表页迭代 - 场景化学习资源整合",
+    "created": "2025-12-31",
+    "source": "prototype-reverse-engineering"
+  },
+  "tech_stack": {
+    "framework": "Vue 3",
+    "language": "TypeScript 5.x",
+    "state_management": "Pinia 2.x",
+    "build_tool": "Vite 5.x",
+    "css_preprocessor": "SCSS",
+    "icon_library": "Lucide Vue Next"
+  },
+  "design_tokens": {
+    "colors": {
+      "primary": "#FEA345",
+      "primary_light": "#FFF0E6",
+      "primary_bg": "#FFF9F2",
+      "secondary": "#845EFF",
+      "secondary_light": "#EBF3FF",
+      "secondary_bg": "#F0F7FF",
+      "success": "#92E066",
+      "success_light": "#E8F5E9",
+      "success_bg": "#F1F8F4",
+      "warning": "#FFD633",
+      "warning_light": "#FFF5E6",
+      "warning_bg": "#FFFBF0",
+      "error": "#FA5A65",
+      "text_primary": "#2E2E3A",
+      "text_secondary": "#848096",
+      "text_tertiary": "#999999",
+      "border": "#D4D2DC",
+      "background": "#FFFFFF",
+      "background_secondary": "#F5F4F8",
+      "background_tertiary": "#FAFAFA",
+      "overlay": "rgba(0, 0, 0, 0.4)",
+      "vip_gradient_start": "rgba(255, 197, 97, 1)",
+      "vip_gradient_end": "rgba(245, 117, 117, 1)",
+      "gold_gradient_start": "#FFD700",
+      "gold_gradient_end": "#FFAA00"
+    },
+    "typography": {
+      "font_family": "'Alibaba PuHuiTi 2.0', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif",
+      "sizes": {
+        "xl": "18px",
+        "lg": "16px",
+        "md": "14px",
+        "sm": "13px",
+        "xs": "12px",
+        "xxs": "11px",
+        "xxxs": "10px"
+      },
+      "weights": {
+        "normal": 400,
+        "medium": 500,
+        "semibold": 600,
+        "bold": 800
+      }
+    },
+    "spacing": {
+      "xxs": "2px",
+      "xs": "4px",
+      "sm": "6px",
+      "md": "8px",
+      "lg": "10px",
+      "xl": "12px",
+      "xxl": "16px",
+      "xxxl": "24px"
+    },
+    "radii": {
+      "sm": "6px",
+      "md": "8px",
+      "lg": "14px",
+      "xl": "14px",
+      "pill": "999px",
+      "circle": "50%"
+    },
+    "shadows": {
+      "card": "0 2px 8px rgba(0, 0, 0, 0.04)",
+      "dropdown": "0 4px 12px rgba(0, 0, 0, 0.15)",
+      "badge": "-1px 1px 4px rgba(0, 0, 0, 0.1)"
+    },
+    "transitions": {
+      "fast": "0.2s",
+      "normal": "0.3s",
+      "slow": "0.6s"
+    },
+    "breakpoints": {
+      "mobile": "768px",
+      "small_mobile": "600px",
+      "tiny_mobile": "380px",
+      "micro_mobile": "360px"
+    }
+  },
+  "data_models": {
+    "Resource": {
+      "fields": {
+        "id": { "type": "string", "required": true },
+        "type": { "type": "ResourceType", "required": true },
+        "title": { "type": "string", "required": true },
+        "tags": { "type": "string[]", "required": true },
+        "isFree": { "type": "boolean", "required": true },
+        "scenes": { "type": "SceneType[]", "required": false },
+        "subType": { "type": "'vocab' | 'text'", "required": false },
+        "subject": { "type": "string", "required": false },
+        "isPremium": { "type": "boolean", "required": false },
+        "premiumStatus": { "type": "'locked' | 'unlocked'", "required": false },
+        "isTrial": { "type": "boolean", "required": false },
+        "duration": { "type": "number", "required": false, "unit": "minutes" },
+        "questionCount": { "type": "number", "required": false },
+        "completedCount": { "type": "number", "required": false },
+        "totalCount": { "type": "number", "required": false },
+        "difficultyLevels": { "type": "string[]", "required": false },
+        "category": { "type": "'概念课' | '解题课' | '实验课' | '总结课'", "required": false },
+        "valueTag": { "type": "'新中考' | '重难点' | '易错点' | '考点'", "required": false },
+        "difficulty": { "type": "1 | 2 | 3", "required": false },
+        "coverUrl": { "type": "string", "required": false },
+        "subsectionTitle": { "type": "string", "required": false }
+      }
+    },
+    "Chapter": {
+      "fields": {
+        "id": { "type": "string", "required": true },
+        "title": { "type": "string", "required": true },
+        "level": { "type": "'chapter' | 'section' | 'subsection'", "required": true },
+        "children": { "type": "Chapter[]", "required": false },
+        "resources": { "type": "Resource[]", "required": false },
+        "progress": { "type": "{ completed: number; total: number }", "required": false },
+        "isExpanded": { "type": "boolean", "required": false }
+      }
+    },
+    "UserProgress": {
+      "fields": {
+        "nodeId": { "type": "string", "required": true },
+        "status": { "type": "'not_started' | 'in_progress' | 'completed'", "required": true },
+        "percentage": { "type": "number", "required": true, "range": [0, 100] },
+        "lastUpdateTime": { "type": "string", "required": true, "format": "ISO8601" }
+      }
+    }
+  },
+  "enums": {
+    "SceneType": ["preview", "review", "extra"],
+    "ResourceType": [
+      "video", "exercise", "paper", "guide", "exam", "recite",
+      "mind_map", "quick_review", "ai_solve", "note", "error_book",
+      "quick_memorize", "practice", "premium_video"
+    ],
+    "ChapterLevel": ["chapter", "section", "subsection"],
+    "ProgressStatus": ["not_started", "in_progress", "completed"]
+  },
+  "state_machine": {
+    "page_state": {
+      "initial": "loading",
+      "states": {
+        "loading": {
+          "on": { "LOAD_SUCCESS": "idle", "LOAD_ERROR": "error" }
+        },
+        "idle": {
+          "on": { "REFRESH": "loading" }
+        },
+        "error": {
+          "on": { "RETRY": "loading" }
+        }
+      }
+    },
+    "sidebar_state": {
+      "initial": "closed",
+      "context": "mobile_only",
+      "states": {
+        "closed": {
+          "on": { "TOGGLE": "open" }
+        },
+        "open": {
+          "on": { "TOGGLE": "closed", "SELECT_NODE": "closed", "OVERLAY_CLICK": "closed" }
+        }
+      }
+    },
+    "guide_state": {
+      "initial": "expanded",
+      "states": {
+        "expanded": {
+          "on": { "TOGGLE": "collapsed" }
+        },
+        "collapsed": {
+          "on": { "TOGGLE": "expanded" }
+        }
+      }
+    }
+  },
+  "store": {
+    "name": "chapter",
+    "state": {
+      "loading": { "type": "boolean", "default": false },
+      "currentTab": { "type": "SceneType", "default": "preview" },
+      "chapters": { "type": "Chapter[]", "default": [] },
+      "selectedNodeId": { "type": "string", "default": "" },
+      "isScrollingByClick": { "type": "boolean", "default": false },
+      "progressMap": { "type": "Record<string, UserProgress>", "default": {} },
+      "isVip": { "type": "boolean", "default": false },
+      "currentSubject": { "type": "string", "default": "数学" },
+      "hasPremiumAccess": { "type": "boolean", "default": false }
+    },
+    "getters": {
+      "currentGuide": {
+        "returns": "string",
+        "logic": "guideContent[currentTab]"
+      },
+      "allSubsections": {
+        "returns": "Chapter[]",
+        "logic": "递归遍历 chapters，收集所有 level === 'subsection' 的节点"
+      }
+    },
+    "actions": {
+      "fetchChapters": {
+        "async": true,
+        "logic": "加载章节数据，更新 chapters 和 progressMap"
+      },
+      "selectNode": {
+        "params": ["id: string"],
+        "logic": "更新 selectedNodeId"
+      },
+      "toggleExpand": {
+        "params": ["chapterId: string"],
+        "logic": "切换指定章节的 isExpanded 状态"
+      },
+      "switchTab": {
+        "params": ["tab: SceneType"],
+        "async": true,
+        "logic": "更新 currentTab，重新调用 fetchChapters"
+      },
+      "unlockVip": {
+        "logic": "模拟购买流程，将 isVip 设置为 true"
+      }
+    }
+  },
+  "components": {
+    "App": {
+      "path": "src/App.vue",
+      "description": "应用入口",
+      "children": ["ChapterList"]
+    },
+    "ChapterList": {
+      "path": "src/views/ChapterList.vue",
+      "description": "主页面布局",
+      "children": ["GlobalHeader", "FunctionBar", "SceneTabs", "ChapterTree", "ResourceList"],
+      "local_state": {
+        "isSidebarOpen": { "type": "boolean", "default": false }
+      },
+      "layout": {
+        "type": "flex-column",
+        "areas": ["top-area", "main-layout"],
+        "responsive": {
+          "desktop": { "sidebar": "fixed", "width": "260px" },
+          "mobile": { "sidebar": "drawer", "width": "80%" }
+        }
+      }
+    },
+    "GlobalHeader": {
+      "path": "src/components/GlobalHeader.vue",
+      "description": "全局顶部导航",
+      "slots": ["default"],
+      "elements": {
+        "back_btn": { "icon": "ChevronLeft", "size": 24, "action": "goBack" },
+        "header_center": { "slot": true },
+        "upgrade_entry": {
+          "icon": "Crown",
+          "size": 14,
+          "text_vip": "已升级",
+          "text_non_vip": "去升级",
+          "action": "handleUpgradeClick"
+        }
+      },
+      "style": {
+        "height": "40px",
+        "padding": "0 12px",
+        "background": "#fff"
+      }
+    },
+    "FunctionBar": {
+      "path": "src/components/FunctionBar.vue",
+      "description": "功能栏",
+      "local_state": {
+        "isMoreMenuOpen": { "type": "boolean", "default": false }
+      },
+      "elements": {
+        "context_selector": {
+          "display": "{subject} {version}{grade}",
+          "icon": "ChevronDown",
+          "action": "openSelector"
+        },
+        "quick_actions": {
+          "desktop": ["学霸笔记", "错题", "收藏"],
+          "mobile": "收纳到更多菜单"
+        }
+      },
+      "style": {
+        "height": "44px",
+        "padding": "0 16px",
+        "border_bottom": "1px solid #f5f5f5"
+      },
+      "responsive": {
+        "breakpoint": "600px",
+        "desktop": "展示全部快捷入口",
+        "mobile": "收纳到更多菜单"
+      }
+    },
+    "SceneTabs": {
+      "path": "src/components/SceneTabs.vue",
+      "description": "场景切换Tab",
+      "props": {
+        "embedded": { "type": "boolean", "default": false }
+      },
+      "tabs": [
+        { "key": "preview", "label": "预习" },
+        { "key": "review", "label": "复习" },
+        { "key": "extra", "label": "加餐" }
+      ],
+      "modes": {
+        "default": {
+          "layout": "flex-row-equal",
+          "indicator": "bottom-line",
+          "indicator_color": "#FEA345"
+        },
+        "embedded": {
+          "layout": "flex-row-gap",
+          "indicator": "background-pill",
+          "active_bg": "#FFF0E6",
+          "active_color": "#FEA345"
+        }
+      }
+    },
+    "ChapterTree": {
+      "path": "src/components/ChapterTree.vue",
+      "description": "章节目录树（递归）",
+      "props": {
+        "chapters": { "type": "Chapter[]", "required": true }
+      },
+      "recursive": true,
+      "node_styles": {
+        "section": {
+          "font_weight": 600,
+          "color": "#2E2E3A",
+          "padding_top": "12px",
+          "clickable": false
+        },
+        "subsection": {
+          "font_size": "13px",
+          "padding_left": "24px",
+          "clickable": true,
+          "hover_bg": "#f5f5f5",
+          "selected_bg": "#FFF0E6",
+          "selected_color": "#FEA345"
+        }
+      },
+      "interactions": {
+        "click_subsection": {
+          "set": "store.isScrollingByClick = true",
+          "update": "store.selectedNodeId = item.id",
+          "scroll": "document.getElementById('subsection-{id}').scrollIntoView",
+          "timeout": "600ms → store.isScrollingByClick = false"
+        }
+      }
+    },
+    "LearningGuide": {
+      "path": "src/components/LearningGuide.vue",
+      "description": "学习方法指南",
+      "local_state": {
+        "isExpanded": { "type": "boolean", "default": true }
+      },
+      "content_source": "store.currentGuide",
+      "style": {
+        "background": "#FFF9F2",
+        "border_radius": "8px",
+        "margin": "12px 16px",
+        "padding": "0 12px"
+      },
+      "animation": {
+        "type": "expand",
+        "duration": "0.3s",
+        "timing": "ease"
+      }
+    },
+    "ResourceList": {
+      "path": "src/components/ResourceList.vue",
+      "description": "资源列表容器",
+      "children": ["LearningGuide", "所有卡片组件"],
+      "filter_logic": {
+        "scene_filter": "resource.scenes.includes(currentTab)",
+        "default_scenes": ["preview", "review"],
+        "subject_filter": {
+          "quick_memorize": "['地理', '历史', '政治', '生物', '化学']"
+        }
+      },
+      "scroll_observer": {
+        "root": "containerRef",
+        "threshold": [0, 0.1, 0.2],
+        "rootMargin": "-10% 0px -85% 0px",
+        "on_intersecting": "更新 store.selectedNodeId"
+      },
+      "watch": {
+        "currentTab": "滚动到顶部，重新设置观察者",
+        "allSubsections": "重新设置观察者"
+      }
+    },
+    "KnowledgeCard": {
+      "path": "src/components/KnowledgeCard.vue",
+      "description": "知识点视频卡片",
+      "props": { "resource": { "type": "Resource", "required": true } },
+      "layout": "horizontal",
+      "elements": {
+        "cover": { "width": "100px", "height": "60px", "radius": "8px" },
+        "title": { "font_size": "14px", "font_weight": 600, "max_lines": 2 },
+        "tags": ["category", "valueTag", "difficulty"],
+        "meta": "tags 数组",
+        "progress": { "type": "bar", "height": "4px" },
+        "badge": { "position": "top-right", "variants": ["lock", "unlocked", "trial"] }
+      },
+      "vip_logic": {
+        "locked": "!resource.isFree && !store.isVip",
+        "on_click_locked": "confirm() → store.unlockVip()"
+      }
+    },
+    "MindMapCard": {
+      "path": "src/components/MindMapCard.vue",
+      "description": "思维导图卡片",
+      "props": { "resource": { "type": "Resource", "required": true } },
+      "layout": "horizontal",
+      "elements": {
+        "icon_area": { "width": "100px", "height": "60px", "bg": "#F0F7FF", "icon": "BrainCircuit" },
+        "title": { "font_size": "14px", "font_weight": 600 },
+        "subtitle": "知识脉络一目了然",
+        "action": { "text": "查看", "icon": "ChevronRight" }
+      }
+    },
+    "ReciteCard": {
+      "path": "src/components/ReciteCard.vue",
+      "description": "背诵卡片",
+      "props": { "resource": { "type": "Resource", "required": true } },
+      "variants": {
+        "vocab": { "icon": "Languages", "color": "#FEA345", "bg": "#FFF9F5", "label": "背单词" },
+        "text": { "icon": "BookOpenCheck", "color": "#92E066", "bg": "#F6FFF7", "label": "读课文" }
+      }
+    },
+    "QuickReviewCard": {
+      "path": "src/components/QuickReviewCard.vue",
+      "description": "极速复习卡片",
+      "props": { "resource": { "type": "Resource", "required": true } },
+      "layout": "compact",
+      "elements": {
+        "icon_area": { "size": "40px", "shape": "circle", "bg": "#FFFBF0", "icon": "Zap", "badge": "Camera" },
+        "subtitle": "拍照关联知识点视频"
+      }
+    },
+    "AISolveCard": {
+      "path": "src/components/AISolveCard.vue",
+      "description": "AI拍题精学卡片",
+      "props": { "resource": { "type": "Resource", "required": true } },
+      "layout": "compact",
+      "elements": {
+        "icon_area": { "size": "40px", "shape": "circle", "bg": "#F0F7FF", "icon": "Sparkles", "badge": "Camera" },
+        "subtitle": "拍照获得AI讲解"
+      }
+    },
+    "NoteCard": {
+      "path": "src/components/NoteCard.vue",
+      "description": "学霸笔记卡片",
+      "props": { "resource": { "type": "Resource", "required": true } },
+      "layout": "compact",
+      "elements": {
+        "icon_area": { "size": "40px", "shape": "circle", "bg": "#FFFBF0", "icon": "NotebookPen" }
+      }
+    },
+    "ErrorBookCard": {
+      "path": "src/components/ErrorBookCard.vue",
+      "description": "错题本卡片",
+      "props": { "resource": { "type": "Resource", "required": true } },
+      "layout": "compact",
+      "elements": {
+        "icon_area": { "size": "40px", "shape": "circle", "bg": "#FFF0E6", "icon": "BookX" }
+      }
+    },
+    "QuickMemorizeCard": {
+      "path": "src/components/QuickMemorizeCard.vue",
+      "description": "快背卡片",
+      "props": { "resource": { "type": "Resource", "required": true } },
+      "layout": "compact",
+      "display_condition": "resource.subject in liberalArtsSubjects",
+      "elements": {
+        "icon_area": { "size": "40px", "shape": "circle", "bg": "#F1F8F4", "icon": "Brain" },
+        "subtitle": "快速识记知识卡片"
+      }
+    },
+    "PracticeCard": {
+      "path": "src/components/PracticeCard.vue",
+      "description": "同步刷题卡片",
+      "props": { "resource": { "type": "Resource", "required": true } },
+      "layout": "horizontal",
+      "elements": {
+        "cover": { "type": "svg_icon", "bg": "#F0F7FF", "label": "同步刷题" },
+        "title": "resource.subsectionTitle || resource.title",
+        "difficulty_levels": "resource.difficultyLevels.join(' ')",
+        "progress": { "type": "bar", "text": "{completed}/{total}题" }
+      }
+    },
+    "PremiumKnowledgeCard": {
+      "path": "src/components/PremiumKnowledgeCard.vue",
+      "description": "培优课视频卡片",
+      "props": { "resource": { "type": "Resource", "required": true } },
+      "layout": "horizontal",
+      "badge_variants": {
+        "locked": { "text": "去加购", "icon": "Crown", "bg": "vip_gradient" },
+        "unlocked": { "text": "培优课", "icon": "Crown", "bg": "gold_gradient" }
+      },
+      "premium_logic": {
+        "locked": "resource.premiumStatus === 'locked' || (!store.hasPremiumAccess && resource.isPremium)",
+        "on_click_locked": "confirm('购买培优课') → 跳转加购页"
+      }
+    }
+  },
+  "api_mock": {
+    "guide_content": {
+      "preview": "预习建议：重点关注相交线中的对顶角与邻补角定义，尝试画出简单的三线八角图。",
+      "review": "复习建议：总结平行线的三个判定定理与性质定理的区别，熟练掌握子弹图、猪手图的辅助线添加方法。",
+      "extra": "加餐建议：挑战平行线的复杂证明题，尝试用多种方法证明同一结论。"
+    },
+    "liberal_arts_subjects": ["地理", "历史", "政治", "生物", "化学"]
+  },
+  "responsive_rules": {
+    "sidebar": {
+      "desktop": { "min_width": "768px", "mode": "fixed", "width": "260px" },
+      "mobile": { "max_width": "767px", "mode": "drawer", "width": "80%" }
+    },
+    "function_bar_actions": {
+      "desktop": { "min_width": "600px", "mode": "inline" },
+      "mobile": { "max_width": "599px", "mode": "dropdown" }
+    },
+    "scene_tabs_embedded": {
+      "tiny": { "max_width": "380px", "padding": "6px 10px", "font_size": "13px" }
+    },
+    "vip_badge_text": {
+      "micro": { "max_width": "360px", "display": "none" }
+    }
+  },
+  "scroll_sync": {
+    "click_to_scroll": {
+      "trigger": "点击左侧目录小节",
+      "lock": "isScrollingByClick = true",
+      "action": "右侧滚动到对应小节",
+      "unlock_delay": "600ms"
+    },
+    "scroll_to_highlight": {
+      "trigger": "右侧滚动",
+      "condition": "!isScrollingByClick",
+      "observer": "IntersectionObserver",
+      "root_margin": "-10% 0px -85% 0px",
+      "action": "更新 selectedNodeId",
+      "follow": "左侧目录滚动到对应项"
+    }
+  },
+  "changelog": [
+    {
+      "version": "1.0.0",
+      "date": "2025-12-31",
+      "changes": [
+        "基于可交互原型反向工程生成 SDD",
+        "完整覆盖 50 个功能点",
+        "包含 10 种资源卡片组件规格"
+      ]
+    },
+    {
+      "version": "1.1.0",
+      "date": "2026-03-09",
+      "changes": [
+        "同步官方设计令牌 (onion-tokens)：颜色、字体、圆角",
+        "进度条从实心条改为分段式 (10段)",
+        "VIP角标文字从 VIP 改为 会员，背景从渐变改为珊瑚色 #FA5A65",
+        "更多菜单图标从 ... (MoreHorizontal) 改为 ≡ (Menu) 汉堡图标",
+        "刷题卡片难度展示从胶囊 pill 改为文字标签 + 彩色分段下划线",
+        "全部 tab 使用描边胶囊边框样式"
+      ]
+    }
+  ]
+}
+

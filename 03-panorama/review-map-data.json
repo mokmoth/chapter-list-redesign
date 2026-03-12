@@ -1,0 +1,289 @@
+{
+  "metadata": {
+    "projectName": "章节列表页迭代 V1.6",
+    "generatedAt": "2026-03-12T16:00:00+08:00",
+    "prototypeType": "standard-vue",
+    "prototypePath": "02-prototypes/vue-apps/chapter-list-redesign/",
+    "prdPath": "01-prd/章节列表页迭代_V1.6.md",
+    "version": "2.0"
+  },
+  "pages": [
+    {
+      "id": "chapter-list-desktop",
+      "name": "章节列表（桌面端）",
+      "route": "/",
+      "screenshot": "desktop--preview-tab.png",
+      "viewport": "desktop",
+      "pageType": "entry",
+      "summary": "主页面，采用左右联动双栏布局：左侧章节目录树、右侧场景化资源卡片列表。支持 4 种学科模板的场景 Tab 切换、全量资源模式、滚动联动选中等核心交互。",
+      "features": [
+        {
+          "id": "dt-feat-01",
+          "name": "全局头部",
+          "selector": ".global-header",
+          "screenshot": "feat--dt-feat-01.png",
+          "description": "返回按钮 + 「教材同步」标题 + 教材版本选择器 + VIP升级入口",
+          "notes": "VIP 按钮在 <360px 下隐藏文字仅显示图标"
+        },
+        {
+          "id": "dt-feat-02",
+          "name": "场景 Tab 栏",
+          "selector": ".scene-tabs",
+          "screenshot": "feat--dt-feat-02.png",
+          "description": "固定「全部」按钮 + 分隔线 + 横向滚动场景 Tabs。理科解题型模板含预习/解题指导/刷题，语言文科型含预习/复习/日常积累，理科基础型含预习/复习，历史道法型含预习/复习。",
+          "notes": "4 种学科模板通过 sceneConfig.ts 映射，切换学科自动变更 Tab 组合"
+        },
+        {
+          "id": "dt-feat-03",
+          "name": "快捷入口栏",
+          "selector": ".function-bar",
+          "screenshot": "feat--dt-feat-03.png",
+          "description": "思维导图(2)、错题本(15)、收藏、设置四个快捷按钮，数字角标显示待处理数量",
+          "notes": "移动端折叠为「更多」菜单"
+        },
+        {
+          "id": "dt-feat-04",
+          "name": "章节目录树",
+          "selector": ".sidebar",
+          "screenshot": "feat--dt-feat-04.png",
+          "description": "递归树形结构：章→节→小节。节级显示进度（如 12/14），小节级可点击选中。选中状态高亮，NEW 红点标记新内容。",
+          "notes": "点击小节 → 右侧内容区滚动到对应位置，IntersectionObserver 反向联动"
+        },
+        {
+          "id": "dt-feat-05",
+          "name": "切换教材按钮",
+          "selector": ".switch-btn",
+          "screenshot": "feat--dt-feat-05.png",
+          "description": "位于侧边栏顶部章节标题旁，点击可打开教材切换弹窗",
+          "notes": ""
+        },
+        {
+          "id": "dt-feat-06",
+          "name": "学习方法指引",
+          "selector": ".learning-guide",
+          "screenshot": "feat--dt-feat-06.png",
+          "description": "可展开/收起的黄底卡片，根据当前场景 Tab 显示对应的学习建议文案",
+          "notes": "全量模式下显示通用指引"
+        },
+        {
+          "id": "dt-feat-07",
+          "name": "知识点视频卡片",
+          "selector": ".knowledge-card",
+          "screenshot": "feat--dt-feat-07.png",
+          "description": "横向布局：缩略图（播放按钮+时长标签）+ 标题/标签/难度星级/双进度条（视频10段+习题10段）。VIP锁定标记，NEW标记。",
+          "notes": "复习 Tab 下点击触发学习模式选择；有进度时点击触发内容选择弹窗"
+        },
+        {
+          "id": "dt-feat-08",
+          "name": "练习卡片",
+          "selector": ".practice-card",
+          "screenshot": "feat--dt-feat-08.png",
+          "description": "题目练习入口，显示难度标签（基础/中等/困难三色）和完成进度（已完成/总数）",
+          "notes": "仅在刷题Tab下出现，与学习指引卡片组成 50-50 并排布局"
+        },
+        {
+          "id": "dt-feat-09",
+          "name": "学习指引卡片",
+          "selector": ".guide-card",
+          "description": "PDF学案下载入口，显示文件图标、页数和下载按钮",
+          "notes": "与练习卡片配对使用。当前原型仅在英语/语文学科数据中定义，数学学科暂无此卡片渲染"
+        },
+        {
+          "id": "dt-feat-10",
+          "name": "AI总结笔记卡片",
+          "selector": ".summary-note-card",
+          "description": "绿色渐变底，含金色星标角标，显示笔记数量和「AI总结」标签",
+          "notes": "当前原型 mock 数据未包含此类型资源，组件已实现但不会渲染"
+        },
+        {
+          "id": "dt-feat-11",
+          "name": "VIP钩子卡片",
+          "selector": ".premium-hook-card",
+          "description": "金色渐变缩略图 + 「去加购」橙色按钮，用于引导付费内容购买",
+          "notes": "当前原型 mock 数据未包含此类型资源，组件已实现但不会渲染"
+        },
+        {
+          "id": "dt-feat-12",
+          "name": "章节底部导航",
+          "selector": ".chapter-footer",
+          "screenshot": "feat--dt-feat-12.png",
+          "description": "「上一章」「下一章」双按钮导航，显示目标章节标题",
+          "notes": "首章隐藏上一章，末章隐藏下一章"
+        },
+        {
+          "id": "dt-feat-13",
+          "name": "NEW 新内容标识",
+          "selector": ".new-badge",
+          "screenshot": "feat--dt-feat-13.png",
+          "description": "资源级显示红底白字 NEW 标签，章节级显示红点。7天内发布且未查看的内容标记为新。",
+          "notes": "isNewContent: firstPublishAt ≤ 7天 && 不在 readResources 集合中"
+        }
+      ],
+      "states": [
+        { "name": "预习Tab", "screenshot": "desktop--preview-tab.png", "description": "默认状态，显示预习场景下的知识点视频和练习资源", "trigger": "页面加载默认" },
+        { "name": "解题指导Tab", "screenshot": "desktop--second-tab.png", "description": "切换到解题指导场景，筛选展示解题相关资源", "trigger": "点击解题指导Tab" },
+        { "name": "刷题Tab", "screenshot": "desktop--third-tab.png", "description": "切换到刷题场景，筛选展示刷题练习和VIP付费内容", "trigger": "点击刷题Tab" },
+        { "name": "全部资源模式", "screenshot": "desktop--all-resources.png", "description": "全量资源展示，不按场景筛选", "trigger": "点击「全部」按钮" },
+        { "name": "VIP锁定状态", "screenshot": "desktop--vip-state.png", "description": "部分内容标记为VIP锁定", "trigger": "用户未购买VIP" },
+        { "name": "章节底部", "screenshot": "desktop--chapter-footer.png", "description": "滚动到底部显示上一章/下一章导航", "trigger": "内容滚动到底部" },
+        { "name": "英语预习", "screenshot": "desktop--english-preview.png", "description": "英语学科预习Tab，含朗读卡片和背单词入口", "trigger": "切换到英语学科" }
+      ]
+    },
+    {
+      "id": "chapter-list-mobile",
+      "name": "章节列表（移动端）",
+      "route": "/",
+      "screenshot": "mobile--default.png",
+      "viewport": "mobile",
+      "pageType": "entry",
+      "summary": "移动端自适应布局：侧边栏默认隐藏，通过左侧拉手按钮滑入。单栏显示资源列表。",
+      "features": [
+        { "id": "mb-feat-01", "name": "侧边栏拉手", "selector": ".mobile-toggle", "screenshot": "feat--mb-feat-01.png", "description": "位于页面左侧61.8%位置的竖条按钮，点击打开抽屉式侧边栏", "notes": "黄底圆角按钮，宽16px高80px" },
+        { "id": "mb-feat-02", "name": "抽屉式侧边栏", "selector": ".sidebar.is-open", "screenshot": "feat--mb-feat-02.png", "description": "从左侧滑入的侧边栏（宽80%，最大300px），含遮罩层。包含章节目录树和背单词入口。", "notes": "点击遮罩或选择小节后自动关闭" },
+        { "id": "mb-feat-03", "name": "移动端更多菜单", "selector": ".more-menu-wrapper", "screenshot": "feat--mb-feat-03.png", "description": "桌面端快捷入口栏在移动端折叠为「更多」按钮 → 下拉菜单", "notes": "菜单外点击自动关闭" }
+      ],
+      "states": [
+        { "name": "默认状态", "screenshot": "mobile--default.png", "description": "侧边栏隐藏，全屏显示资源列表", "trigger": "页面加载默认" },
+        { "name": "侧边栏展开", "screenshot": "mobile--sidebar-open.png", "description": "侧边栏从左侧滑入，背景显示半透明遮罩", "trigger": "点击拉手按钮" },
+        { "name": "向下滚动", "screenshot": "mobile--preview-scrolled.png", "description": "资源列表向下滚动后的状态", "trigger": "用户向下滚动" },
+        { "name": "解题指导Tab", "screenshot": "mobile--second-tab.png", "description": "移动端切换到解题指导场景", "trigger": "点击解题指导Tab" }
+      ]
+    },
+    {
+      "id": "settings-page",
+      "name": "设置页",
+      "route": "/settings",
+      "screenshot": "desktop--settings.png",
+      "viewport": "desktop",
+      "pageType": "normal",
+      "summary": "用户个性化设置：复习学习顺序、默认场景偏好、同步刷题难度筛选。即时生效并持久化到 localStorage。",
+      "features": [
+        { "id": "st-feat-01", "name": "复习学习顺序", "description": "三选一：先做题后看视频（推荐）/ 先看视频后做题 / 每次选择。影响复习Tab下点击卡片的行为。", "notes": "「每次选择」时弹出学习模式弹窗" },
+        { "id": "st-feat-02", "name": "默认场景选择", "description": "二选一：全部 / 上次选择（记住上次的场景Tab）", "notes": "" },
+        { "id": "st-feat-03", "name": "同步刷题难度", "description": "多选：基础（绿）/ 中等（黄）/ 困难（红），至少保留1个", "notes": "最后一个勾选项无法取消" }
+      ],
+      "states": []
+    },
+    {
+      "id": "textbook-modal",
+      "name": "教材切换弹窗",
+      "route": "/",
+      "screenshot": "desktop--textbook-modal.png",
+      "viewport": "desktop",
+      "pageType": "conditional",
+      "summary": "三列级联选择器：学科→版本→年级册别。支持10个学科、多个出版社版本。",
+      "features": [
+        { "id": "tb-feat-01", "name": "学科选择列", "screenshot": "feat--tb-modal.png", "description": "左列显示所有学科（数学/英语/语文/物理/化学/生物/历史/地理/政治）", "notes": "选中后右侧版本和年级联动更新" },
+        { "id": "tb-feat-02", "name": "版本选择列", "description": "中列显示教材版本（部编版/北师大版/苏教版等）", "notes": "" },
+        { "id": "tb-feat-03", "name": "年级册别选择列", "description": "右列显示年级学期，附2024新课标标签", "notes": "" },
+        { "id": "tb-feat-04", "name": "确认按钮", "description": "底部黄底确认按钮，切换教材并刷新章节数据", "notes": "" }
+      ],
+      "states": []
+    },
+    {
+      "id": "first-time-guide",
+      "name": "新手引导",
+      "route": "/",
+      "screenshot": "first-time-guide--step-1.png",
+      "viewport": "desktop",
+      "pageType": "conditional",
+      "summary": "首次访问的3步引导：60%半透明遮罩 + 居中引导卡片 + 步骤指示器 + 手势提示动画。",
+      "features": [
+        { "id": "fg-feat-01", "name": "步骤指示器", "screenshot": "feat--fg-step-indicator.png", "description": "3个点状指示器，当前步骤为主色胶囊形", "notes": "" },
+        { "id": "fg-feat-02", "name": "引导内容卡片", "screenshot": "feat--fg-guide-card.png", "description": "居中白色圆角卡片（最大340px），含图标、标题、描述", "notes": "" },
+        { "id": "fg-feat-03", "name": "手势提示动画", "description": "6秒无操作后自动弹出鼠标点击动画提示", "notes": "" },
+        { "id": "fg-feat-04", "name": "跳过/下一步", "description": "「跳过」灰色按钮 + 「下一步」/「开始学习」主色按钮", "notes": "最后一步文案变为「开始学习」" }
+      ],
+      "states": [
+        { "name": "第1步：选择教材", "screenshot": "first-time-guide--step-1.png", "description": "引导用户注意教材选择器", "trigger": "首次访问" },
+        { "name": "第2步：浏览章节", "screenshot": "first-time-guide--step-2.png", "description": "引导用户浏览章节目录树", "trigger": "点击下一步" },
+        { "name": "第3步：开始学习", "screenshot": "first-time-guide--step-3.png", "description": "引导用户点击资源开始学习", "trigger": "点击下一步" }
+      ]
+    },
+    {
+      "id": "learning-mode-modal",
+      "name": "学习模式弹窗",
+      "route": "/",
+      "screenshot": "desktop--preview-tab.png",
+      "viewport": "desktop",
+      "pageType": "conditional",
+      "summary": "复习场景下的模式选择器（设置为「每次选择」时触发）：先做题后看视频（推荐）/ 先看视频后做题。",
+      "features": [
+        { "id": "lm-feat-01", "name": "模式选项卡片", "description": "两张选项卡片，各含图标+标题+描述+单选指示器，第一项带「推荐」角标", "notes": "" },
+        { "id": "lm-feat-02", "name": "开始学习按钮", "description": "底部黄底确认按钮，进入对应学习路径", "notes": "" },
+        { "id": "lm-feat-03", "name": "设置提示", "description": "底部灰色文字「可在设置中修改默认选择」", "notes": "" }
+      ],
+      "states": []
+    },
+    {
+      "id": "content-choice-modal",
+      "name": "内容选择弹窗",
+      "route": "/",
+      "screenshot": "desktop--preview-tab.png",
+      "viewport": "desktop",
+      "pageType": "conditional",
+      "summary": "点击有进度的知识点卡片时弹出3种路径：继续看视频、做补充练习、看课堂笔记（条件显示）。",
+      "features": [
+        { "id": "cc-feat-01", "name": "继续看视频", "description": "PlayCircle图标 +「从上次断点继续播放」", "notes": "" },
+        { "id": "cc-feat-02", "name": "做补充练习", "description": "FileText图标 +「做该知识点的课后习题」", "notes": "" },
+        { "id": "cc-feat-03", "name": "看课堂笔记", "description": "BookOpen图标，仅当资源含笔记时显示", "notes": "v-if=\"hasNote\"" }
+      ],
+      "states": []
+    }
+  ],
+  "connections": [
+    { "id": "conn-01", "from": "chapter-list-desktop", "to": "settings-page", "type": "navigation", "label": "点击设置按钮" },
+    { "id": "conn-02", "from": "settings-page", "to": "chapter-list-desktop", "type": "back", "label": "点击返回" },
+    { "id": "conn-03", "from": "chapter-list-desktop", "to": "textbook-modal", "type": "navigation", "label": "点击教材选择器或切换按钮" },
+    { "id": "conn-04", "from": "textbook-modal", "to": "chapter-list-desktop", "type": "back", "label": "确认选择或关闭" },
+    { "id": "conn-05", "from": "chapter-list-desktop", "to": "first-time-guide", "type": "conditional", "label": "首次访问自动弹出", "condition": "isFirstVisit === true" },
+    { "id": "conn-06", "from": "first-time-guide", "to": "chapter-list-desktop", "type": "back", "label": "完成引导或跳过" },
+    { "id": "conn-07", "from": "chapter-list-desktop", "to": "learning-mode-modal", "type": "conditional", "label": "复习Tab + 每次选择模式", "condition": "currentTab === review && reviewLearningMode === ask-every-time" },
+    { "id": "conn-08", "from": "learning-mode-modal", "to": "chapter-list-desktop", "type": "back", "label": "选择模式后开始" },
+    { "id": "conn-09", "from": "chapter-list-desktop", "to": "content-choice-modal", "type": "conditional", "label": "点击有进度的视频卡片", "condition": "videoProgress > 0 && videoProgress < 100" },
+    { "id": "conn-10", "from": "content-choice-modal", "to": "chapter-list-desktop", "type": "back", "label": "选择内容后" },
+    { "id": "conn-11", "from": "chapter-list-desktop", "to": "chapter-list-mobile", "type": "data", "label": "响应式适配 (viewport < 768px)" }
+  ],
+  "journeys": [
+    {
+      "name": "用户首次学习",
+      "description": "新用户第一次打开章节列表页，从新手引导开始，到成功学习第一个知识点",
+      "goal": "完成新手引导，理解页面布局，成功点击第一个资源开始学习",
+      "steps": [
+        { "pageId": "chapter-list-desktop", "action": "进入章节列表页", "result": "页面加载完成，自动弹出新手引导" },
+        { "pageId": "first-time-guide", "action": "阅读第1步「选择教材」", "result": "了解教材选择器位置" },
+        { "pageId": "first-time-guide", "action": "点击下一步 → 第2步「浏览章节」", "result": "了解左侧目录树作用" },
+        { "pageId": "first-time-guide", "action": "点击「开始学习」完成引导", "result": "引导关闭，进入正常列表页" },
+        { "pageId": "chapter-list-desktop", "action": "浏览预习Tab下的资源", "result": "看到知识点视频、练习等卡片", "decisionPoint": { "condition": "用户是否为VIP？", "branches": [{ "label": "VIP → 直接点击", "targetPageId": "chapter-list-desktop" }, { "label": "非VIP → VIP锁定标记", "targetPageId": "chapter-list-desktop" }] } },
+        { "pageId": "chapter-list-desktop", "action": "点击第一个知识点视频卡片", "result": "跳转到视频播放页开始学习" }
+      ]
+    },
+    {
+      "name": "用户自主选择场景完成学习",
+      "description": "用户根据学习需求切换场景Tab和章节，完成个性化学习路径",
+      "goal": "找到适合自己的学习场景，在不同章节间自由导航并完成学习",
+      "steps": [
+        { "pageId": "chapter-list-desktop", "action": "进入页面（预习Tab默认）", "result": "显示当前章节预习资源" },
+        { "pageId": "chapter-list-desktop", "action": "切换场景Tab", "result": "资源列表按新场景过滤", "decisionPoint": { "condition": "选择哪个场景？", "branches": [{ "label": "预习 → 视频+练习+学案", "targetPageId": "chapter-list-desktop" }, { "label": "解题指导 → 解题视频", "targetPageId": "chapter-list-desktop" }, { "label": "刷题 → 练习+付费", "targetPageId": "chapter-list-desktop" }, { "label": "全部 → 所有资源", "targetPageId": "chapter-list-desktop" }] } },
+        { "pageId": "chapter-list-desktop", "action": "在目录树中点击其他小节", "result": "右侧内容平滑滚动到对应位置" },
+        { "pageId": "chapter-list-desktop", "action": "点击知识点视频卡片", "result": "进入学习", "decisionPoint": { "condition": "视频有进度？", "branches": [{ "label": "无 → 直接开始", "targetPageId": "chapter-list-desktop" }, { "label": "有 → 弹出选择", "targetPageId": "content-choice-modal" }] } },
+        { "pageId": "chapter-list-desktop", "action": "滚动到底部 → 点击「下一章」", "result": "章节切换，目录和资源刷新" },
+        { "pageId": "chapter-list-desktop", "action": "点击教材选择器", "result": "弹出教材切换弹窗" },
+        { "pageId": "textbook-modal", "action": "选择学科→版本→年级 → 确认", "result": "章节数据刷新，场景Tab可能变更" }
+      ]
+    },
+    {
+      "name": "用户调整功能设置",
+      "description": "用户根据学习习惯调整应用设置",
+      "goal": "个性化配置学习偏好，让应用更符合使用习惯",
+      "steps": [
+        { "pageId": "chapter-list-desktop", "action": "点击「设置」按钮", "result": "进入设置页" },
+        { "pageId": "settings-page", "action": "调整复习学习顺序", "result": "即时生效", "decisionPoint": { "condition": "选择哪种复习模式？", "branches": [{ "label": "先做题（推荐）", "targetPageId": "settings-page" }, { "label": "先看视频", "targetPageId": "settings-page" }, { "label": "每次选择 → 弹窗", "targetPageId": "settings-page" }] } },
+        { "pageId": "settings-page", "action": "设置默认场景偏好", "result": "下次进入按偏好展示" },
+        { "pageId": "settings-page", "action": "勾选刷题难度", "result": "至少保留1个，影响练习筛选" },
+        { "pageId": "settings-page", "action": "点击返回", "result": "返回列表页，设置即时生效" },
+        { "pageId": "chapter-list-desktop", "action": "验证设置效果", "result": "交互行为已按新设置调整" }
+      ]
+    }
+  ]
+}

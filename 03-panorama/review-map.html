@@ -1,0 +1,3932 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>评审地图 — 章节列表页迭代 V1.6</title>
+
+  <!--
+    评审地图模板 v2.0 (review-map-template.html)
+    技术栈：Alpine.js 3.14.1 + Tailwind CSS（内联 CDN，自包含）
+
+    架构：Alpine.store('review') 全局状态 + Alpine.data() 命名组件
+    视图：流程图 (flow) / 功能详情 (detail) / 用户路径 (journey)
+
+    使用方式：
+    1. AI 将 review-map-data.json 数据注入到 <script id="map-data"> 标签中
+    2. 截图文件放在同级 screenshots/ 目录
+    3. 在浏览器中直接打开此 HTML 文件
+
+    模板变量（由 AI 在生成时替换）：
+    - 章节列表页迭代 V1.6 — 项目名称
+    - 2026-03-12T16:00:00+08:00 — 生成时间
+    - {
+  "metadata": {
+    "projectName": "章节列表页迭代 V1.6",
+    "generatedAt": "2026-03-12T16:00:00+08:00",
+    "prototypeType": "standard-vue",
+    "prototypePath": "02-prototypes/vue-apps/chapter-list-redesign/",
+    "prdPath": "01-prd/章节列表页迭代_V1.6.md",
+    "version": "2.0"
+  },
+  "pages": [
+    {
+      "id": "chapter-list-desktop",
+      "name": "章节列表（桌面端）",
+      "route": "/",
+      "screenshot": "desktop--preview-tab.png",
+      "viewport": "desktop",
+      "pageType": "entry",
+      "summary": "主页面，采用左右联动双栏布局：左侧章节目录树、右侧场景化资源卡片列表。支持 4 种学科模板的场景 Tab 切换、全量资源模式、滚动联动选中等核心交互。",
+      "features": [
+        {
+          "id": "dt-feat-01",
+          "name": "全局头部",
+          "selector": ".global-header",
+          "screenshot": "feat--dt-feat-01.png",
+          "description": "返回按钮 + 「教材同步」标题 + 教材版本选择器 + VIP升级入口",
+          "notes": "VIP 按钮在 <360px 下隐藏文字仅显示图标"
+        },
+        {
+          "id": "dt-feat-02",
+          "name": "场景 Tab 栏",
+          "selector": ".scene-tabs",
+          "screenshot": "feat--dt-feat-02.png",
+          "description": "固定「全部」按钮 + 分隔线 + 横向滚动场景 Tabs。理科解题型模板含预习/解题指导/刷题，语言文科型含预习/复习/日常积累，理科基础型含预习/复习，历史道法型含预习/复习。",
+          "notes": "4 种学科模板通过 sceneConfig.ts 映射，切换学科自动变更 Tab 组合"
+        },
+        {
+          "id": "dt-feat-03",
+          "name": "快捷入口栏",
+          "selector": ".function-bar",
+          "screenshot": "feat--dt-feat-03.png",
+          "description": "思维导图(2)、错题本(15)、收藏、设置四个快捷按钮，数字角标显示待处理数量",
+          "notes": "移动端折叠为「更多」菜单"
+        },
+        {
+          "id": "dt-feat-04",
+          "name": "章节目录树",
+          "selector": ".sidebar",
+          "screenshot": "feat--dt-feat-04.png",
+          "description": "递归树形结构：章→节→小节。节级显示进度（如 12/14），小节级可点击选中。选中状态高亮，NEW 红点标记新内容。",
+          "notes": "点击小节 → 右侧内容区滚动到对应位置，IntersectionObserver 反向联动"
+        },
+        {
+          "id": "dt-feat-05",
+          "name": "切换教材按钮",
+          "selector": ".switch-btn",
+          "screenshot": "feat--dt-feat-05.png",
+          "description": "位于侧边栏顶部章节标题旁，点击可打开教材切换弹窗",
+          "notes": ""
+        },
+        {
+          "id": "dt-feat-06",
+          "name": "学习方法指引",
+          "selector": ".learning-guide",
+          "screenshot": "feat--dt-feat-06.png",
+          "description": "可展开/收起的黄底卡片，根据当前场景 Tab 显示对应的学习建议文案",
+          "notes": "全量模式下显示通用指引"
+        },
+        {
+          "id": "dt-feat-07",
+          "name": "知识点视频卡片",
+          "selector": ".knowledge-card",
+          "screenshot": "feat--dt-feat-07.png",
+          "description": "横向布局：缩略图（播放按钮+时长标签）+ 标题/标签/难度星级/双进度条（视频10段+习题10段）。VIP锁定标记，NEW标记。",
+          "notes": "复习 Tab 下点击触发学习模式选择；有进度时点击触发内容选择弹窗"
+        },
+        {
+          "id": "dt-feat-08",
+          "name": "练习卡片",
+          "selector": ".practice-card",
+          "screenshot": "feat--dt-feat-08.png",
+          "description": "题目练习入口，显示难度标签（基础/中等/困难三色）和完成进度（已完成/总数）",
+          "notes": "仅在刷题Tab下出现，与学习指引卡片组成 50-50 并排布局"
+        },
+        {
+          "id": "dt-feat-09",
+          "name": "学习指引卡片",
+          "selector": ".guide-card",
+          "description": "PDF学案下载入口，显示文件图标、页数和下载按钮",
+          "notes": "与练习卡片配对使用。当前原型仅在英语/语文学科数据中定义，数学学科暂无此卡片渲染"
+        },
+        {
+          "id": "dt-feat-10",
+          "name": "AI总结笔记卡片",
+          "selector": ".summary-note-card",
+          "description": "绿色渐变底，含金色星标角标，显示笔记数量和「AI总结」标签",
+          "notes": "当前原型 mock 数据未包含此类型资源，组件已实现但不会渲染"
+        },
+        {
+          "id": "dt-feat-11",
+          "name": "VIP钩子卡片",
+          "selector": ".premium-hook-card",
+          "description": "金色渐变缩略图 + 「去加购」橙色按钮，用于引导付费内容购买",
+          "notes": "当前原型 mock 数据未包含此类型资源，组件已实现但不会渲染"
+        },
+        {
+          "id": "dt-feat-12",
+          "name": "章节底部导航",
+          "selector": ".chapter-footer",
+          "screenshot": "feat--dt-feat-12.png",
+          "description": "「上一章」「下一章」双按钮导航，显示目标章节标题",
+          "notes": "首章隐藏上一章，末章隐藏下一章"
+        },
+        {
+          "id": "dt-feat-13",
+          "name": "NEW 新内容标识",
+          "selector": ".new-badge",
+          "screenshot": "feat--dt-feat-13.png",
+          "description": "资源级显示红底白字 NEW 标签，章节级显示红点。7天内发布且未查看的内容标记为新。",
+          "notes": "isNewContent: firstPublishAt ≤ 7天 && 不在 readResources 集合中"
+        }
+      ],
+      "states": [
+        { "name": "预习Tab", "screenshot": "desktop--preview-tab.png", "description": "默认状态，显示预习场景下的知识点视频和练习资源", "trigger": "页面加载默认" },
+        { "name": "解题指导Tab", "screenshot": "desktop--second-tab.png", "description": "切换到解题指导场景，筛选展示解题相关资源", "trigger": "点击解题指导Tab" },
+        { "name": "刷题Tab", "screenshot": "desktop--third-tab.png", "description": "切换到刷题场景，筛选展示刷题练习和VIP付费内容", "trigger": "点击刷题Tab" },
+        { "name": "全部资源模式", "screenshot": "desktop--all-resources.png", "description": "全量资源展示，不按场景筛选", "trigger": "点击「全部」按钮" },
+        { "name": "VIP锁定状态", "screenshot": "desktop--vip-state.png", "description": "部分内容标记为VIP锁定", "trigger": "用户未购买VIP" },
+        { "name": "章节底部", "screenshot": "desktop--chapter-footer.png", "description": "滚动到底部显示上一章/下一章导航", "trigger": "内容滚动到底部" },
+        { "name": "英语预习", "screenshot": "desktop--english-preview.png", "description": "英语学科预习Tab，含朗读卡片和背单词入口", "trigger": "切换到英语学科" }
+      ]
+    },
+    {
+      "id": "chapter-list-mobile",
+      "name": "章节列表（移动端）",
+      "route": "/",
+      "screenshot": "mobile--default.png",
+      "viewport": "mobile",
+      "pageType": "entry",
+      "summary": "移动端自适应布局：侧边栏默认隐藏，通过左侧拉手按钮滑入。单栏显示资源列表。",
+      "features": [
+        { "id": "mb-feat-01", "name": "侧边栏拉手", "selector": ".mobile-toggle", "screenshot": "feat--mb-feat-01.png", "description": "位于页面左侧61.8%位置的竖条按钮，点击打开抽屉式侧边栏", "notes": "黄底圆角按钮，宽16px高80px" },
+        { "id": "mb-feat-02", "name": "抽屉式侧边栏", "selector": ".sidebar.is-open", "screenshot": "feat--mb-feat-02.png", "description": "从左侧滑入的侧边栏（宽80%，最大300px），含遮罩层。包含章节目录树和背单词入口。", "notes": "点击遮罩或选择小节后自动关闭" },
+        { "id": "mb-feat-03", "name": "移动端更多菜单", "selector": ".more-menu-wrapper", "screenshot": "feat--mb-feat-03.png", "description": "桌面端快捷入口栏在移动端折叠为「更多」按钮 → 下拉菜单", "notes": "菜单外点击自动关闭" }
+      ],
+      "states": [
+        { "name": "默认状态", "screenshot": "mobile--default.png", "description": "侧边栏隐藏，全屏显示资源列表", "trigger": "页面加载默认" },
+        { "name": "侧边栏展开", "screenshot": "mobile--sidebar-open.png", "description": "侧边栏从左侧滑入，背景显示半透明遮罩", "trigger": "点击拉手按钮" },
+        { "name": "向下滚动", "screenshot": "mobile--preview-scrolled.png", "description": "资源列表向下滚动后的状态", "trigger": "用户向下滚动" },
+        { "name": "解题指导Tab", "screenshot": "mobile--second-tab.png", "description": "移动端切换到解题指导场景", "trigger": "点击解题指导Tab" }
+      ]
+    },
+    {
+      "id": "settings-page",
+      "name": "设置页",
+      "route": "/settings",
+      "screenshot": "desktop--settings.png",
+      "viewport": "desktop",
+      "pageType": "normal",
+      "summary": "用户个性化设置：复习学习顺序、默认场景偏好、同步刷题难度筛选。即时生效并持久化到 localStorage。",
+      "features": [
+        { "id": "st-feat-01", "name": "复习学习顺序", "description": "三选一：先做题后看视频（推荐）/ 先看视频后做题 / 每次选择。影响复习Tab下点击卡片的行为。", "notes": "「每次选择」时弹出学习模式弹窗" },
+        { "id": "st-feat-02", "name": "默认场景选择", "description": "二选一：全部 / 上次选择（记住上次的场景Tab）", "notes": "" },
+        { "id": "st-feat-03", "name": "同步刷题难度", "description": "多选：基础（绿）/ 中等（黄）/ 困难（红），至少保留1个", "notes": "最后一个勾选项无法取消" }
+      ],
+      "states": []
+    },
+    {
+      "id": "textbook-modal",
+      "name": "教材切换弹窗",
+      "route": "/",
+      "screenshot": "desktop--textbook-modal.png",
+      "viewport": "desktop",
+      "pageType": "conditional",
+      "summary": "三列级联选择器：学科→版本→年级册别。支持10个学科、多个出版社版本。",
+      "features": [
+        { "id": "tb-feat-01", "name": "学科选择列", "screenshot": "feat--tb-modal.png", "description": "左列显示所有学科（数学/英语/语文/物理/化学/生物/历史/地理/政治）", "notes": "选中后右侧版本和年级联动更新" },
+        { "id": "tb-feat-02", "name": "版本选择列", "description": "中列显示教材版本（部编版/北师大版/苏教版等）", "notes": "" },
+        { "id": "tb-feat-03", "name": "年级册别选择列", "description": "右列显示年级学期，附2024新课标标签", "notes": "" },
+        { "id": "tb-feat-04", "name": "确认按钮", "description": "底部黄底确认按钮，切换教材并刷新章节数据", "notes": "" }
+      ],
+      "states": []
+    },
+    {
+      "id": "first-time-guide",
+      "name": "新手引导",
+      "route": "/",
+      "screenshot": "first-time-guide--step-1.png",
+      "viewport": "desktop",
+      "pageType": "conditional",
+      "summary": "首次访问的3步引导：60%半透明遮罩 + 居中引导卡片 + 步骤指示器 + 手势提示动画。",
+      "features": [
+        { "id": "fg-feat-01", "name": "步骤指示器", "screenshot": "feat--fg-step-indicator.png", "description": "3个点状指示器，当前步骤为主色胶囊形", "notes": "" },
+        { "id": "fg-feat-02", "name": "引导内容卡片", "screenshot": "feat--fg-guide-card.png", "description": "居中白色圆角卡片（最大340px），含图标、标题、描述", "notes": "" },
+        { "id": "fg-feat-03", "name": "手势提示动画", "description": "6秒无操作后自动弹出鼠标点击动画提示", "notes": "" },
+        { "id": "fg-feat-04", "name": "跳过/下一步", "description": "「跳过」灰色按钮 + 「下一步」/「开始学习」主色按钮", "notes": "最后一步文案变为「开始学习」" }
+      ],
+      "states": [
+        { "name": "第1步：选择教材", "screenshot": "first-time-guide--step-1.png", "description": "引导用户注意教材选择器", "trigger": "首次访问" },
+        { "name": "第2步：浏览章节", "screenshot": "first-time-guide--step-2.png", "description": "引导用户浏览章节目录树", "trigger": "点击下一步" },
+        { "name": "第3步：开始学习", "screenshot": "first-time-guide--step-3.png", "description": "引导用户点击资源开始学习", "trigger": "点击下一步" }
+      ]
+    },
+    {
+      "id": "learning-mode-modal",
+      "name": "学习模式弹窗",
+      "route": "/",
+      "screenshot": "desktop--preview-tab.png",
+      "viewport": "desktop",
+      "pageType": "conditional",
+      "summary": "复习场景下的模式选择器（设置为「每次选择」时触发）：先做题后看视频（推荐）/ 先看视频后做题。",
+      "features": [
+        { "id": "lm-feat-01", "name": "模式选项卡片", "description": "两张选项卡片，各含图标+标题+描述+单选指示器，第一项带「推荐」角标", "notes": "" },
+        { "id": "lm-feat-02", "name": "开始学习按钮", "description": "底部黄底确认按钮，进入对应学习路径", "notes": "" },
+        { "id": "lm-feat-03", "name": "设置提示", "description": "底部灰色文字「可在设置中修改默认选择」", "notes": "" }
+      ],
+      "states": []
+    },
+    {
+      "id": "content-choice-modal",
+      "name": "内容选择弹窗",
+      "route": "/",
+      "screenshot": "desktop--preview-tab.png",
+      "viewport": "desktop",
+      "pageType": "conditional",
+      "summary": "点击有进度的知识点卡片时弹出3种路径：继续看视频、做补充练习、看课堂笔记（条件显示）。",
+      "features": [
+        { "id": "cc-feat-01", "name": "继续看视频", "description": "PlayCircle图标 +「从上次断点继续播放」", "notes": "" },
+        { "id": "cc-feat-02", "name": "做补充练习", "description": "FileText图标 +「做该知识点的课后习题」", "notes": "" },
+        { "id": "cc-feat-03", "name": "看课堂笔记", "description": "BookOpen图标，仅当资源含笔记时显示", "notes": "v-if=\"hasNote\"" }
+      ],
+      "states": []
+    }
+  ],
+  "connections": [
+    { "id": "conn-01", "from": "chapter-list-desktop", "to": "settings-page", "type": "navigation", "label": "点击设置按钮" },
+    { "id": "conn-02", "from": "settings-page", "to": "chapter-list-desktop", "type": "back", "label": "点击返回" },
+    { "id": "conn-03", "from": "chapter-list-desktop", "to": "textbook-modal", "type": "navigation", "label": "点击教材选择器或切换按钮" },
+    { "id": "conn-04", "from": "textbook-modal", "to": "chapter-list-desktop", "type": "back", "label": "确认选择或关闭" },
+    { "id": "conn-05", "from": "chapter-list-desktop", "to": "first-time-guide", "type": "conditional", "label": "首次访问自动弹出", "condition": "isFirstVisit === true" },
+    { "id": "conn-06", "from": "first-time-guide", "to": "chapter-list-desktop", "type": "back", "label": "完成引导或跳过" },
+    { "id": "conn-07", "from": "chapter-list-desktop", "to": "learning-mode-modal", "type": "conditional", "label": "复习Tab + 每次选择模式", "condition": "currentTab === review && reviewLearningMode === ask-every-time" },
+    { "id": "conn-08", "from": "learning-mode-modal", "to": "chapter-list-desktop", "type": "back", "label": "选择模式后开始" },
+    { "id": "conn-09", "from": "chapter-list-desktop", "to": "content-choice-modal", "type": "conditional", "label": "点击有进度的视频卡片", "condition": "videoProgress > 0 && videoProgress < 100" },
+    { "id": "conn-10", "from": "content-choice-modal", "to": "chapter-list-desktop", "type": "back", "label": "选择内容后" },
+    { "id": "conn-11", "from": "chapter-list-desktop", "to": "chapter-list-mobile", "type": "data", "label": "响应式适配 (viewport < 768px)" }
+  ],
+  "journeys": [
+    {
+      "name": "用户首次学习",
+      "description": "新用户第一次打开章节列表页，从新手引导开始，到成功学习第一个知识点",
+      "goal": "完成新手引导，理解页面布局，成功点击第一个资源开始学习",
+      "steps": [
+        { "pageId": "chapter-list-desktop", "action": "进入章节列表页", "result": "页面加载完成，自动弹出新手引导" },
+        { "pageId": "first-time-guide", "action": "阅读第1步「选择教材」", "result": "了解教材选择器位置" },
+        { "pageId": "first-time-guide", "action": "点击下一步 → 第2步「浏览章节」", "result": "了解左侧目录树作用" },
+        { "pageId": "first-time-guide", "action": "点击「开始学习」完成引导", "result": "引导关闭，进入正常列表页" },
+        { "pageId": "chapter-list-desktop", "action": "浏览预习Tab下的资源", "result": "看到知识点视频、练习等卡片", "decisionPoint": { "condition": "用户是否为VIP？", "branches": [{ "label": "VIP → 直接点击", "targetPageId": "chapter-list-desktop" }, { "label": "非VIP → VIP锁定标记", "targetPageId": "chapter-list-desktop" }] } },
+        { "pageId": "chapter-list-desktop", "action": "点击第一个知识点视频卡片", "result": "跳转到视频播放页开始学习" }
+      ]
+    },
+    {
+      "name": "用户自主选择场景完成学习",
+      "description": "用户根据学习需求切换场景Tab和章节，完成个性化学习路径",
+      "goal": "找到适合自己的学习场景，在不同章节间自由导航并完成学习",
+      "steps": [
+        { "pageId": "chapter-list-desktop", "action": "进入页面（预习Tab默认）", "result": "显示当前章节预习资源" },
+        { "pageId": "chapter-list-desktop", "action": "切换场景Tab", "result": "资源列表按新场景过滤", "decisionPoint": { "condition": "选择哪个场景？", "branches": [{ "label": "预习 → 视频+练习+学案", "targetPageId": "chapter-list-desktop" }, { "label": "解题指导 → 解题视频", "targetPageId": "chapter-list-desktop" }, { "label": "刷题 → 练习+付费", "targetPageId": "chapter-list-desktop" }, { "label": "全部 → 所有资源", "targetPageId": "chapter-list-desktop" }] } },
+        { "pageId": "chapter-list-desktop", "action": "在目录树中点击其他小节", "result": "右侧内容平滑滚动到对应位置" },
+        { "pageId": "chapter-list-desktop", "action": "点击知识点视频卡片", "result": "进入学习", "decisionPoint": { "condition": "视频有进度？", "branches": [{ "label": "无 → 直接开始", "targetPageId": "chapter-list-desktop" }, { "label": "有 → 弹出选择", "targetPageId": "content-choice-modal" }] } },
+        { "pageId": "chapter-list-desktop", "action": "滚动到底部 → 点击「下一章」", "result": "章节切换，目录和资源刷新" },
+        { "pageId": "chapter-list-desktop", "action": "点击教材选择器", "result": "弹出教材切换弹窗" },
+        { "pageId": "textbook-modal", "action": "选择学科→版本→年级 → 确认", "result": "章节数据刷新，场景Tab可能变更" }
+      ]
+    },
+    {
+      "name": "用户调整功能设置",
+      "description": "用户根据学习习惯调整应用设置",
+      "goal": "个性化配置学习偏好，让应用更符合使用习惯",
+      "steps": [
+        { "pageId": "chapter-list-desktop", "action": "点击「设置」按钮", "result": "进入设置页" },
+        { "pageId": "settings-page", "action": "调整复习学习顺序", "result": "即时生效", "decisionPoint": { "condition": "选择哪种复习模式？", "branches": [{ "label": "先做题（推荐）", "targetPageId": "settings-page" }, { "label": "先看视频", "targetPageId": "settings-page" }, { "label": "每次选择 → 弹窗", "targetPageId": "settings-page" }] } },
+        { "pageId": "settings-page", "action": "设置默认场景偏好", "result": "下次进入按偏好展示" },
+        { "pageId": "settings-page", "action": "勾选刷题难度", "result": "至少保留1个，影响练习筛选" },
+        { "pageId": "settings-page", "action": "点击返回", "result": "返回列表页，设置即时生效" },
+        { "pageId": "chapter-list-desktop", "action": "验证设置效果", "result": "交互行为已按新设置调整" }
+      ]
+    }
+  ]
+} — 完整的 review-map-data.json 内容
+  -->
+
+  <!-- ===== ZONE 1: Head + CSS ===== -->
+
+  <!-- FOUC prevention: apply dark class before any rendering -->
+  <script>
+    (function() {
+      try {
+        var t = localStorage.getItem('review-map-theme');
+        if (t === 'dark' || (!t && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+          document.documentElement.classList.add('dark');
+        }
+      } catch(e) {}
+    })();
+  </script>
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            primary: '#3B82F6',
+            'primary-dark': '#2563EB',
+            accent: '#F59E0B',
+            surface: '#F8FAFC',
+            'surface-dark': '#F1F5F9',
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- Alpine.js CDN (pinned to 3.14.1 for shallow reactive improvements) -->
+  <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.1/dist/cdn.min.js"></script>
+
+  <style>
+    [x-cloak] { display: none !important; }
+
+    /* SVG connection lines */
+    .connection-line {
+      stroke-width: 2;
+      fill: none;
+      marker-end: url(#arrowhead);
+    }
+    .connection-navigation { stroke: #3B82F6; }
+    .connection-redirect { stroke: #8B5CF6; stroke-dasharray: 6 4; }
+    .connection-back { stroke: #9CA3AF; }
+    .connection-conditional { stroke: #F59E0B; stroke-dasharray: 4 2; }
+    .connection-data { stroke: #10B981; stroke-dasharray: 2 4; }
+
+    /* Flow View */
+    .flow-node { cursor: pointer; transition: filter 0.15s; }
+    .flow-node:hover { filter: brightness(0.95); }
+    .flow-edge-hitbox { stroke-width: 14; opacity: 0; pointer-events: stroke; cursor: pointer; }
+    .flow-edge-path { pointer-events: none; fill: none; stroke-width: 2; }
+    .flow-label { font-size: 11px; pointer-events: none; }
+    .flow-zoom-btn { width: 28px; height: 28px; }
+    .node-type-entry { border-color: #22C55E; background-color: #F0FDF4; }
+    .node-type-normal { border-color: #3B82F6; background-color: #EFF6FF; }
+    .node-type-exit { border-color: #9CA3AF; background-color: #F9FAFB; }
+    .node-type-conditional { border-color: #F59E0B; background-color: #FFFBEB; }
+
+    /* Page cards */
+    .page-card {
+      transition: all 0.2s ease;
+    }
+    .page-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(0,0,0,0.12);
+    }
+
+    /* Print mode */
+    @media print {
+      .no-print { display: none !important; }
+      .page-card { break-inside: avoid; }
+      body { background: white !important; }
+      .print-break { page-break-before: always; }
+    }
+
+    /* Screenshot thumbnails */
+    .screenshot-thumb {
+      object-fit: cover;
+      object-position: top;
+    }
+
+    /* Dark mode screenshot visibility */
+    .dark .screenshot-thumb {
+      border: 1px solid #374151;
+    }
+    .dark img[src*="screenshots/"] {
+      border: 1px solid #374151;
+      border-radius: 4px;
+    }
+
+    /* Dark mode flow node type colors */
+    .dark .node-type-entry { border-color: #4ADE80; background-color: #14532D; }
+    .dark .node-type-normal { border-color: #60A5FA; background-color: #1E3A5F; }
+    .dark .node-type-exit { border-color: #6B7280; background-color: #1F2937; }
+    .dark .node-type-conditional { border-color: #FBBF24; background-color: #422006; }
+
+    /* ===== Edit mode styles ===== */
+
+    /* Edit mode button pulse */
+    .edit-pulse {
+      animation: pulse-ring 2s ease infinite;
+    }
+    @keyframes pulse-ring {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.4); }
+      50% { box-shadow: 0 0 0 6px rgba(34, 197, 94, 0); }
+    }
+
+    /* Screenshot drop zone */
+    .screenshot-drop-active {
+      outline: 2px dashed #3B82F6;
+      outline-offset: -2px;
+    }
+
+    /* Editable field hover */
+    .editable-hint {
+      cursor: pointer;
+      border-radius: 4px;
+      padding: 2px 4px;
+      margin: -2px -4px;
+      transition: background 0.15s;
+    }
+    .editable-hint:hover {
+      background: rgba(0, 0, 0, 0.04);
+    }
+    .dark .editable-hint:hover {
+      background: rgba(255, 255, 255, 0.06);
+    }
+
+    /* Comment entry animation */
+    .comment-enter {
+      animation: comment-slide 0.2s ease;
+    }
+    @keyframes comment-slide {
+      from { opacity: 0; transform: translateY(-4px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Toast notification */
+    .toast-notification {
+      animation: toast-slide-in 0.3s ease, toast-fade-out 0.5s ease 3.5s forwards;
+    }
+    @keyframes toast-slide-in {
+      from { opacity: 0; transform: translateY(-20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes toast-fade-out {
+      from { opacity: 1; }
+      to { opacity: 0; }
+    }
+
+    /* Connection action bar */
+    .conn-action-bar select {
+      appearance: none;
+      background: white url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='5'%3E%3Cpath d='M0 0l4 5 4-5z' fill='%23666'/%3E%3C/svg%3E") no-repeat right 4px center;
+      padding-right: 14px;
+    }
+
+    /* Add-connection pulse */
+    .flow-node-adding { animation: flow-pulse 1.5s infinite; }
+    @keyframes flow-pulse {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.4); }
+      50% { box-shadow: 0 0 0 8px rgba(59, 130, 246, 0); }
+    }
+
+    /* ===== Detail View styles ===== */
+
+    /* Page card container */
+    .detail-card {
+      border-radius: 0.5rem;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+      overflow: hidden;
+      margin-bottom: 1.5rem;
+    }
+
+    /* Dark header row for page-level info */
+    .detail-page-header {
+      background: #1F2937;
+      color: white;
+      padding: 1rem;
+      display: flex;
+      gap: 1rem;
+    }
+
+    /* Feature row with hover */
+    .detail-feature-row {
+      border-bottom: 1px solid #F3F4F6;
+      transition: background 0.15s;
+    }
+    .detail-feature-row:hover {
+      background: #F9FAFB;
+    }
+    .dark .detail-feature-row {
+      border-bottom-color: #374151;
+    }
+    .dark .detail-feature-row:hover {
+      background: #374151;
+    }
+
+    /* Lightbox overlay */
+    .lightbox-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 70;
+      background: rgba(0,0,0,0.80);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1rem;
+    }
+
+    /* Responsive Detail View: stack feature rows vertically on mobile */
+    @media (max-width: 767px) {
+      .detail-feature-row {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+      }
+      .detail-feature-row td {
+        display: block;
+        width: 100% !important;
+      }
+      .detail-feature-row td img {
+        width: 100%;
+        height: auto;
+        max-height: 200px;
+      }
+    }
+
+    /* Print additions for detail cards */
+    @media print {
+      .detail-card { break-inside: avoid; box-shadow: none; border: 1px solid #E5E7EB; }
+      .detail-page-header { background: #374151 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+      .lightbox-overlay { display: none !important; }
+    }
+  </style>
+</head>
+
+<!-- ===== ZONE 2: Header HTML ===== -->
+
+<body class="bg-gray-50 dark:bg-gray-900 min-h-screen" x-data @keydown.window="$store.review.handleGlobalKeydown($event)" x-cloak>
+
+  <!-- Top navigation bar -->
+  <header class="bg-white dark:bg-gray-800 shadow-sm dark:shadow-gray-900/30 sticky top-0 z-50 no-print">
+    <div class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between flex-wrap gap-2">
+      <div>
+        <h1 class="text-xl font-bold text-gray-900 dark:text-gray-100">
+          评审地图 — <span x-text="$store.review.data?.metadata?.projectName"></span>
+        </h1>
+        <p class="text-sm text-gray-500 dark:text-gray-400">
+          <span x-text="$store.review.data?.metadata?.prototypeType === 'quick-html' ? 'Quick HTML' : 'Standard Vue'"></span>
+          · 生成于 <span x-text="formatDate($store.review.data?.metadata?.generatedAt)"></span>
+          · <span x-text="($store.review.data?.pages?.length || 0)"></span> 个页面
+        </p>
+      </div>
+      <div class="flex items-center gap-2 flex-wrap">
+        <!-- View switch: 3 buttons -->
+        <button
+          @click="$store.review.view = 'flow'"
+          :class="$store.review.view === 'flow' ? 'bg-primary text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600'"
+          class="px-3 py-1.5 rounded-md text-xs md:text-sm font-medium transition-colors">
+          流程图
+        </button>
+        <button
+          @click="$store.review.view = 'detail'"
+          :class="$store.review.view === 'detail' ? 'bg-primary text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600'"
+          class="px-3 py-1.5 rounded-md text-xs md:text-sm font-medium transition-colors">
+          功能详情
+        </button>
+        <button
+          @click="$store.review.view = 'journey'"
+          :class="$store.review.view === 'journey' ? 'bg-primary text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600'"
+          class="px-3 py-1.5 rounded-md text-xs md:text-sm font-medium transition-colors">
+          用户路径
+        </button>
+        <button
+          @click="window.print()"
+          class="px-3 py-1.5 rounded-md text-xs md:text-sm font-medium bg-gray-100 text-gray-600 hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600 transition-colors">
+          打印
+        </button>
+        <button @click="$store.review.toggleDarkMode()"
+                class="px-3 py-1.5 rounded-md text-xs md:text-sm font-medium bg-gray-100 text-gray-600
+                       hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600
+                       transition-colors">
+          <span x-text="$store.review.darkMode ? '\u6D45\u8272' : '\u6DF1\u8272'"></span>
+        </button>
+        <span class="hidden md:inline text-[10px] text-gray-400 dark:text-gray-500 ml-1"
+              title="\u5FEB\u6377\u952E\uFF1A1/2/3 \u5207\u6362\u89C6\u56FE\uFF0CE \u7F16\u8F91\uFF0CD \u6DF1\u8272\uFF0CEsc \u5173\u95ED">
+          &#x2328;
+        </span>
+
+        <!-- Separator + edit mode controls -->
+        <div class="flex items-center gap-2 ml-2 pl-2 border-l border-gray-200 dark:border-gray-700">
+          <button
+            @click="$store.review.editMode = !$store.review.editMode"
+            :class="$store.review.editMode ? 'bg-green-500 text-white edit-pulse' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'"
+            class="px-3 py-1.5 rounded-md text-sm font-medium transition-colors flex items-center gap-1.5">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+            </svg>
+            <span x-text="$store.review.editMode ? '编辑中' : '编辑模式'"></span>
+          </button>
+
+          <template x-if="$store.review.hasEdits">
+            <span class="text-[11px] text-amber-600 bg-amber-50 dark:text-amber-400 dark:bg-amber-900/30 px-2 py-0.5 rounded-full whitespace-nowrap">
+              有未导出的修改
+            </span>
+          </template>
+
+          <template x-if="$store.review.hasEdits">
+            <div class="flex gap-1">
+              <button @click="$store.review.exportData()"
+                class="px-2 py-1 rounded text-xs bg-blue-500 text-white hover:bg-blue-600 transition-colors">
+                导出 JSON
+              </button>
+              <button @click="$store.review.resetEdits()"
+                class="px-2 py-1 rounded text-xs bg-gray-200 text-gray-600 hover:bg-gray-300 transition-colors">
+                重置
+              </button>
+            </div>
+          </template>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- ===== ZONE 3: View Shells HTML ===== -->
+
+  <main class="max-w-7xl mx-auto px-4 py-6">
+
+    <!-- ===== ZONE 4: Connection Legend ===== -->
+    <div class="mb-4 flex flex-wrap gap-4 text-xs text-gray-500 dark:text-gray-400 no-print">
+      <span class="flex items-center gap-1">
+        <svg width="24" height="8"><line x1="0" y1="4" x2="24" y2="4" stroke="#3B82F6" stroke-width="2"/></svg>
+        导航跳转
+      </span>
+      <span class="flex items-center gap-1">
+        <svg width="24" height="8"><line x1="0" y1="4" x2="24" y2="4" stroke="#8B5CF6" stroke-width="2" stroke-dasharray="6 4"/></svg>
+        自动跳转
+      </span>
+      <span class="flex items-center gap-1">
+        <svg width="24" height="8"><line x1="0" y1="4" x2="24" y2="4" stroke="#9CA3AF" stroke-width="2"/></svg>
+        返回
+      </span>
+      <span class="flex items-center gap-1">
+        <svg width="24" height="8"><line x1="0" y1="4" x2="24" y2="4" stroke="#F59E0B" stroke-width="2" stroke-dasharray="4 2"/></svg>
+        条件跳转
+      </span>
+      <span class="flex items-center gap-1">
+        <svg width="24" height="8"><line x1="0" y1="4" x2="24" y2="4" stroke="#10B981" stroke-width="2" stroke-dasharray="2 4"/></svg>
+        数据传递
+      </span>
+    </div>
+
+    <!-- Flow View -->
+    <section x-data="flowView" x-show="$store.review.view === 'flow'" x-transition>
+
+      <!-- Zoom controls + Add Connection button -->
+      <div class="flex items-center gap-1 mb-3 no-print" x-show="!isSmallScreen"
+           @keydown.escape.window="if (addingConnection) { addingConnection = null; }">
+        <button @click="zoomIn()" class="flow-zoom-btn flex items-center justify-center rounded bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-600 dark:text-gray-300 text-sm font-bold">+</button>
+        <button @click="zoomOut()" class="flow-zoom-btn flex items-center justify-center rounded bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-600 dark:text-gray-300 text-sm font-bold">&minus;</button>
+        <button @click="zoomReset()" class="px-2 h-7 flex items-center justify-center rounded bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-500 dark:text-gray-400 text-xs">Reset</button>
+        <span class="text-xs text-gray-400 ml-1" x-text="Math.round(zoom * 100) + '%'"></span>
+        <!-- Add Connection button (edit mode only) -->
+        <button x-show="$store.review.editMode"
+                @click="addingConnection ? (addingConnection = null) : (addingConnection = { sourceId: null, step: 'selectSource' })"
+                class="ml-3 px-2 h-7 flex items-center justify-center rounded text-xs font-medium"
+                :class="addingConnection ? 'bg-red-100 text-red-600 hover:bg-red-200' : 'bg-blue-100 text-blue-600 hover:bg-blue-200'">
+          <span x-text="addingConnection ? '取消连线' : '+ 新建连线'"></span>
+        </button>
+        <!-- Add-connection status tip -->
+        <span x-show="addingConnection && addingConnection.step === 'selectSource'" class="ml-2 text-xs text-blue-500 font-medium">点击起始页面节点</span>
+        <span x-show="addingConnection && addingConnection.step === 'selectTarget'" class="ml-2 text-xs text-blue-500 font-medium">点击目标页面节点</span>
+      </div>
+
+      <!-- SVG graph (imperative rendering — <template x-for> doesn't work inside SVG namespace) -->
+      <div x-show="!isSmallScreen" class="overflow-auto border rounded-lg bg-white dark:bg-gray-800 dark:border-gray-700 relative">
+        <svg x-ref="flowSvg" :view-box.camel="viewBox" class="w-full" style="min-height:400px"
+             @click="handleSvgClick($event)" @dblclick="handleSvgDblClick($event)">
+          <defs>
+            <marker id="flow-arrowhead" viewBox="0 0 10 7" refX="10" refY="3.5"
+                    markerWidth="10" markerHeight="7" orient="auto-start-reverse" fill="currentColor">
+              <polygon points="0 0, 10 3.5, 0 7"/>
+            </marker>
+          </defs>
+          <g x-ref="edgesGroup"></g>
+          <g x-ref="nodesGroup"></g>
+        </svg>
+
+        <!-- HTML overlays positioned over SVG (for interactive editing elements) -->
+
+        <!-- Connection action bar -->
+        <div x-show="selectedEdge && $store.review.editMode" x-transition
+             class="absolute z-10" :style="getOverlayStyle(selectedEdge, 'actionBar')" @click.stop>
+          <div class="conn-action-bar bg-white dark:bg-gray-800 shadow-lg rounded-lg px-2 py-1 border dark:border-gray-600 flex items-center gap-1 text-xs">
+            <select class="border rounded px-1 py-0.5 text-xs flex-1"
+                    :value="$store.review.getConnectionType(selectedEdge)"
+                    @change="(function(el, s, eid, comp) { s.updateEdit('connectionTypes', eid, el.value); comp.computeLayout(); })($event.target, $store.review, selectedEdge, $data)">
+              <option value="navigation">导航跳转</option>
+              <option value="redirect">自动跳转</option>
+              <option value="back">返回</option>
+              <option value="conditional">条件跳转</option>
+              <option value="data">数据传递</option>
+            </select>
+            <button class="px-1.5 py-0.5 rounded bg-red-50 hover:bg-red-100 text-red-600"
+                    title="删除连线"
+                    @click.stop="deleteConnection(selectedEdge)">&#x2715;</button>
+          </div>
+        </div>
+
+        <!-- Label inline edit overlay -->
+        <div x-show="editingLabel" x-transition class="absolute z-10"
+             :style="getOverlayStyle(editingLabel, 'labelEdit')" @click.stop>
+          <input type="text" x-ref="labelEditInput"
+                 class="border border-blue-400 rounded px-1 text-xs text-center bg-white"
+                 style="width:120px; height:24px"
+                 @blur="saveLabelEdit($event.target.value)"
+                 @keydown.enter="$event.target.blur()"
+                 @keydown.escape.stop="editingLabel = null"/>
+        </div>
+
+        <!-- Node name inline edit overlay -->
+        <div x-show="editingNodeName" x-transition class="absolute z-10"
+             :style="getOverlayStyle(editingNodeName, 'nameEdit')" @click.stop>
+          <input type="text" x-ref="nameEditInput"
+                 class="border border-blue-400 rounded px-1 text-xs text-center bg-white"
+                 style="width:140px; height:22px"
+                 @blur="saveNameEdit($event.target.value)"
+                 @keydown.enter="$event.target.blur()"
+                 @keydown.escape.stop="editingNodeName = null"/>
+        </div>
+
+        <!-- Add-connection dialog overlay -->
+        <div x-show="addingConnection && addingConnection.step === 'confirmDialog'" x-transition
+             class="absolute z-10" :style="getOverlayStyle(addingConnection && addingConnection.targetId, 'addConn')" @click.stop>
+          <div class="bg-white shadow-lg rounded-lg p-2 border text-xs space-y-1" style="width:200px">
+            <div class="flex items-center gap-1">
+              <label class="text-gray-500 w-10">类型</label>
+              <select x-ref="newConnType" class="flex-1 border rounded px-1 py-0.5 text-xs">
+                <option value="navigation" selected>导航跳转</option>
+                <option value="redirect">自动跳转</option>
+                <option value="back">返回</option>
+                <option value="conditional">条件跳转</option>
+                <option value="data">数据传递</option>
+              </select>
+            </div>
+            <div class="flex items-center gap-1">
+              <label class="text-gray-500 w-10">标签</label>
+              <input x-ref="newConnLabel" type="text" placeholder="操作描述" class="flex-1 border rounded px-1 py-0.5 text-xs"/>
+            </div>
+            <div class="flex justify-end gap-1 pt-1">
+              <button @click="addingConnection = null" class="px-2 py-0.5 rounded bg-gray-100 hover:bg-gray-200 text-gray-600">取消</button>
+              <button @click="confirmNewConnection()" class="px-2 py-0.5 rounded bg-blue-500 hover:bg-blue-600 text-white">确认</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Small screen fallback -->
+      <div x-show="isSmallScreen" class="space-y-1 p-4">
+        <div class="text-sm text-gray-500 dark:text-gray-400 mb-2">Flow connections (small screen view)</div>
+        <template x-for="conn in getLinearConnections()" :key="conn.id">
+          <div class="flex items-center gap-2 py-1 text-sm">
+            <span class="font-medium" x-text="conn.fromName"></span>
+            <span class="text-gray-400">&rarr;</span>
+            <span class="text-gray-500 italic text-xs" x-text="conn.label"></span>
+            <span class="text-gray-400">&rarr;</span>
+            <span class="font-medium" x-text="conn.toName"></span>
+          </div>
+        </template>
+      </div>
+    </section>
+
+    <!-- Detail View (Phase 2) — default view -->
+    <section x-data="detailView" x-show="$store.review.view === 'detail'" x-transition>
+
+      <!-- Global controls bar -->
+      <div class="flex items-center justify-between mb-4 no-print">
+        <div class="flex items-center gap-2">
+          <button @click="expandAll()"
+            class="px-3 py-1.5 rounded-md text-sm font-medium bg-gray-100 text-gray-600 hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600 transition-colors">
+            展开全部
+          </button>
+          <button @click="collapseAll()"
+            class="px-3 py-1.5 rounded-md text-sm font-medium bg-gray-100 text-gray-600 hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600 transition-colors">
+            折叠全部
+          </button>
+        </div>
+        <span class="text-sm text-gray-500">
+          共 <span x-text="$store.review.data?.pages?.length || 0"></span> 个页面
+        </span>
+      </div>
+
+      <!-- Page card iteration -->
+      <template x-for="page in $store.review.data.pages" :key="page.id">
+        <div class="detail-card bg-white dark:bg-gray-800" :id="'page-card-' + page.id">
+
+          <!-- Page header: dark bg, left screenshot + right info -->
+          <div class="detail-page-header">
+            <!-- Page screenshot: view mode = lightbox click, edit mode = file picker (EDIT-DETAIL-09) -->
+            <div class="w-[200px] flex-shrink-0">
+              <div x-show="!$store.review.editMode" class="cursor-pointer"
+                   @click="openLightbox($store.review.getScreenshotSrc(page.id, 'default'))">
+                <img :src="$store.review.getScreenshotSrc(page.id, 'default')"
+                     class="w-full rounded shadow-sm screenshot-thumb"
+                     :alt="page.name">
+              </div>
+              <label x-show="$store.review.editMode"
+                     class="block cursor-pointer editable-hint relative"
+                     @dragover.prevent="$el.classList.add('screenshot-drop-active')"
+                     @dragleave="$el.classList.remove('screenshot-drop-active')"
+                     @drop.prevent="$el.classList.remove('screenshot-drop-active'); $store.review.handleScreenshotDrop($event, page.id, 'default')">
+                <img :src="$store.review.getScreenshotSrc(page.id, 'default')"
+                     class="w-full rounded shadow-sm screenshot-thumb"
+                     :alt="page.name">
+                <div class="absolute inset-0 bg-black/40 rounded flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity">
+                  <span class="text-white text-xs">点击替换截图</span>
+                </div>
+                <input type="file" accept="image/*" class="hidden"
+                       @change="$store.review.handleScreenshotUpload($event, page.id, 'default')">
+              </label>
+            </div>
+            <div class="flex-1 min-w-0">
+              <h3 class="text-lg font-bold text-white" x-text="page.name"></h3>
+              <!-- Page summary: view mode = text, edit mode = textarea (EDIT-DETAIL-01) -->
+              <p x-show="!$store.review.editMode" class="text-gray-300 text-sm mt-1"
+                 x-text="$store.review.getPageSummary(page.id)"></p>
+              <template x-if="$store.review.editMode">
+                <textarea
+                  :value="$store.review.getPageSummary(page.id)"
+                  @blur="$store.review.updateEdit('pageSummaries', page.id, $event.target.value)"
+                  @keydown.escape="$event.target.blur()"
+                  class="w-full bg-gray-700 border border-gray-600 rounded px-2 py-1 text-gray-200 text-sm resize-y mt-1"
+                  rows="2"
+                  placeholder="输入页面功能概述..."></textarea>
+              </template>
+            </div>
+          </div>
+
+          <!-- Feature table: 4-column layout -->
+          <div class="overflow-x-auto">
+            <table class="w-full">
+              <thead class="bg-gray-50 dark:bg-gray-700 text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                <tr class="hidden md:table-row">
+                  <th class="w-[130px] px-3 py-2 text-left font-medium">截图</th>
+                  <th class="w-[150px] px-3 py-2 text-left font-medium">功能点</th>
+                  <th class="px-3 py-2 text-left font-medium">功能说明</th>
+                  <th class="w-[180px] px-3 py-2 text-left font-medium">备注</th>
+                  <th class="w-[40px] px-1 py-2 text-center font-medium">批注</th>
+                  <th x-show="$store.review.editMode" class="w-[80px] px-2 py-2 text-center font-medium">操作</th>
+                </tr>
+              </thead>
+              <!-- Feature rows: each feature wrapped in its own tbody for comment panel pairing -->
+              <template x-for="(feat, featIdx) in getEffectiveFeatures(page.id)" :key="feat.id">
+                <tbody>
+                  <tr class="detail-feature-row">
+                    <!-- Screenshot cell (EDIT-DETAIL-05 / CAPTURE-03) -->
+                    <td class="px-3 py-2 align-top">
+                      <!-- View mode: click for lightbox -->
+                      <div x-show="!$store.review.editMode">
+                        <template x-if="getFeatureScreenshot(page.id, feat.id)">
+                          <img :src="getFeatureScreenshot(page.id, feat.id)"
+                               class="w-[120px] h-[80px] object-cover rounded cursor-pointer screenshot-thumb"
+                               @click="openLightbox(getFeatureScreenshot(page.id, feat.id))"
+                               :alt="$store.review.getFeature(page.id, feat.id, 'name')">
+                        </template>
+                        <template x-if="!getFeatureScreenshot(page.id, feat.id)">
+                          <div class="w-[120px] h-[80px] border-2 border-dashed border-gray-200 rounded flex items-center justify-center">
+                            <svg class="w-6 h-6 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                                    d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/>
+                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                                    d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/>
+                            </svg>
+                          </div>
+                        </template>
+                      </div>
+                      <!-- Edit mode: click for file picker / drag to replace -->
+                      <label x-show="$store.review.editMode"
+                             class="block cursor-pointer editable-hint relative w-[120px] h-[80px]"
+                             @dragover.prevent="$el.classList.add('screenshot-drop-active')"
+                             @dragleave="$el.classList.remove('screenshot-drop-active')"
+                             @drop.prevent="$el.classList.remove('screenshot-drop-active'); handleFeatureScreenshotDrop($event, page.id, feat.id)">
+                        <template x-if="getFeatureScreenshot(page.id, feat.id)">
+                          <img :src="getFeatureScreenshot(page.id, feat.id)"
+                               class="w-full h-full object-cover rounded">
+                        </template>
+                        <template x-if="!getFeatureScreenshot(page.id, feat.id)">
+                          <div class="w-full h-full border-2 border-dashed border-gray-300 rounded flex items-center justify-center">
+                            <span class="text-xs text-gray-400 text-center px-1">点击添加截图</span>
+                          </div>
+                        </template>
+                        <div class="absolute inset-0 bg-black/40 rounded flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity">
+                          <span class="text-white text-xs">替换截图</span>
+                        </div>
+                        <input type="file" accept="image/*" class="hidden"
+                               @change="handleFeatureScreenshotUpload($event, page.id, feat.id)">
+                      </label>
+                    </td>
+                    <!-- Feature name cell with expand toggle (EDIT-DETAIL-02) -->
+                    <td class="px-3 py-2 align-top">
+                      <div class="flex items-start gap-1">
+                        <button @click="toggleExpand(feat.id)"
+                          class="mt-0.5 flex-shrink-0 w-5 h-5 flex items-center justify-center text-gray-400 hover:text-gray-600 transition-colors rounded">
+                          <svg class="w-4 h-4 transition-transform duration-200"
+                               :class="isExpanded(feat.id) ? 'rotate-90' : ''"
+                               fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                          </svg>
+                        </button>
+                        <span x-show="!$store.review.editMode" class="font-medium text-gray-900 dark:text-gray-100"
+                              x-text="$store.review.getFeature(page.id, feat.id, 'name')"></span>
+                        <input x-show="$store.review.editMode" type="text"
+                               :value="$store.review.getFeature(page.id, feat.id, 'name')"
+                               @blur="(function(el, s, pid, fid) { var k = pid + '_' + fid; var ex = Object.assign({}, s.edits.features[k] || {}); ex.name = el.value; s.updateEdit('features', k, ex); })($event.target, $store.review, page.id, feat.id)"
+                               @keydown.escape="$event.target.blur()"
+                               class="flex-1 min-w-0 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded px-1.5 py-0.5 text-sm font-medium text-gray-900 dark:text-white focus:ring-1 focus:ring-primary focus:border-primary">
+                      </div>
+                    </td>
+                    <!-- Description cell (EDIT-DETAIL-03, Markdown rendered, collapsible) -->
+                    <td class="px-3 py-2 align-top text-sm text-gray-700 dark:text-gray-300"
+                        x-show="isExpanded(feat.id)">
+                      <div x-show="!$store.review.editMode"
+                           x-html="renderMarkdown($store.review.getFeature(page.id, feat.id, 'description'))"></div>
+                      <textarea x-show="$store.review.editMode"
+                                :value="$store.review.getFeature(page.id, feat.id, 'description')"
+                                @blur="(function(el, s, pid, fid) { var k = pid + '_' + fid; var ex = Object.assign({}, s.edits.features[k] || {}); ex.description = el.value; s.updateEdit('features', k, ex); })($event.target, $store.review, page.id, feat.id)"
+                                @keydown.escape="$event.target.blur()"
+                                class="w-full bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded px-2 py-1 text-sm text-gray-700 dark:text-white resize-y focus:ring-1 focus:ring-primary focus:border-primary dark:placeholder-gray-400"
+                                rows="3"
+                                placeholder="输入功能说明..."></textarea>
+                    </td>
+                    <!-- Notes cell (EDIT-DETAIL-04, collapsible) -->
+                    <td class="px-3 py-2 align-top text-sm text-gray-500 dark:text-gray-400"
+                        x-show="isExpanded(feat.id)">
+                      <span x-show="!$store.review.editMode"
+                            x-text="$store.review.getFeature(page.id, feat.id, 'notes')"></span>
+                      <textarea x-show="$store.review.editMode"
+                                :value="$store.review.getFeature(page.id, feat.id, 'notes')"
+                                @blur="(function(el, s, pid, fid) { var k = pid + '_' + fid; var ex = Object.assign({}, s.edits.features[k] || {}); ex.notes = el.value; s.updateEdit('features', k, ex); })($event.target, $store.review, page.id, feat.id)"
+                                @keydown.escape="$event.target.blur()"
+                                class="w-full bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded px-2 py-1 text-sm text-gray-500 dark:text-white resize-y focus:ring-1 focus:ring-primary focus:border-primary dark:placeholder-gray-400"
+                                rows="2"
+                                placeholder="输入备注..."></textarea>
+                    </td>
+                    <!-- Comment button cell (EDIT-DETAIL-10, always visible) -->
+                    <td class="px-1 py-2 align-top text-center">
+                      <button @click="toggleComments(feat.id)"
+                              class="relative p-1 text-gray-400 hover:text-blue-500 transition-colors rounded"
+                              title="批注">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>
+                        </svg>
+                        <span x-show="$store.review.getFeatureCommentCount(page.id, feat.id) > 0"
+                              x-text="$store.review.getFeatureCommentCount(page.id, feat.id)"
+                              class="absolute -top-1 -right-1 bg-blue-500 text-white text-[10px] font-bold rounded-full w-4 h-4 flex items-center justify-center leading-none"></span>
+                      </button>
+                    </td>
+                    <!-- Actions cell: delete + reorder (EDIT-DETAIL-07/08) -->
+                    <td x-show="$store.review.editMode" class="px-2 py-2 align-top text-center">
+                      <div class="flex flex-col items-center gap-0.5">
+                        <button @click="moveFeature(page.id, feat.id, -1)"
+                                :disabled="featIdx === 0"
+                                :class="featIdx === 0 ? 'text-gray-300 cursor-not-allowed' : 'text-gray-500 hover:text-gray-700'"
+                                class="w-6 h-6 flex items-center justify-center rounded transition-colors"
+                                title="上移">&#9650;</button>
+                        <button @click="moveFeature(page.id, feat.id, 1)"
+                                :disabled="featIdx === getEffectiveFeatures(page.id).length - 1"
+                                :class="featIdx === getEffectiveFeatures(page.id).length - 1 ? 'text-gray-300 cursor-not-allowed' : 'text-gray-500 hover:text-gray-700'"
+                                class="w-6 h-6 flex items-center justify-center rounded transition-colors"
+                                title="下移">&#9660;</button>
+                        <button @click="deleteFeature(page.id, feat.id)"
+                                class="w-6 h-6 flex items-center justify-center rounded text-red-400 hover:text-red-600 hover:bg-red-50 transition-colors mt-1"
+                                title="删除">&#10005;</button>
+                      </div>
+                    </td>
+                  </tr>
+                  <!-- Comment panel (EDIT-DETAIL-10, inline expand below feature row) -->
+                  <tr x-show="isCommentsOpen(feat.id)" x-transition>
+                    <td :colspan="$store.review.editMode ? 6 : 5" class="px-3 py-3 bg-gray-50 dark:bg-gray-800">
+                      <div class="space-y-2">
+                        <!-- Existing comments list -->
+                        <template x-for="comment in $store.review.getFeatureComments(page.id, feat.id)" :key="comment.id">
+                          <div class="bg-white dark:bg-gray-700 rounded p-2 mb-1 shadow-sm">
+                            <div class="flex items-center gap-2">
+                              <span class="font-medium text-sm dark:text-gray-200" x-text="comment.author || '\u533F\u540D'"></span>
+                              <span class="text-gray-400 dark:text-gray-500 text-xs" x-text="comment.timestamp"></span>
+                            </div>
+                            <p class="text-sm text-gray-700 dark:text-gray-300 mt-1" x-text="comment.text"></p>
+                          </div>
+                        </template>
+                        <!-- No comments message -->
+                        <template x-if="$store.review.getFeatureComments(page.id, feat.id).length === 0">
+                          <p class="text-xs text-gray-400 italic">暂无批注</p>
+                        </template>
+                        <!-- New comment form -->
+                        <div class="flex items-start gap-2 mt-2 pt-2 border-t border-gray-200 dark:border-gray-600">
+                          <input type="text" placeholder="你的名字"
+                                 class="text-xs border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 rounded px-2 py-1 w-24 flex-shrink-0"
+                                 :value="localStorage.getItem('reviewMapAuthor') || ''"
+                                 @blur="$store.review.setReviewAuthor($event.target.value)">
+                          <textarea placeholder="添加批注..." rows="2"
+                                    class="flex-1 text-sm border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 rounded px-2 py-1 resize-y focus:ring-1 focus:ring-primary focus:border-primary"
+                                    :value="commentText[feat.id] || ''"
+                                    @input="updateCommentText(feat.id, $event.target.value)"
+                                    @keydown.ctrl.enter="submitComment(page.id, feat.id)"></textarea>
+                          <button @click="submitComment(page.id, feat.id)"
+                                  class="flex-shrink-0 px-3 py-1.5 bg-blue-500 text-white text-xs font-medium rounded hover:bg-blue-600 transition-colors">
+                            提交批注
+                          </button>
+                        </div>
+                      </div>
+                    </td>
+                  </tr>
+                </tbody>
+              </template>
+              <!-- Empty state -->
+              <tbody>
+                <template x-if="getEffectiveFeatures(page.id).length === 0">
+                  <tr>
+                    <td :colspan="$store.review.editMode ? 6 : 5" class="px-3 py-8 text-center text-gray-400 text-sm">
+                      暂无功能点
+                    </td>
+                  </tr>
+                </template>
+                <!-- Add feature button (EDIT-DETAIL-06) -->
+                <tr x-show="$store.review.editMode">
+                  <td :colspan="$store.review.editMode ? 6 : 5" class="px-3 py-2">
+                    <button @click="addFeature(page.id)"
+                            class="w-full py-2 border-2 border-dashed border-gray-300 rounded-md text-sm text-gray-500 hover:border-primary hover:text-primary transition-colors flex items-center justify-center gap-1">
+                      <span class="text-lg leading-none">+</span> 添加功能点
+                    </button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+        </div>
+      </template>
+
+    </section>
+
+    <!-- Lightbox modal (global, shared across all views) -->
+    <div x-show="$store.review.lightboxOpen"
+         x-transition:enter="transition ease-out duration-200"
+         x-transition:enter-start="opacity-0"
+         x-transition:enter-end="opacity-100"
+         x-transition:leave="transition ease-in duration-150"
+         x-transition:leave-start="opacity-100"
+         x-transition:leave-end="opacity-0"
+         @click.self="$store.review.closeLightbox()"
+         @keydown.escape.window="$store.review.closeLightbox()"
+         class="lightbox-overlay no-print"
+         style="display: none;">
+      <img :src="$store.review.lightboxSrc"
+           class="max-w-full max-h-full object-contain rounded-lg shadow-2xl">
+      <button @click="$store.review.closeLightbox()"
+              class="absolute top-4 right-4 text-white text-3xl leading-none hover:text-gray-300 transition-colors"
+              aria-label="Close">
+        &times;
+      </button>
+    </div>
+
+    <!-- Journey View (Phase 4) -->
+    <section x-data="journeyView" x-show="$store.review.view === 'journey'" x-transition>
+      <!-- Header bar -->
+      <div class="flex items-center justify-between mb-6">
+        <h2 class="text-xl font-bold text-gray-800 dark:text-gray-100">用户路径</h2>
+        <span class="text-sm text-gray-500 dark:text-gray-400" x-text="($store.review.data.journeys || []).length + ' 条路径'"></span>
+      </div>
+
+      <!-- Empty state -->
+      <template x-if="!$store.review.data.journeys || $store.review.data.journeys.length === 0">
+        <div class="text-center text-gray-400 py-20">
+          <p class="text-lg">暂无用户路径数据</p>
+          <p class="text-sm mt-2">在数据中添加 journeys 数组以启用此视图</p>
+        </div>
+      </template>
+
+      <!-- Journey cards -->
+      <template x-for="(journey, jIdx) in getEffectiveJourneys()" :key="jIdx">
+        <div x-show="!isJourneyDeleted(jIdx)" class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-5 mb-5">
+          <!-- Card header -->
+          <div class="flex items-start justify-between">
+            <div class="flex-1 min-w-0">
+              <!-- Journey name: read-only -->
+              <h3 x-show="!$store.review.editMode" class="text-lg font-bold text-gray-800 dark:text-gray-100" x-text="getJourneyName(journey, jIdx)"></h3>
+              <!-- Journey name: edit mode (EDIT-JOURNEY-01) -->
+              <input x-show="$store.review.editMode"
+                     type="text"
+                     :value="getJourneyName(journey, jIdx)"
+                     @blur="(function(el, comp, idx) { comp.saveJourneyField(idx, 'name', el.value); })($event.target, $data, jIdx)"
+                     @keydown.escape="$event.target.blur()"
+                     @keydown.enter="$event.target.blur()"
+                     class="text-lg font-bold text-gray-800 dark:text-white bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded px-2 py-0.5 w-full focus:ring-1 focus:ring-primary">
+              <!-- Journey goal: read-only -->
+              <p x-show="!$store.review.editMode && getJourneyGoal(journey, jIdx)" class="text-sm text-gray-500 dark:text-gray-400 mt-1">
+                <span class="text-gray-400">目标：</span><span x-text="getJourneyGoal(journey, jIdx)"></span>
+              </p>
+              <!-- Journey goal: edit mode (EDIT-JOURNEY-02) -->
+              <textarea x-show="$store.review.editMode"
+                        :value="getJourneyGoal(journey, jIdx)"
+                        @blur="(function(el, comp, idx) { comp.saveJourneyField(idx, 'goal', el.value); })($event.target, $data, jIdx)"
+                        @keydown.escape="$event.target.blur()"
+                        class="text-sm text-gray-500 dark:text-gray-400 mt-1 w-full bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded px-2 py-1 resize-y focus:ring-1 focus:ring-primary dark:placeholder-gray-400"
+                        rows="1" placeholder="输入用户目标..."></textarea>
+            </div>
+            <!-- Delete journey button (EDIT-JOURNEY-07 delete) -->
+            <button x-show="$store.review.editMode"
+                    @click="deleteJourney(jIdx)"
+                    class="text-red-400 hover:text-red-600 text-lg leading-none ml-2 flex-shrink-0"
+                    title="删除路径">&times;</button>
+          </div>
+
+          <!-- Horizontal step timeline (desktop >=768px) -->
+          <div class="hidden md:flex items-start gap-0 overflow-x-auto py-4 px-2">
+            <template x-for="(step, sIdx) in getEffectiveSteps(journey, jIdx)" :key="sIdx">
+              <div class="flex items-start flex-shrink-0">
+                <!-- Step card -->
+                <div class="w-48 border dark:border-gray-600 rounded-lg p-3 bg-gray-50 dark:bg-gray-700 relative"
+                     :class="isSharedStep(step.pageId, jIdx) ? 'ring-2 ring-blue-300' : ''">
+                  <!-- Shared step indicator -->
+                  <span x-show="isSharedStep(step.pageId, jIdx)"
+                        class="absolute -top-2 -right-2 w-5 h-5 bg-blue-500 text-white rounded-full text-xs flex items-center justify-center"
+                        title="此步骤在其他路径中也出现">&#x2194;</span>
+                  <!-- Delete step button (EDIT-JOURNEY-05 delete) -->
+                  <button x-show="$store.review.editMode"
+                          @click="deleteStep(jIdx, sIdx)"
+                          class="absolute top-1 right-1 text-red-400 hover:text-red-600 text-xs leading-none"
+                          title="删除步骤">&times;</button>
+                  <!-- Page name (clickable link) -->
+                  <a class="text-sm font-bold text-blue-600 hover:underline cursor-pointer block truncate"
+                     @click="goToPage(step.pageId)"
+                     x-text="getPageName(step.pageId)"></a>
+                  <!-- Action description: read-only -->
+                  <p x-show="!$store.review.editMode" class="text-xs text-gray-700 dark:text-gray-300 mt-1 line-clamp-2" x-text="step.action || ''"></p>
+                  <!-- Action description: edit mode (EDIT-JOURNEY-03) -->
+                  <input x-show="$store.review.editMode" type="text"
+                         :value="step.action || ''"
+                         @blur="(function(el, comp, ji, si) { comp.saveStepField(ji, si, 'action', el.value); })($event.target, $data, jIdx, sIdx)"
+                         @keydown.escape="$event.target.blur()"
+                         class="text-xs text-gray-700 dark:text-white mt-1 w-full bg-white dark:bg-gray-600 border border-gray-300 dark:border-gray-500 rounded px-1.5 py-0.5 focus:ring-1 focus:ring-primary dark:placeholder-gray-400"
+                         placeholder="操作描述...">
+                  <!-- Result: read-only -->
+                  <p x-show="!$store.review.editMode" class="text-xs text-gray-400 dark:text-gray-500 mt-0.5 line-clamp-2" x-text="step.result || ''"></p>
+                  <!-- Result: edit mode (EDIT-JOURNEY-04) -->
+                  <input x-show="$store.review.editMode" type="text"
+                         :value="step.result || ''"
+                         @blur="(function(el, comp, ji, si) { comp.saveStepField(ji, si, 'result', el.value); })($event.target, $data, jIdx, sIdx)"
+                         @keydown.escape="$event.target.blur()"
+                         class="text-xs text-gray-400 dark:text-white mt-0.5 w-full bg-white dark:bg-gray-600 border border-gray-300 dark:border-gray-500 rounded px-1.5 py-0.5 focus:ring-1 focus:ring-primary dark:placeholder-gray-400"
+                         placeholder="操作结果...">
+                  <!-- Decision point (if exists) -->
+                  <template x-if="step.decisionPoint">
+                    <div class="mt-2 pt-2 border-t border-dashed border-amber-300 bg-amber-50 -mx-3 -mb-3 px-3 pb-3 rounded-b-lg relative">
+                      <!-- Delete decision point button (edit mode) -->
+                      <button x-show="$store.review.editMode"
+                              @click="deleteDecisionPoint(jIdx, sIdx)"
+                              class="absolute top-1 right-1 text-red-400 hover:text-red-600 text-xs leading-none"
+                              title="删除决策点">&times;</button>
+                      <div class="flex items-center gap-1 mb-1">
+                        <span class="text-amber-600 text-xs">&#x25C7;</span>
+                        <!-- Condition: read-only -->
+                        <span x-show="!$store.review.editMode" class="text-xs font-medium text-amber-700" x-text="step.decisionPoint.condition || '决策点'"></span>
+                        <!-- Condition: edit mode (EDIT-JOURNEY-09) -->
+                        <input x-show="$store.review.editMode" type="text"
+                               :value="step.decisionPoint.condition || ''"
+                               @blur="(function(el, comp, ji, si) { comp.saveDecisionCondition(ji, si, el.value); })($event.target, $data, jIdx, sIdx)"
+                               @keydown.escape="$event.target.blur()"
+                               class="text-xs font-medium text-amber-700 bg-white border border-amber-300 rounded px-1 py-0.5 flex-1 focus:ring-1 focus:ring-amber-400"
+                               placeholder="决策条件...">
+                      </div>
+                      <template x-for="(branch, bIdx) in (step.decisionPoint.branches || [])" :key="bIdx">
+                        <div class="flex items-center gap-1 pl-3 mt-0.5">
+                          <!-- Branch: read-only -->
+                          <a x-show="!$store.review.editMode" class="block text-xs text-blue-600 hover:underline cursor-pointer"
+                             @click="goToPage(branch.targetPageId)"
+                             x-text="'→ ' + branch.label"></a>
+                          <!-- Branch: edit mode -->
+                          <span x-show="$store.review.editMode" class="text-xs text-gray-400">→</span>
+                          <input x-show="$store.review.editMode" type="text"
+                                 :value="branch.label || ''"
+                                 @blur="(function(el, comp, ji, si, bi) { comp.saveBranchLabel(ji, si, bi, el.value); })($event.target, $data, jIdx, sIdx, bIdx)"
+                                 @keydown.escape="$event.target.blur()"
+                                 class="text-xs bg-white border border-gray-300 rounded px-1 py-0.5 w-16 focus:ring-1 focus:ring-primary"
+                                 placeholder="分支名...">
+                          <select x-show="$store.review.editMode"
+                                  :value="branch.targetPageId || ''"
+                                  @change="(function(el, comp, ji, si, bi) { comp.saveBranchTarget(ji, si, bi, el.value); })($event.target, $data, jIdx, sIdx, bIdx)"
+                                  class="text-xs border border-gray-300 rounded px-1 py-0.5 w-20">
+                            <option value="">目标页...</option>
+                            <template x-for="pg in ($store.review.data.pages || [])" :key="pg.id">
+                              <option :value="pg.id" x-text="getPageName(pg.id)"></option>
+                            </template>
+                          </select>
+                          <button x-show="$store.review.editMode"
+                                  @click="deleteBranch(jIdx, sIdx, bIdx)"
+                                  class="text-red-400 hover:text-red-600 text-xs leading-none"
+                                  title="删除分支">&times;</button>
+                        </div>
+                      </template>
+                      <!-- Add branch button (edit mode) -->
+                      <button x-show="$store.review.editMode"
+                              @click="addBranch(jIdx, sIdx)"
+                              class="text-xs text-amber-500 hover:text-amber-700 mt-1 pl-3"
+                              title="添加分支">+ 分支</button>
+                    </div>
+                  </template>
+                  <!-- Add decision point button (edit mode, no existing decision point) -->
+                  <template x-if="!step.decisionPoint">
+                    <button x-show="$store.review.editMode"
+                            @click="addDecisionPoint(jIdx, sIdx)"
+                            class="text-xs text-amber-500 hover:text-amber-700 mt-2"
+                            title="添加决策点">+ 决策点</button>
+                  </template>
+                  <!-- Step reorder arrows (EDIT-JOURNEY-06) -->
+                  <div x-show="$store.review.editMode" class="flex justify-center gap-1 mt-2 pt-1 border-t border-gray-200">
+                    <button @click="moveStep(jIdx, sIdx, -1)"
+                            :disabled="sIdx === 0"
+                            :class="sIdx === 0 ? 'text-gray-300 cursor-not-allowed' : 'text-gray-500 hover:text-gray-700'"
+                            class="w-5 h-5 flex items-center justify-center text-xs rounded transition-colors"
+                            title="左移">&#x25C0;</button>
+                    <button @click="moveStep(jIdx, sIdx, 1)"
+                            :disabled="sIdx === getEffectiveSteps(journey, jIdx).length - 1"
+                            :class="sIdx === getEffectiveSteps(journey, jIdx).length - 1 ? 'text-gray-300 cursor-not-allowed' : 'text-gray-500 hover:text-gray-700'"
+                            class="w-5 h-5 flex items-center justify-center text-xs rounded transition-colors"
+                            title="右移">&#x25B6;</button>
+                  </div>
+                </div>
+                <!-- Arrow connector between steps (not after last) -->
+                <template x-if="sIdx < getEffectiveSteps(journey, jIdx).length - 1">
+                  <div class="flex items-center px-1 pt-6 flex-shrink-0 text-gray-300">
+                    <svg class="w-6 h-4" viewBox="0 0 24 16" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M0 8h20M16 3l5 5-5 5"/>
+                    </svg>
+                  </div>
+                </template>
+              </div>
+            </template>
+            <!-- Add step button (EDIT-JOURNEY-05 add, desktop) -->
+            <div x-show="$store.review.editMode" class="flex-shrink-0 flex items-center px-2 pt-4">
+              <button @click="addStepForm = addStepForm && addStepForm.jIdx === jIdx ? null : {jIdx: jIdx, pageId: '', action: '', result: ''}"
+                      class="w-10 h-10 rounded-full border-2 border-dashed border-gray-300 hover:border-blue-400 hover:text-blue-500 text-gray-400 flex items-center justify-center text-xl transition-colors"
+                      title="新增步骤">+</button>
+            </div>
+          </div>
+
+          <!-- Vertical step list (mobile <768px) -->
+          <div class="md:hidden space-y-3 py-4 px-2">
+            <template x-for="(step, sIdx) in getEffectiveSteps(journey, jIdx)" :key="sIdx">
+              <div class="flex items-start gap-3">
+                <!-- Step number circle -->
+                <div class="w-7 h-7 rounded-full bg-gray-200 dark:bg-gray-600 text-gray-600 dark:text-gray-300 text-xs font-bold flex items-center justify-center flex-shrink-0 mt-0.5"
+                     x-text="sIdx + 1"></div>
+                <!-- Step content -->
+                <div class="flex-1 border dark:border-gray-600 rounded-lg p-3 bg-gray-50 dark:bg-gray-700 relative"
+                     :class="isSharedStep(step.pageId, jIdx) ? 'ring-2 ring-blue-300' : ''">
+                  <!-- Delete step button (mobile, edit mode) -->
+                  <button x-show="$store.review.editMode"
+                          @click="deleteStep(jIdx, sIdx)"
+                          class="absolute top-1 right-1 text-red-400 hover:text-red-600 text-xs leading-none"
+                          title="删除步骤">&times;</button>
+                  <a class="text-sm font-bold text-blue-600 hover:underline cursor-pointer"
+                     @click="goToPage(step.pageId)"
+                     x-text="getPageName(step.pageId)"></a>
+                  <!-- Action: read-only -->
+                  <p x-show="!$store.review.editMode" class="text-xs text-gray-700 dark:text-gray-300 mt-1" x-text="step.action || ''"></p>
+                  <!-- Action: edit mode -->
+                  <input x-show="$store.review.editMode" type="text"
+                         :value="step.action || ''"
+                         @blur="(function(el, comp, ji, si) { comp.saveStepField(ji, si, 'action', el.value); })($event.target, $data, jIdx, sIdx)"
+                         @keydown.escape="$event.target.blur()"
+                         class="text-xs text-gray-700 dark:text-white mt-1 w-full bg-white dark:bg-gray-600 border border-gray-300 dark:border-gray-500 rounded px-1.5 py-0.5 focus:ring-1 focus:ring-primary dark:placeholder-gray-400"
+                         placeholder="操作描述...">
+                  <!-- Result: read-only -->
+                  <p x-show="!$store.review.editMode" class="text-xs text-gray-400 dark:text-gray-500 mt-0.5" x-text="step.result || ''"></p>
+                  <!-- Result: edit mode -->
+                  <input x-show="$store.review.editMode" type="text"
+                         :value="step.result || ''"
+                         @blur="(function(el, comp, ji, si) { comp.saveStepField(ji, si, 'result', el.value); })($event.target, $data, jIdx, sIdx)"
+                         @keydown.escape="$event.target.blur()"
+                         class="text-xs text-gray-400 dark:text-white mt-0.5 w-full bg-white dark:bg-gray-600 border border-gray-300 dark:border-gray-500 rounded px-1.5 py-0.5 focus:ring-1 focus:ring-primary dark:placeholder-gray-400"
+                         placeholder="操作结果...">
+                  <!-- Decision point (mobile) -->
+                  <template x-if="step.decisionPoint">
+                    <div class="mt-2 pt-2 border-t border-dashed border-amber-300 bg-amber-50 rounded-b-lg px-2 pb-2 -mx-3 -mb-3 relative">
+                      <button x-show="$store.review.editMode"
+                              @click="deleteDecisionPoint(jIdx, sIdx)"
+                              class="absolute top-1 right-1 text-red-400 hover:text-red-600 text-xs leading-none"
+                              title="删除决策点">&times;</button>
+                      <div class="flex items-center gap-1 mb-1">
+                        <span class="text-amber-600 text-xs">&#x25C7;</span>
+                        <span x-show="!$store.review.editMode" class="text-xs font-medium text-amber-700" x-text="step.decisionPoint.condition || '决策点'"></span>
+                        <input x-show="$store.review.editMode" type="text"
+                               :value="step.decisionPoint.condition || ''"
+                               @blur="(function(el, comp, ji, si) { comp.saveDecisionCondition(ji, si, el.value); })($event.target, $data, jIdx, sIdx)"
+                               @keydown.escape="$event.target.blur()"
+                               class="text-xs font-medium text-amber-700 bg-white border border-amber-300 rounded px-1 py-0.5 flex-1 focus:ring-1 focus:ring-amber-400"
+                               placeholder="决策条件...">
+                      </div>
+                      <template x-for="(branch, bIdx) in (step.decisionPoint.branches || [])" :key="bIdx">
+                        <div class="flex items-center gap-1 pl-3 mt-0.5">
+                          <a x-show="!$store.review.editMode" class="block text-xs text-blue-600 hover:underline cursor-pointer"
+                             @click="goToPage(branch.targetPageId)"
+                             x-text="'→ ' + branch.label"></a>
+                          <span x-show="$store.review.editMode" class="text-xs text-gray-400">→</span>
+                          <input x-show="$store.review.editMode" type="text"
+                                 :value="branch.label || ''"
+                                 @blur="(function(el, comp, ji, si, bi) { comp.saveBranchLabel(ji, si, bi, el.value); })($event.target, $data, jIdx, sIdx, bIdx)"
+                                 @keydown.escape="$event.target.blur()"
+                                 class="text-xs bg-white border border-gray-300 rounded px-1 py-0.5 w-16 focus:ring-1 focus:ring-primary"
+                                 placeholder="分支名...">
+                          <select x-show="$store.review.editMode"
+                                  :value="branch.targetPageId || ''"
+                                  @change="(function(el, comp, ji, si, bi) { comp.saveBranchTarget(ji, si, bi, el.value); })($event.target, $data, jIdx, sIdx, bIdx)"
+                                  class="text-xs border border-gray-300 rounded px-1 py-0.5 w-20">
+                            <option value="">目标页...</option>
+                            <template x-for="pg in ($store.review.data.pages || [])" :key="pg.id">
+                              <option :value="pg.id" x-text="getPageName(pg.id)"></option>
+                            </template>
+                          </select>
+                          <button x-show="$store.review.editMode"
+                                  @click="deleteBranch(jIdx, sIdx, bIdx)"
+                                  class="text-red-400 hover:text-red-600 text-xs leading-none"
+                                  title="删除分支">&times;</button>
+                        </div>
+                      </template>
+                      <button x-show="$store.review.editMode"
+                              @click="addBranch(jIdx, sIdx)"
+                              class="text-xs text-amber-500 hover:text-amber-700 mt-1 pl-3"
+                              title="添加分支">+ 分支</button>
+                    </div>
+                  </template>
+                  <!-- Add decision point (mobile, edit mode) -->
+                  <template x-if="!step.decisionPoint">
+                    <button x-show="$store.review.editMode"
+                            @click="addDecisionPoint(jIdx, sIdx)"
+                            class="text-xs text-amber-500 hover:text-amber-700 mt-2"
+                            title="添加决策点">+ 决策点</button>
+                  </template>
+                  <!-- Step reorder arrows (mobile) -->
+                  <div x-show="$store.review.editMode" class="flex justify-center gap-1 mt-2 pt-1 border-t border-gray-200">
+                    <button @click="moveStep(jIdx, sIdx, -1)"
+                            :disabled="sIdx === 0"
+                            :class="sIdx === 0 ? 'text-gray-300 cursor-not-allowed' : 'text-gray-500 hover:text-gray-700'"
+                            class="w-5 h-5 flex items-center justify-center text-xs rounded transition-colors"
+                            title="左移">&#x25C0;</button>
+                    <button @click="moveStep(jIdx, sIdx, 1)"
+                            :disabled="sIdx === getEffectiveSteps(journey, jIdx).length - 1"
+                            :class="sIdx === getEffectiveSteps(journey, jIdx).length - 1 ? 'text-gray-300 cursor-not-allowed' : 'text-gray-500 hover:text-gray-700'"
+                            class="w-5 h-5 flex items-center justify-center text-xs rounded transition-colors"
+                            title="右移">&#x25B6;</button>
+                  </div>
+                </div>
+              </div>
+            </template>
+            <!-- Add step button (mobile) -->
+            <div x-show="$store.review.editMode" class="flex justify-center pt-2">
+              <button @click="addStepForm = addStepForm && addStepForm.jIdx === jIdx ? null : {jIdx: jIdx, pageId: '', action: '', result: ''}"
+                      class="w-10 h-10 rounded-full border-2 border-dashed border-gray-300 hover:border-blue-400 hover:text-blue-500 text-gray-400 flex items-center justify-center text-xl transition-colors"
+                      title="新增步骤">+</button>
+            </div>
+          </div>
+
+          <!-- Add step form (inline, shared desktop/mobile) -->
+          <div x-show="addStepForm && addStepForm.jIdx === jIdx" x-transition
+               class="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-3 mt-2 mx-2">
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
+              <div>
+                <label class="text-xs text-gray-500 mb-1 block">页面</label>
+                <select class="w-full text-sm border border-gray-300 rounded px-2 py-1"
+                        @change="addStepForm && (addStepForm = Object.assign({}, addStepForm, {pageId: $event.target.value}))">
+                  <option value="">选择页面...</option>
+                  <template x-for="pg in ($store.review.data.pages || [])" :key="pg.id">
+                    <option :value="pg.id" x-text="getPageName(pg.id)"></option>
+                  </template>
+                </select>
+              </div>
+              <div>
+                <label class="text-xs text-gray-500 mb-1 block">操作描述</label>
+                <input type="text" class="w-full text-sm border border-gray-300 rounded px-2 py-1"
+                       placeholder="用户做了什么..."
+                       @input="addStepForm && (addStepForm = Object.assign({}, addStepForm, {action: $event.target.value}))">
+              </div>
+              <div>
+                <label class="text-xs text-gray-500 mb-1 block">操作结果</label>
+                <input type="text" class="w-full text-sm border border-gray-300 rounded px-2 py-1"
+                       placeholder="得到了什么..."
+                       @input="addStepForm && (addStepForm = Object.assign({}, addStepForm, {result: $event.target.value}))">
+              </div>
+            </div>
+            <div class="flex justify-end gap-2 mt-2">
+              <button @click="addStepForm = null" class="text-sm text-gray-500 hover:text-gray-700">取消</button>
+              <button @click="addStep(jIdx)" class="text-sm bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600">添加</button>
+            </div>
+          </div>
+
+          <!-- Comment section -->
+          <div class="border-t pt-3 mt-3">
+            <button @click="toggleComments(jIdx)"
+                    class="relative text-gray-400 hover:text-blue-500 transition-colors text-sm flex items-center gap-1">
+              <span>&#x1F4AC;</span>
+              <span x-text="$store.review.getJourneyCommentCount(jIdx) > 0 ? $store.review.getJourneyCommentCount(jIdx) + ' 条批注' : '添加批注'"></span>
+            </button>
+            <div x-show="isCommentsOpen(jIdx)" x-transition class="mt-2 bg-gray-50 dark:bg-gray-800 rounded-lg p-3 space-y-2">
+              <!-- Existing comments -->
+              <template x-for="comment in $store.review.getJourneyComments(jIdx)" :key="comment.id">
+                <div class="bg-white dark:bg-gray-700 rounded p-2 shadow-sm">
+                  <div class="flex items-center gap-2">
+                    <span class="font-medium text-sm dark:text-gray-200" x-text="comment.author || '匿名'"></span>
+                    <span class="text-gray-400 dark:text-gray-500 text-xs" x-text="comment.timestamp"></span>
+                  </div>
+                  <p class="text-sm text-gray-700 dark:text-gray-300 mt-1" x-text="comment.text"></p>
+                </div>
+              </template>
+              <template x-if="$store.review.getJourneyComments(jIdx).length === 0">
+                <p class="text-xs text-gray-400 italic">暂无批注</p>
+              </template>
+              <!-- New comment form -->
+              <div class="flex items-start gap-2 mt-2 pt-2 border-t border-gray-200 dark:border-gray-600">
+                <input type="text" placeholder="你的名字"
+                       class="text-xs border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 rounded px-2 py-1 w-24 flex-shrink-0"
+                       :value="localStorage.getItem('reviewMapAuthor') || ''"
+                       @blur="$store.review.setReviewAuthor($event.target.value)">
+                <textarea placeholder="添加批注..." rows="2"
+                          class="flex-1 text-sm border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 rounded px-2 py-1 resize-y focus:ring-1 focus:ring-primary focus:border-primary"
+                          :value="commentText[jIdx] || ''"
+                          @input="updateCommentText(jIdx, $event.target.value)"
+                          @keydown.ctrl.enter="submitComment(jIdx)"></textarea>
+                <button @click="submitComment(jIdx)"
+                        class="px-3 py-1 bg-blue-500 text-white text-sm rounded hover:bg-blue-600 flex-shrink-0 self-end">
+                  发送
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </template>
+
+      <!-- Add journey button (EDIT-JOURNEY-07 add) -->
+      <div x-show="$store.review.editMode" class="mt-4">
+        <button @click="addJourney()"
+                class="w-full py-3 border-2 border-dashed border-gray-300 rounded-lg text-gray-400 hover:border-blue-400 hover:text-blue-500 transition-colors text-sm">
+          + 添加新路径
+        </button>
+      </div>
+    </section>
+  </main>
+
+  <!-- ===== ZONE 5: Toast Notification HTML ===== -->
+
+  <div x-show="$store.review.toastMessage"
+       x-transition:enter="transition ease-out duration-300"
+       x-transition:enter-start="opacity-0 -translate-y-4"
+       x-transition:enter-end="opacity-100 translate-y-0"
+       x-transition:leave="transition ease-in duration-200"
+       x-transition:leave-start="opacity-100 translate-y-0"
+       x-transition:leave-end="opacity-0 -translate-y-4"
+       class="fixed top-4 left-1/2 -translate-x-1/2 z-[60] bg-gray-800 dark:bg-gray-700 text-white text-sm px-5 py-2.5 rounded-lg shadow-lg toast-notification no-print">
+    <span x-text="$store.review.toastMessage"></span>
+  </div>
+
+  <!-- ===== ZONE 6: Utilities + ScreenshotDB JS ===== -->
+
+  <script>
+    // --- Utility functions ---
+
+    function generateId() {
+      if (typeof crypto !== 'undefined' && crypto.randomUUID) {
+        return crypto.randomUUID();
+      }
+      return 'xxxx-xxxx-xxxx'.replace(/x/g, function() {
+        return Math.floor(Math.random() * 16).toString(16);
+      });
+    }
+
+    function formatDate(isoString) {
+      if (!isoString) return '';
+      var d = new Date(isoString);
+      return d.toLocaleDateString('zh-CN', { year: 'numeric', month: 'long', day: 'numeric' });
+    }
+
+    function blobUrlToDataUrl(blobUrl) {
+      return new Promise(function(resolve, reject) {
+        var img = new Image();
+        img.crossOrigin = 'anonymous';
+        img.onload = function() {
+          var canvas = document.createElement('canvas');
+          var maxDim = 1200;
+          var w = img.naturalWidth;
+          var h = img.naturalHeight;
+          // Scale down if larger than maxDim on either side
+          if (w > maxDim || h > maxDim) {
+            var scale = Math.min(maxDim / w, maxDim / h);
+            w = Math.round(w * scale);
+            h = Math.round(h * scale);
+          }
+          canvas.width = w;
+          canvas.height = h;
+          var ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0, w, h);
+          // Use JPEG at 70% quality for significant size reduction
+          resolve(canvas.toDataURL('image/jpeg', 0.7));
+        };
+        img.onerror = reject;
+        img.src = blobUrl;
+      });
+    }
+    // --- ScreenshotDB: IndexedDB wrapper for persistent screenshot storage ---
+
+    var ScreenshotDB = {
+      DB_NAME: 'review-map-screenshots',
+      DB_VERSION: 1,
+      STORE_NAME: 'images',
+      _db: null,
+      _available: null,
+
+      async isAvailable() {
+        if (this._available !== null) return this._available;
+        try {
+          var testName = '__rm_idb_test__';
+          await new Promise(function(resolve, reject) {
+            var req = indexedDB.open(testName, 1);
+            req.onupgradeneeded = function(e) { e.target.result.createObjectStore('test'); };
+            req.onsuccess = function(e) {
+              e.target.result.close();
+              indexedDB.deleteDatabase(testName);
+              resolve();
+            };
+            req.onerror = function() { reject(); };
+          });
+          this._available = true;
+        } catch (e) {
+          this._available = false;
+        }
+        return this._available;
+      },
+
+      async open() {
+        if (this._db) return this._db;
+        var self = this;
+        return new Promise(function(resolve, reject) {
+          var req = indexedDB.open(self.DB_NAME, self.DB_VERSION);
+          req.onupgradeneeded = function(e) {
+            var db = e.target.result;
+            if (!db.objectStoreNames.contains(self.STORE_NAME)) {
+              db.createObjectStore(self.STORE_NAME);
+            }
+          };
+          req.onsuccess = function(e) { self._db = e.target.result; resolve(self._db); };
+          req.onerror = function(e) { reject(e.target.error); };
+        });
+      },
+
+      async save(key, blob) {
+        var db = await this.open();
+        var storeName = this.STORE_NAME;
+        return new Promise(function(resolve, reject) {
+          var tx = db.transaction(storeName, 'readwrite');
+          tx.objectStore(storeName).put(blob, key);
+          tx.oncomplete = function() { resolve(); };
+          tx.onerror = function(e) { reject(e.target.error); };
+        });
+      },
+
+      async load(key) {
+        var db = await this.open();
+        var storeName = this.STORE_NAME;
+        return new Promise(function(resolve, reject) {
+          var tx = db.transaction(storeName, 'readonly');
+          var req = tx.objectStore(storeName).get(key);
+          req.onsuccess = function() { resolve(req.result || null); };
+          req.onerror = function(e) { reject(e.target.error); };
+        });
+      },
+
+      async getAllKeys() {
+        var db = await this.open();
+        var storeName = this.STORE_NAME;
+        return new Promise(function(resolve, reject) {
+          var tx = db.transaction(storeName, 'readonly');
+          var req = tx.objectStore(storeName).getAllKeys();
+          req.onsuccess = function() { resolve(req.result || []); };
+          req.onerror = function(e) { reject(e.target.error); };
+        });
+      },
+
+      async delete(key) {
+        var db = await this.open();
+        var storeName = this.STORE_NAME;
+        return new Promise(function(resolve, reject) {
+          var tx = db.transaction(storeName, 'readwrite');
+          tx.objectStore(storeName).delete(key);
+          tx.oncomplete = function() { resolve(); };
+          tx.onerror = function(e) { reject(e.target.error); };
+        });
+      },
+
+      async clear() {
+        var db = await this.open();
+        var storeName = this.STORE_NAME;
+        return new Promise(function(resolve, reject) {
+          var tx = db.transaction(storeName, 'readwrite');
+          tx.objectStore(storeName).clear();
+          tx.oncomplete = function() { resolve(); };
+          tx.onerror = function(e) { reject(e.target.error); };
+        });
+      },
+    };
+
+    // --- renderMarkdown: Lightweight Markdown subset renderer ---
+    // Supports: **bold**, unordered lists (- or *), line breaks as <p>
+    function renderMarkdown(text) {
+      if (!text) return '';
+      // Escape HTML entities first (prevent XSS)
+      var html = text
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;');
+
+      // Bold: **text**
+      html = html.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+
+      // Split into lines for list processing
+      var lines = html.split('\n');
+      var result = [];
+      var inList = false;
+
+      for (var i = 0; i < lines.length; i++) {
+        var line = lines[i];
+        var listMatch = line.match(/^[-*]\s+(.+)/);
+        if (listMatch) {
+          if (!inList) { result.push('<ul class="list-disc list-inside ml-2 space-y-0.5">'); inList = true; }
+          result.push('<li>' + listMatch[1] + '</li>');
+        } else {
+          if (inList) { result.push('</ul>'); inList = false; }
+          if (line.trim()) {
+            result.push('<p>' + line + '</p>');
+          }
+        }
+      }
+      if (inList) { result.push('</ul>'); }
+
+      return result.join('');
+    }
+  </script>
+
+  <!-- ===== ZONE 7: Alpine.store('review') JS ===== -->
+  <!-- ===== ZONE 8: Alpine.data() Components JS ===== -->
+
+  <script>
+    document.addEventListener('alpine:init', function() {
+
+      // ===== ZONE 7: Global Store =====
+      Alpine.store('review', {
+        // --- Core state ---
+        data: null,
+        view: 'detail',
+        editMode: false,
+        selectedPageId: null,
+        idbAvailable: false,
+        toastMessage: '',
+        toastShown: {},
+        lightboxSrc: '',
+        lightboxOpen: false,
+        _key: '',
+        _toastTimer: null,
+        darkMode: document.documentElement.classList.contains('dark'),
+
+        toggleDarkMode() {
+          this.darkMode = !this.darkMode;
+          if (this.darkMode) {
+            document.documentElement.classList.add('dark');
+            localStorage.setItem('review-map-theme', 'dark');
+          } else {
+            document.documentElement.classList.remove('dark');
+            localStorage.setItem('review-map-theme', 'light');
+          }
+        },
+
+        handleGlobalKeydown(event) {
+          if (event.isComposing) return;
+          if (event.target.matches('input, select, textarea, [contenteditable]')) return;
+          if (event.ctrlKey || event.metaKey || event.altKey) return;
+          var key = event.key;
+          if (key === 'Escape') {
+            if (this.lightboxOpen) { this.closeLightbox(); }
+            else if (this.editMode) { this.editMode = false; }
+            event.preventDefault();
+          } else if (key === 'e' || key === 'E') {
+            this.editMode = !this.editMode;
+            event.preventDefault();
+          } else if (key === 'd' || key === 'D') {
+            this.toggleDarkMode();
+            event.preventDefault();
+          } else if (key === '1') {
+            this.view = 'flow';
+            event.preventDefault();
+          } else if (key === '2') {
+            this.view = 'detail';
+            event.preventDefault();
+          } else if (key === '3') {
+            this.view = 'journey';
+            event.preventDefault();
+          }
+        },
+
+        // --- Edits overlay (all v2 sub-keys initialized) ---
+        edits: {
+          screenshots: {},
+          screenshotKeys: {},
+          pageSummaries: {},
+          features: {},
+          featureScreenshots: {},
+          newFeatures: {},
+          deletedFeatures: {},
+          featureOrder: {},
+          featureComments: {},
+          connectionLabels: {},
+          connectionTypes: {},
+          newConnections: [],
+          deletedConnections: {},
+          pageDisplayNames: {},
+          journeys: {},
+          journeyComments: {},
+          comments: {},
+        },
+
+        // --- Store init (called automatically by Alpine) ---
+        init() {
+          try {
+            var raw = document.getElementById('map-data').textContent;
+            this.data = JSON.parse(raw);
+          } catch (e) {
+            this.data = { metadata: { projectName: 'unknown' }, pages: [], connections: [], journeys: [] };
+          }
+          this._key = 'reviewMapEdits_' + (this.data.metadata.projectName || 'default');
+          this._loadEdits();
+          this._detectStorage();
+        },
+
+        // --- Load edits from localStorage, merge with defaults ---
+        _loadEdits() {
+          try {
+            var saved = JSON.parse(localStorage.getItem(this._key) || '{}');
+            this.edits = {
+              screenshots: {},
+              screenshotKeys: saved.screenshotKeys || {},
+              pageSummaries: saved.pageSummaries || {},
+              features: saved.features || {},
+              featureScreenshots: {},
+              newFeatures: saved.newFeatures || {},
+              deletedFeatures: saved.deletedFeatures || {},
+              featureOrder: saved.featureOrder || {},
+              featureComments: saved.featureComments || {},
+              connectionLabels: saved.connectionLabels || {},
+              connectionTypes: saved.connectionTypes || {},
+              newConnections: saved.newConnections || [],
+              deletedConnections: saved.deletedConnections || {},
+              pageDisplayNames: saved.pageDisplayNames || {},
+              journeys: saved.journeys || {},
+              journeyComments: saved.journeyComments || {},
+              comments: saved.comments || {},
+            };
+          } catch (e) {
+            /* ignore corrupt data */
+          }
+        },
+
+        // --- Detect IndexedDB availability and restore persisted screenshots ---
+        async _detectStorage() {
+          this.idbAvailable = await ScreenshotDB.isAvailable();
+          if (this.idbAvailable) {
+            await this._restoreScreenshots();
+          }
+        },
+
+        // --- Restore screenshots from IndexedDB on page load ---
+        async _restoreScreenshots() {
+          try {
+            var keys = await ScreenshotDB.getAllKeys();
+            for (var i = 0; i < keys.length; i++) {
+              var key = keys[i];
+              var blob = await ScreenshotDB.load(key);
+              if (!blob) continue;
+              var blobUrl = URL.createObjectURL(blob);
+              // Key format: pageId__stateName (page) or feat__pageId__featureId (feature)
+              if (typeof key === 'string' && key.indexOf('feat__') === 0) {
+                var featureKey = key.replace('feat__', '');
+                var fss = Object.assign({}, this.edits.featureScreenshots);
+                fss[featureKey] = blobUrl;
+                var fsk = Object.assign({}, this.edits.screenshotKeys);
+                fsk[key] = true;
+                this.edits = Object.assign({}, this.edits, {
+                  featureScreenshots: fss,
+                  screenshotKeys: fsk,
+                });
+              } else {
+                var parts = String(key).split('__');
+                var pageId = parts[0];
+                var stateName = parts[1] || 'default';
+                var pss = Object.assign({}, this.edits.screenshots);
+                var pageStates = Object.assign({}, pss[pageId] || {});
+                pageStates[stateName] = blobUrl;
+                pss[pageId] = pageStates;
+                var psk = Object.assign({}, this.edits.screenshotKeys);
+                psk[key] = true;
+                this.edits = Object.assign({}, this.edits, {
+                  screenshots: pss,
+                  screenshotKeys: psk,
+                });
+              }
+            }
+          } catch (e) { /* silent */ }
+        },
+
+        // --- Save a screenshot file: update UI + persist to IndexedDB ---
+        async _saveScreenshotBlob(file, pageId, stateName) {
+          var blobUrl = URL.createObjectURL(file);
+          var key = stateName || 'default';
+          var idbKey = pageId + '__' + key;
+
+          // Update UI immediately (immutable)
+          var ss = Object.assign({}, this.edits.screenshots);
+          var pageStates = Object.assign({}, ss[pageId] || {});
+          pageStates[key] = blobUrl;
+          ss[pageId] = pageStates;
+          this.edits = Object.assign({}, this.edits, { screenshots: ss });
+
+          // Persist to IndexedDB if available
+          if (this.idbAvailable) {
+            try {
+              await ScreenshotDB.save(idbKey, file);
+              var sk = Object.assign({}, this.edits.screenshotKeys);
+              sk[idbKey] = true;
+              this.edits = Object.assign({}, this.edits, { screenshotKeys: sk });
+            } catch (e) { /* silent fallback to memory-only */ }
+          } else {
+            this.showToast('\u5F53\u524D\u6A21\u5F0F\u4E0B\u622A\u56FE\u66FF\u6362\u4EC5\u672C\u6B21\u4F1A\u8BDD\u6709\u6548', 'idb-unavailable');
+          }
+          this.persistEdits();
+        },
+
+        // --- Feature screenshot save (EDIT-DETAIL-05 / CAPTURE-03) ---
+        async _saveFeatureScreenshot(file, pageId, featureId) {
+          var blobUrl = URL.createObjectURL(file);
+          var compositeKey = pageId + '__' + featureId;
+          var idbKey = 'feat__' + compositeKey;
+
+          // Update UI immediately (immutable)
+          var fss = Object.assign({}, this.edits.featureScreenshots);
+          fss[compositeKey] = blobUrl;
+          this.edits = Object.assign({}, this.edits, { featureScreenshots: fss });
+
+          // Persist to IndexedDB if available
+          if (this.idbAvailable) {
+            try {
+              await ScreenshotDB.save(idbKey, file);
+              var sk = Object.assign({}, this.edits.screenshotKeys);
+              sk[idbKey] = true;
+              this.edits = Object.assign({}, this.edits, { screenshotKeys: sk });
+            } catch (e) { /* silent fallback to memory-only */ }
+          } else {
+            this.showToast('\u5F53\u524D\u6A21\u5F0F\u4E0B\u622A\u56FE\u66FF\u6362\u4EC5\u672C\u6B21\u4F1A\u8BDD\u6709\u6548', 'idb-unavailable');
+          }
+          this.persistEdits();
+        },
+
+        // --- Screenshot upload handler (file input) ---
+        async handleScreenshotUpload(event, pageId, stateName) {
+          var file = event.target && event.target.files ? event.target.files[0] : null;
+          if (!file || file.type.indexOf('image/') !== 0) return;
+          await this._saveScreenshotBlob(file, pageId, stateName);
+          event.target.value = '';
+        },
+
+        // --- Screenshot drop handler (drag and drop) ---
+        async handleScreenshotDrop(event, pageId, stateName) {
+          event.preventDefault();
+          var file = event.dataTransfer && event.dataTransfer.files ? event.dataTransfer.files[0] : null;
+          if (!file || file.type.indexOf('image/') !== 0) return;
+          await this._saveScreenshotBlob(file, pageId, stateName);
+        },
+
+        // --- CRITICAL: Immutable update for edits (Alpine Proxy reactivity) ---
+        updateEdit(category, key, value) {
+          if (Array.isArray(this.edits[category])) {
+            var updated = [].concat(this.edits[category]);
+            updated.push(value);
+            this.edits = Object.assign({}, this.edits, (function() {
+              var o = {}; o[category] = updated; return o;
+            })());
+          } else {
+            var catCopy = Object.assign({}, this.edits[category] || {});
+            catCopy[key] = value;
+            this.edits = Object.assign({}, this.edits, (function() {
+              var o = {}; o[category] = catCopy; return o;
+            })());
+          }
+          this.persistEdits();
+        },
+
+        // --- Persist edits to localStorage (exclude Blob URL categories) ---
+        persistEdits() {
+          try {
+            var toSave = Object.assign({}, this.edits);
+            delete toSave.screenshots;
+            delete toSave.featureScreenshots;
+            localStorage.setItem(this._key, JSON.stringify(toSave));
+          } catch (e) {
+            /* localStorage full */
+          }
+        },
+
+        // --- Computed: total edit count ---
+        get editCount() {
+          var count = 0;
+          var edits = this.edits;
+          var keys = Object.keys(edits);
+          for (var i = 0; i < keys.length; i++) {
+            var cat = edits[keys[i]];
+            if (Array.isArray(cat)) {
+              count += cat.length;
+            } else if (cat && typeof cat === 'object') {
+              count += Object.keys(cat).length;
+            }
+          }
+          return count;
+        },
+
+        // --- Computed: has any edits ---
+        get hasEdits() {
+          return this.editCount > 0;
+        },
+
+        // --- Overlay accessors ---
+
+        getFeature(pageId, featureId, field) {
+          var editKey = pageId + '_' + featureId;
+          var edited = this.edits.features[editKey];
+          if (edited && edited[field] !== undefined) return edited[field];
+          if (!this.data) return '';
+          var page = this.data.pages.find(function(p) { return p.id === pageId; });
+          var feature = page && page.features
+            ? page.features.find(function(f) { return f.id === featureId; })
+            : null;
+          return feature ? (feature[field] || '') : '';
+        },
+
+        getPageSummary(pageId) {
+          if (this.edits.pageSummaries[pageId] !== undefined) {
+            return this.edits.pageSummaries[pageId];
+          }
+          if (!this.data) return '';
+          var page = this.data.pages.find(function(p) { return p.id === pageId; });
+          return page ? (page.summary || '') : '';
+        },
+
+        getScreenshotSrc(pageId, stateName) {
+          var key = stateName || 'default';
+          var override = this.edits.screenshots[pageId];
+          if (override && override[key]) return override[key];
+          if (!this.data) return '';
+          var page = this.data.pages.find(function(p) { return p.id === pageId; });
+          if (!page) return '';
+          if (key === 'default') return 'screenshots/' + page.screenshot;
+          var state = page.states
+            ? page.states.find(function(s) { return s.name === key; })
+            : null;
+          return state ? 'screenshots/' + state.screenshot : 'screenshots/' + page.screenshot;
+        },
+
+        getConnectionLabel(connId) {
+          if (this.edits.connectionLabels[connId] !== undefined) {
+            return this.edits.connectionLabels[connId];
+          }
+          if (!this.data) return '';
+          var conn = this.data.connections.find(function(c) { return c.id === connId; });
+          return conn ? (conn.label || '') : '';
+        },
+
+        getConnectionType(connId) {
+          if (this.edits.connectionTypes[connId] !== undefined) {
+            return this.edits.connectionTypes[connId];
+          }
+          if (!this.data) return 'navigation';
+          var conn = this.data.connections.find(function(c) { return c.id === connId; });
+          return conn ? (conn.type || 'navigation') : 'navigation';
+        },
+
+        getComments(pageId) {
+          return this.edits.comments[pageId] || [];
+        },
+
+        getCommentCount(pageId) {
+          return (this.edits.comments[pageId] || []).length;
+        },
+
+        // --- Lightbox controls ---
+
+        openLightbox(src) {
+          this.lightboxSrc = src;
+          this.lightboxOpen = true;
+        },
+
+        closeLightbox() {
+          this.lightboxOpen = false;
+          this.lightboxSrc = '';
+        },
+
+        // --- Feature screenshot accessor ---
+
+        getFeatureScreenshotSrc(pageId, featureId) {
+          var compositeKey = pageId + '__' + featureId;
+          if (this.edits.featureScreenshots[compositeKey]) {
+            return this.edits.featureScreenshots[compositeKey];
+          }
+          if (!this.data) return '';
+          var page = this.data.pages.find(function(p) { return p.id === pageId; });
+          var feat = page && page.features
+            ? page.features.find(function(f) { return f.id === featureId; })
+            : null;
+          return feat && feat.screenshot ? 'screenshots/' + feat.screenshot : '';
+        },
+
+        // --- Feature comment count accessor ---
+
+        getFeatureCommentCount(pageId, featureId) {
+          var key = pageId + '--' + featureId;
+          return (this.edits.featureComments[key] || []).length;
+        },
+
+        getFeatureComments(pageId, featureId) {
+          var key = pageId + '--' + featureId;
+          return this.edits.featureComments[key] || [];
+        },
+
+        addFeatureComment(pageId, featureId, text) {
+          if (!text || !text.trim()) return;
+          var author = localStorage.getItem('reviewMapAuthor') || '';
+          var now = new Date();
+          var yyyy = now.getFullYear();
+          var mm = (now.getMonth() + 1 < 10 ? '0' : '') + (now.getMonth() + 1);
+          var dd = (now.getDate() < 10 ? '0' : '') + now.getDate();
+          var hh = (now.getHours() < 10 ? '0' : '') + now.getHours();
+          var mi = (now.getMinutes() < 10 ? '0' : '') + now.getMinutes();
+          var timestamp = yyyy + '-' + mm + '-' + dd + ' ' + hh + ':' + mi;
+          var comment = { id: generateId(), text: text.trim(), author: author, timestamp: timestamp };
+          var key = pageId + '--' + featureId;
+          var existing = (this.edits.featureComments[key] || []).slice();
+          existing.push(comment);
+          var fc = Object.assign({}, this.edits.featureComments);
+          fc[key] = existing;
+          this.edits = Object.assign({}, this.edits, { featureComments: fc });
+          this.persistEdits();
+        },
+
+        setReviewAuthor(name) {
+          localStorage.setItem('reviewMapAuthor', name || '');
+        },
+
+        getJourneyCommentCount(journeyIdx) {
+          return (this.edits.journeyComments[journeyIdx] || []).length;
+        },
+
+        getJourneyComments(journeyIdx) {
+          return this.edits.journeyComments[journeyIdx] || [];
+        },
+
+        addJourneyComment(journeyIdx, text) {
+          var now = new Date();
+          var ts = now.getFullYear() + '-' +
+            String(now.getMonth() + 1).padStart(2, '0') + '-' +
+            String(now.getDate()).padStart(2, '0') + ' ' +
+            String(now.getHours()).padStart(2, '0') + ':' +
+            String(now.getMinutes()).padStart(2, '0');
+          var author = localStorage.getItem('reviewMapAuthor') || '匿名';
+          var comment = { id: Date.now(), author: author, text: text.trim(), timestamp: ts };
+          var existing = (this.edits.journeyComments[journeyIdx] || []).slice();
+          existing.push(comment);
+          var jc = Object.assign({}, this.edits.journeyComments);
+          jc[journeyIdx] = existing;
+          this.edits = Object.assign({}, this.edits, { journeyComments: jc });
+          this.persistEdits();
+        },
+
+        // --- Utility accessors ---
+
+        connColor(type) {
+          var colors = {
+            navigation: '#3B82F6',
+            redirect: '#8B5CF6',
+            back: '#9CA3AF',
+            conditional: '#F59E0B',
+            data: '#10B981'
+          };
+          return colors[type] || '#6B7280';
+        },
+
+        connectionBadgeClass(type) {
+          var classes = {
+            navigation: 'bg-blue-100 text-blue-700',
+            redirect: 'bg-purple-100 text-purple-700',
+            back: 'bg-gray-100 text-gray-500',
+            conditional: 'bg-amber-100 text-amber-700',
+            data: 'bg-green-100 text-green-700',
+          };
+          return classes[type] || 'bg-gray-100 text-gray-600';
+        },
+
+        // --- Toast notification ---
+
+        showToast(message, key) {
+          if (key && this.toastShown[key]) return;
+          if (key) {
+            this.toastShown = Object.assign({}, this.toastShown, (function() {
+              var o = {}; o[key] = true; return o;
+            })());
+          }
+          var self = this;
+          self.toastMessage = message;
+          if (self._toastTimer) clearTimeout(self._toastTimer);
+          self._toastTimer = setTimeout(function() {
+            self.toastMessage = '';
+            self._toastTimer = null;
+          }, 4000);
+        },
+
+        // --- Reset all edits ---
+
+        resetEdits() {
+          var count = this.editCount;
+          if (count === 0) return;
+          if (!confirm('确定要重置所有修改吗？将清除 ' + count + ' 项编辑内容。')) return;
+
+          // Revoke all screenshot Blob URLs
+          var screenshots = this.edits.screenshots;
+          var ssKeys = Object.keys(screenshots);
+          for (var i = 0; i < ssKeys.length; i++) {
+            var states = screenshots[ssKeys[i]];
+            var stateKeys = Object.keys(states);
+            for (var j = 0; j < stateKeys.length; j++) {
+              try { URL.revokeObjectURL(states[stateKeys[j]]); } catch (e) { /* noop */ }
+            }
+          }
+          var featureScreenshots = this.edits.featureScreenshots;
+          var fsKeys = Object.keys(featureScreenshots);
+          for (var k = 0; k < fsKeys.length; k++) {
+            try { URL.revokeObjectURL(featureScreenshots[fsKeys[k]]); } catch (e) { /* noop */ }
+          }
+
+          // Clear IndexedDB if available
+          if (this.idbAvailable) {
+            ScreenshotDB.clear().catch(function() { /* noop */ });
+          }
+
+          // Reset edits to defaults
+          this.edits = {
+            screenshots: {},
+            screenshotKeys: {},
+            pageSummaries: {},
+            features: {},
+            featureScreenshots: {},
+            newFeatures: {},
+            deletedFeatures: {},
+            featureOrder: {},
+            featureComments: {},
+            connectionLabels: {},
+            connectionTypes: {},
+            newConnections: [],
+            deletedConnections: {},
+            pageDisplayNames: {},
+            journeys: {},
+            journeyComments: {},
+            comments: {},
+          };
+          localStorage.removeItem(this._key);
+        },
+
+        // --- Export data as JSON ---
+
+        async exportData() {
+          if (!this.data) return;
+          var exported = JSON.parse(JSON.stringify(this.data));
+
+          // Apply page summaries
+          var summaryKeys = Object.keys(this.edits.pageSummaries);
+          for (var si = 0; si < summaryKeys.length; si++) {
+            var pageId = summaryKeys[si];
+            var page = exported.pages.find(function(p) { return p.id === pageId; });
+            if (page) page.summary = this.edits.pageSummaries[pageId];
+          }
+
+          // Apply feature edits
+          var featureKeys = Object.keys(this.edits.features);
+          for (var fi = 0; fi < featureKeys.length; fi++) {
+            var parts = featureKeys[fi].split('_');
+            var fPageId = parts[0];
+            var fFeatureId = parts.slice(1).join('_');
+            var fPage = exported.pages.find(function(p) { return p.id === fPageId; });
+            if (fPage && fPage.features) {
+              var feat = fPage.features.find(function(f) { return f.id === fFeatureId; });
+              if (feat) {
+                Object.assign(feat, this.edits.features[featureKeys[fi]]);
+              }
+            }
+          }
+
+          // Apply page display names
+          var nameKeys = Object.keys(this.edits.pageDisplayNames);
+          for (var ni = 0; ni < nameKeys.length; ni++) {
+            var nPage = exported.pages.find(function(p) { return p.id === nameKeys[ni]; });
+            if (nPage) nPage.name = this.edits.pageDisplayNames[nameKeys[ni]];
+          }
+
+          // Apply connection edits
+          var connLabelKeys = Object.keys(this.edits.connectionLabels);
+          for (var cli = 0; cli < connLabelKeys.length; cli++) {
+            var conn = exported.connections.find(function(c) { return c.id === connLabelKeys[cli]; });
+            if (conn) conn.label = this.edits.connectionLabels[connLabelKeys[cli]];
+          }
+          var connTypeKeys = Object.keys(this.edits.connectionTypes);
+          for (var cti = 0; cti < connTypeKeys.length; cti++) {
+            var conn2 = exported.connections.find(function(c) { return c.id === connTypeKeys[cti]; });
+            if (conn2) conn2.type = this.edits.connectionTypes[connTypeKeys[cti]];
+          }
+
+          // Apply deleted connections
+          var delConnKeys = Object.keys(this.edits.deletedConnections);
+          exported.connections = exported.connections.filter(function(c) {
+            return !delConnKeys.includes(c.id);
+          });
+
+          // Append new connections
+          if (this.edits.newConnections.length > 0) {
+            exported.connections = exported.connections.concat(this.edits.newConnections);
+          }
+
+          // Apply journey edits (enhanced)
+          if (exported.journeys) {
+            var journeyKeys = Object.keys(this.edits.journeys);
+            // First pass: update existing journeys
+            for (var ji = 0; ji < journeyKeys.length; ji++) {
+              var jk = journeyKeys[ji];
+              var jEdits = this.edits.journeys[jk];
+              var jIdx = parseInt(jk, 10);
+              if (jEdits._deleted || jEdits._isNew) continue;
+              if (exported.journeys[jIdx]) {
+                if (jEdits.name !== undefined) exported.journeys[jIdx].name = jEdits.name;
+                if (jEdits.goal !== undefined) exported.journeys[jIdx].goal = jEdits.goal;
+                if (jEdits.steps) exported.journeys[jIdx].steps = jEdits.steps;
+              }
+            }
+            // Second pass: append new journeys
+            for (var ji2 = 0; ji2 < journeyKeys.length; ji2++) {
+              var jk2 = journeyKeys[ji2];
+              var jEdits2 = this.edits.journeys[jk2];
+              if (jEdits2._isNew) {
+                var nj = { name: jEdits2.name || '', goal: jEdits2.goal || '', steps: jEdits2.steps || [] };
+                exported.journeys.push(nj);
+              }
+            }
+            // Third pass: filter deleted journeys (reverse to preserve indices)
+            for (var ji3 = exported.journeys.length - 1; ji3 >= 0; ji3--) {
+              var jEdits3 = this.edits.journeys[String(ji3)];
+              if (jEdits3 && jEdits3._deleted) {
+                exported.journeys.splice(ji3, 1);
+              }
+            }
+          }
+
+          // Apply journey comments to export
+          var jcKeys = Object.keys(this.edits.journeyComments);
+          for (var jci = 0; jci < jcKeys.length; jci++) {
+            var jcIdx = parseInt(jcKeys[jci], 10);
+            if (exported.journeys && exported.journeys[jcIdx]) {
+              exported.journeys[jcIdx]._comments = this.edits.journeyComments[jcKeys[jci]];
+            }
+          }
+
+          // Apply feature comments to export
+          var fcKeys = Object.keys(this.edits.featureComments);
+          for (var fci = 0; fci < fcKeys.length; fci++) {
+            var fcKey = fcKeys[fci];
+            var fcParts = fcKey.split('--');
+            var fcPageId = fcParts[0];
+            var fcFeatId = fcParts[1];
+            var fcPage = exported.pages.find(function(p) { return p.id === fcPageId; });
+            if (fcPage && fcPage.features) {
+              var fcFeat = fcPage.features.find(function(f) { return f.id === fcFeatId; });
+              if (fcFeat) {
+                fcFeat._comments = this.edits.featureComments[fcKey];
+              }
+            }
+          }
+
+          // Apply feature CRUD operations to exported data
+          for (var epi = 0; epi < exported.pages.length; epi++) {
+            var expPage = exported.pages[epi];
+            if (!expPage.features) expPage.features = [];
+
+            // Remove deleted features
+            var delFeats = this.edits.deletedFeatures[expPage.id];
+            if (delFeats) {
+              expPage.features = expPage.features.filter(function(f) {
+                return !delFeats[f.id];
+              });
+            }
+
+            // Append new features
+            var newFeats = this.edits.newFeatures[expPage.id];
+            if (newFeats && newFeats.length > 0) {
+              expPage.features = expPage.features.concat(newFeats);
+            }
+
+            // Apply feature order
+            var fOrder = this.edits.featureOrder[expPage.id];
+            if (fOrder && fOrder.length > 0) {
+              var fOrderMap = {};
+              for (var foi = 0; foi < fOrder.length; foi++) {
+                fOrderMap[fOrder[foi]] = foi;
+              }
+              expPage.features.sort(function(a, b) {
+                var ai = fOrderMap[a.id] !== undefined ? fOrderMap[a.id] : 9999;
+                var bi = fOrderMap[b.id] !== undefined ? fOrderMap[b.id] : 9999;
+                return ai - bi;
+              });
+            }
+          }
+
+          // Convert screenshot blobs to base64 (IndexedDB path first, then memory fallback)
+          var idbKeys = Object.keys(this.edits.screenshotKeys);
+          for (var ik = 0; ik < idbKeys.length; ik++) {
+            var idbKey = idbKeys[ik];
+            if (!this.edits.screenshotKeys[idbKey]) continue;
+            try {
+              var idbBlob = null;
+              if (this.idbAvailable) {
+                idbBlob = await ScreenshotDB.load(idbKey);
+              }
+              if (!idbBlob) continue;
+              var idbBlobUrl = URL.createObjectURL(idbBlob);
+              var idbDataUrl = await blobUrlToDataUrl(idbBlobUrl);
+              URL.revokeObjectURL(idbBlobUrl);
+              // Parse key to find target
+              if (idbKey.indexOf('feat__') === 0) {
+                // Process feature screenshot: merge base64 into exported features
+                var featParts = idbKey.replace('feat__', '').split('__');
+                var featPageId = featParts[0];
+                var featId = featParts[1];
+                var featPage = exported.pages.find(function(p) { return p.id === featPageId; });
+                if (featPage && featPage.features) {
+                  var exportFeat = featPage.features.find(function(f) { return f.id === featId; });
+                  if (exportFeat) {
+                    exportFeat.screenshot = idbDataUrl;
+                  }
+                }
+                continue;
+              }
+              var idbParts = idbKey.split('__');
+              var idbPageId = idbParts[0];
+              var idbStateName = idbParts[1];
+              var idbPage = exported.pages.find(function(p) { return p.id === idbPageId; });
+              if (!idbPage) continue;
+              if (!idbStateName || idbStateName === 'default') {
+                idbPage.screenshot = idbDataUrl;
+              } else {
+                var idbState = idbPage.states
+                  ? idbPage.states.find(function(s) { return s.name === idbStateName; })
+                  : null;
+                if (idbState) idbState.screenshot = idbDataUrl;
+              }
+            } catch (e) { /* skip failed conversions */ }
+          }
+
+          // Handle in-memory-only screenshots (IDB unavailable fallback path)
+          var ssPageIds = Object.keys(this.edits.screenshots);
+          for (var spi = 0; spi < ssPageIds.length; spi++) {
+            var ssPage = exported.pages.find(function(p) { return p.id === ssPageIds[spi]; });
+            if (!ssPage) continue;
+            var ssStates = this.edits.screenshots[ssPageIds[spi]];
+            var ssStateKeys = Object.keys(ssStates);
+            for (var ssi = 0; ssi < ssStateKeys.length; ssi++) {
+              // Skip if already handled via IDB
+              var memIdbKey = ssPageIds[spi] + '__' + ssStateKeys[ssi];
+              if (this.edits.screenshotKeys[memIdbKey]) continue;
+              try {
+                var memDataUrl = await blobUrlToDataUrl(ssStates[ssStateKeys[ssi]]);
+                if (ssStateKeys[ssi] === 'default') {
+                  ssPage.screenshot = memDataUrl;
+                } else {
+                  var memState = ssPage.states
+                    ? ssPage.states.find(function(s) { return s.name === ssStateKeys[ssi]; })
+                    : null;
+                  if (memState) memState.screenshot = memDataUrl;
+                }
+              } catch (e) { /* skip failed conversions */ }
+            }
+          }
+
+          // Add comments
+          if (Object.keys(this.edits.comments).length > 0) {
+            exported.reviewComments = this.edits.comments;
+          }
+
+          // Update metadata
+          exported.metadata.version = '2.0';
+          exported.metadata.lastEditedAt = new Date().toISOString();
+
+          // Download
+          var json = JSON.stringify(exported, null, 2);
+          var blob = new Blob([json], { type: 'application/json' });
+          var url = URL.createObjectURL(blob);
+          var a = document.createElement('a');
+          a.href = url;
+          a.download = 'review-map-data-' + Date.now() + '.json';
+          a.click();
+          URL.revokeObjectURL(url);
+        },
+      });
+
+      // ===== ZONE 8: View Components =====
+
+      // ===== Sugiyama Layout Utility =====
+      function sugiyamaLayout(nodes, edges, options) {
+        var opts = Object.assign({
+          nodeWidth: 160, nodeHeight: 90,
+          layerGap: 220, nodeGap: 120,
+          marginX: 40, marginY: 40,
+          componentGap: 80
+        }, options || {});
+
+        if (!nodes || nodes.length === 0) {
+          return { positions: {}, width: 0, height: 0, reversedEdges: {} };
+        }
+
+        var nodeIds = [];
+        var nodeSet = {};
+        for (var i = 0; i < nodes.length; i++) {
+          nodeIds.push(nodes[i].id);
+          nodeSet[nodes[i].id] = true;
+        }
+
+        // Build adjacency lists
+        var adjOut = {};
+        var adjIn = {};
+        for (var i = 0; i < nodeIds.length; i++) {
+          adjOut[nodeIds[i]] = [];
+          adjIn[nodeIds[i]] = [];
+        }
+        var validEdges = [];
+        for (var i = 0; i < edges.length; i++) {
+          var e = edges[i];
+          if (nodeSet[e.from] && nodeSet[e.to]) {
+            validEdges.push(e);
+            adjOut[e.from].push(e.to);
+            adjIn[e.to].push(e.from);
+          }
+        }
+
+        // Step 1: Cycle removal (DFS)
+        var reversedEdges = {};
+        var visited = {};
+        var onStack = {};
+        var workAdj = {};
+        var workIn = {};
+        for (var i = 0; i < nodeIds.length; i++) {
+          workAdj[nodeIds[i]] = [];
+          workIn[nodeIds[i]] = [];
+        }
+
+        function dfs(node) {
+          visited[node] = true;
+          onStack[node] = true;
+          var neighbors = adjOut[node];
+          for (var j = 0; j < neighbors.length; j++) {
+            var nb = neighbors[j];
+            if (onStack[nb]) {
+              // Back edge: reverse it
+              reversedEdges[node + '->' + nb] = true;
+              workAdj[nb].push(node);
+              workIn[node].push(nb);
+            } else if (!visited[nb]) {
+              workAdj[node].push(nb);
+              workIn[nb].push(node);
+              dfs(nb);
+            } else {
+              workAdj[node].push(nb);
+              workIn[nb].push(node);
+            }
+          }
+          onStack[node] = false;
+        }
+
+        for (var i = 0; i < nodeIds.length; i++) {
+          if (!visited[nodeIds[i]]) {
+            dfs(nodeIds[i]);
+          }
+        }
+
+        // Step 2: Find connected components via BFS
+        var compVisited = {};
+        var components = [];
+        for (var i = 0; i < nodeIds.length; i++) {
+          var start = nodeIds[i];
+          if (compVisited[start]) continue;
+          var comp = [];
+          var queue = [start];
+          compVisited[start] = true;
+          while (queue.length > 0) {
+            var cur = queue.shift();
+            comp.push(cur);
+            var neighbors = workAdj[cur].concat(workIn[cur]);
+            for (var j = 0; j < neighbors.length; j++) {
+              if (!compVisited[neighbors[j]]) {
+                compVisited[neighbors[j]] = true;
+                queue.push(neighbors[j]);
+              }
+            }
+          }
+          components.push(comp);
+        }
+
+        // Step 2b: Layer assignment (longest path) per component
+        var layers = {};
+        function assignLayers(compNodes) {
+          // Find entry nodes (no incoming in this component)
+          var compSet = {};
+          for (var i = 0; i < compNodes.length; i++) compSet[compNodes[i]] = true;
+          var entries = [];
+          for (var i = 0; i < compNodes.length; i++) {
+            var n = compNodes[i];
+            var hasIn = false;
+            for (var j = 0; j < workIn[n].length; j++) {
+              if (compSet[workIn[n][j]]) { hasIn = true; break; }
+            }
+            if (!hasIn) entries.push(n);
+          }
+          if (entries.length === 0) entries.push(compNodes[0]);
+
+          // BFS longest path
+          var dist = {};
+          for (var i = 0; i < compNodes.length; i++) dist[compNodes[i]] = -1;
+          for (var i = 0; i < entries.length; i++) dist[entries[i]] = 0;
+
+          var changed = true;
+          var maxIter = compNodes.length + 1;
+          while (changed && maxIter-- > 0) {
+            changed = false;
+            for (var i = 0; i < compNodes.length; i++) {
+              var n = compNodes[i];
+              var preds = workIn[n];
+              for (var j = 0; j < preds.length; j++) {
+                if (compSet[preds[j]] && dist[preds[j]] >= 0) {
+                  var newDist = dist[preds[j]] + 1;
+                  if (newDist > dist[n]) {
+                    dist[n] = newDist;
+                    changed = true;
+                  }
+                }
+              }
+            }
+          }
+          // Any unreachable nodes get layer 0
+          for (var i = 0; i < compNodes.length; i++) {
+            if (dist[compNodes[i]] < 0) dist[compNodes[i]] = 0;
+          }
+          return dist;
+        }
+
+        // Step 3: Crossing minimization (median heuristic)
+        function minimizeCrossings(layerNodes, compNodes) {
+          // Build layer-to-nodes map
+          var maxLayer = 0;
+          for (var i = 0; i < compNodes.length; i++) {
+            if (layerNodes[compNodes[i]] > maxLayer) maxLayer = layerNodes[compNodes[i]];
+          }
+          var layerMap = [];
+          for (var l = 0; l <= maxLayer; l++) layerMap.push([]);
+          for (var i = 0; i < compNodes.length; i++) {
+            layerMap[layerNodes[compNodes[i]]].push(compNodes[i]);
+          }
+
+          // Assign initial order
+          var order = {};
+          for (var l = 0; l <= maxLayer; l++) {
+            for (var j = 0; j < layerMap[l].length; j++) {
+              order[layerMap[l][j]] = j;
+            }
+          }
+
+          var compSet = {};
+          for (var i = 0; i < compNodes.length; i++) compSet[compNodes[i]] = true;
+
+          // 10 iterations of forward + backward sweep
+          for (var iter = 0; iter < 10; iter++) {
+            // Forward sweep
+            for (var l = 1; l <= maxLayer; l++) {
+              var medians = [];
+              for (var j = 0; j < layerMap[l].length; j++) {
+                var n = layerMap[l][j];
+                var preds = workIn[n];
+                var positions = [];
+                for (var k = 0; k < preds.length; k++) {
+                  if (compSet[preds[k]] && layerNodes[preds[k]] === l - 1) {
+                    positions.push(order[preds[k]]);
+                  }
+                }
+                positions.sort(function(a, b) { return a - b; });
+                var med = positions.length > 0 ? positions[Math.floor(positions.length / 2)] : order[n];
+                medians.push({ id: n, median: med });
+              }
+              medians.sort(function(a, b) { return a.median - b.median; });
+              layerMap[l] = [];
+              for (var j = 0; j < medians.length; j++) {
+                layerMap[l].push(medians[j].id);
+                order[medians[j].id] = j;
+              }
+            }
+            // Backward sweep
+            for (var l = maxLayer - 1; l >= 0; l--) {
+              var medians = [];
+              for (var j = 0; j < layerMap[l].length; j++) {
+                var n = layerMap[l][j];
+                var succs = workAdj[n];
+                var positions = [];
+                for (var k = 0; k < succs.length; k++) {
+                  if (compSet[succs[k]] && layerNodes[succs[k]] === l + 1) {
+                    positions.push(order[succs[k]]);
+                  }
+                }
+                positions.sort(function(a, b) { return a - b; });
+                var med = positions.length > 0 ? positions[Math.floor(positions.length / 2)] : order[n];
+                medians.push({ id: n, median: med });
+              }
+              medians.sort(function(a, b) { return a.median - b.median; });
+              layerMap[l] = [];
+              for (var j = 0; j < medians.length; j++) {
+                layerMap[l].push(medians[j].id);
+                order[medians[j].id] = j;
+              }
+            }
+          }
+
+          return { layerMap: layerMap, order: order, maxLayer: maxLayer };
+        }
+
+        // Step 4: Coordinate assignment
+        var positions = {};
+        var totalWidth = 0;
+        var totalHeight = 0;
+        var yOffset = opts.marginY;
+
+        for (var ci = 0; ci < components.length; ci++) {
+          var comp = components[ci];
+          var compLayers = assignLayers(comp);
+          var result = minimizeCrossings(compLayers, comp);
+          var layerMap = result.layerMap;
+          var maxLayer = result.maxLayer;
+
+          // Find max nodes in any layer for centering
+          var maxNodesInLayer = 0;
+          for (var l = 0; l <= maxLayer; l++) {
+            if (layerMap[l].length > maxNodesInLayer) maxNodesInLayer = layerMap[l].length;
+          }
+          var compHeight = maxNodesInLayer * opts.nodeGap;
+
+          for (var l = 0; l <= maxLayer; l++) {
+            var layerSize = layerMap[l].length;
+            var layerHeight = layerSize * opts.nodeGap;
+            var vertOffset = yOffset + (compHeight - layerHeight) / 2;
+            for (var j = 0; j < layerMap[l].length; j++) {
+              var nid = layerMap[l][j];
+              positions[nid] = {
+                x: opts.marginX + l * opts.layerGap,
+                y: vertOffset + j * opts.nodeGap,
+                layer: compLayers[nid],
+                order: j
+              };
+            }
+          }
+
+          var compW = opts.marginX + (maxLayer + 1) * opts.layerGap + opts.nodeWidth;
+          if (compW > totalWidth) totalWidth = compW;
+          yOffset += compHeight + opts.componentGap;
+        }
+
+        totalHeight = yOffset - opts.componentGap + opts.marginY + opts.nodeHeight;
+
+        return {
+          positions: positions,
+          width: totalWidth,
+          height: totalHeight,
+          reversedEdges: reversedEdges
+        };
+      }
+
+      Alpine.data('flowView', function() {
+        return {
+          nodes: [],
+          edges: [],
+          svgWidth: 0,
+          svgHeight: 0,
+          viewBox: '0 0 0 0',
+          zoom: 1,
+          nodeWidth: 160,
+          nodeHeight: 90,
+          selectedEdge: null,
+          editingLabel: null,
+          addingConnection: null,
+          editingNodeName: null,
+          isSmallScreen: false,
+
+          init: function() {
+            var self = this;
+            self.isSmallScreen = window.matchMedia('(max-width: 767px)').matches;
+            var mql = window.matchMedia('(max-width: 767px)');
+            var timer = null;
+            var handler = function(e) {
+              clearTimeout(timer);
+              timer = setTimeout(function() {
+                self.isSmallScreen = e.matches;
+                self.computeLayout();
+              }, 150);
+            };
+            if (mql.addEventListener) { mql.addEventListener('change', handler); }
+            self.computeLayout();
+            self.$watch('$store.review.data', function() {
+              self.computeLayout();
+            });
+            self.$watch('$store.review.darkMode', function() {
+              self.renderGraph();
+            });
+          },
+
+          computeLayout: function() {
+            var store = this.$store.review;
+            var pages = (store.data && store.data.pages) ? store.data.pages : [];
+            var connections = (store.data && store.data.connections) ? store.data.connections : [];
+            if (pages.length === 0) return;
+
+            // Filter deleted connections, add new ones
+            var activeConns = [];
+            for (var i = 0; i < connections.length; i++) {
+              if (!store.edits.deletedConnections[connections[i].id]) {
+                activeConns.push(connections[i]);
+              }
+            }
+            var newConns = store.edits.newConnections || [];
+            for (var i = 0; i < newConns.length; i++) {
+              activeConns.push(newConns[i]);
+            }
+
+            // Build layout input
+            var layoutNodes = [];
+            for (var i = 0; i < pages.length; i++) {
+              layoutNodes.push({ id: pages[i].id });
+            }
+            var layoutEdges = [];
+            for (var i = 0; i < activeConns.length; i++) {
+              layoutEdges.push({ from: activeConns[i].from, to: activeConns[i].to });
+            }
+
+            var layoutResult = sugiyamaLayout(layoutNodes, layoutEdges);
+
+            // Map to nodes with full data
+            var pageMap = {};
+            for (var i = 0; i < pages.length; i++) {
+              pageMap[pages[i].id] = pages[i];
+            }
+
+            var newNodes = [];
+            for (var i = 0; i < pages.length; i++) {
+              var p = pages[i];
+              var pos = layoutResult.positions[p.id];
+              if (!pos) continue;
+              newNodes.push({
+                id: p.id,
+                x: pos.x,
+                y: pos.y,
+                name: p.name,
+                pageType: p.pageType || 'normal'
+              });
+            }
+
+            // Compute edge paths and labels
+            var self = this;
+            var newEdges = [];
+            var labelPositions = [];
+            for (var i = 0; i < activeConns.length; i++) {
+              var conn = activeConns[i];
+              var fromPos = layoutResult.positions[conn.from];
+              var toPos = layoutResult.positions[conn.to];
+              if (!fromPos || !toPos) continue;
+
+              var isReversed = layoutResult.reversedEdges && layoutResult.reversedEdges[conn.from + '->' + conn.to];
+              var sx, sy, tx, ty;
+              if (isReversed) {
+                sx = toPos.x; sy = toPos.y;
+                tx = fromPos.x; ty = fromPos.y;
+              } else {
+                sx = fromPos.x; sy = fromPos.y;
+                tx = toPos.x; ty = toPos.y;
+              }
+
+              var path = self.edgePath(sx, sy, tx, ty);
+              var labelX = (sx + self.nodeWidth + tx) / 2;
+              var labelY = (sy + self.nodeHeight / 2 + ty + self.nodeHeight / 2) / 2;
+
+              // Simple label collision detection
+              for (var j = 0; j < labelPositions.length; j++) {
+                if (Math.abs(labelY - labelPositions[j]) < 16) {
+                  labelY = labelPositions[j] + 20;
+                }
+              }
+              labelPositions.push(labelY);
+
+              var label = store.getConnectionLabel ? store.getConnectionLabel(conn.id) : (conn.label || '');
+              var type = store.getConnectionType ? store.getConnectionType(conn.id) : (conn.type || 'navigation');
+
+              newEdges.push({
+                id: conn.id,
+                from: conn.from,
+                to: conn.to,
+                path: path,
+                label: label,
+                labelX: labelX,
+                labelY: labelY,
+                type: type
+              });
+            }
+
+            this.nodes = newNodes;
+            this.edges = newEdges;
+            this.svgWidth = layoutResult.width;
+            this.svgHeight = layoutResult.height;
+            this.updateViewBox();
+            this.renderGraph();
+          },
+
+          renderGraph: function() {
+            var self = this;
+            var store = this.$store.review;
+            if (!this.$refs.edgesGroup || !this.$refs.nodesGroup) return;
+            var isDark = store.darkMode;
+            var labelFill = isDark ? '#E5E7EB' : '#6B7280';
+
+            // Dark mode edge color overrides (lighter variants for visibility)
+            var darkEdgeColors = {
+              navigation: '#60A5FA',
+              redirect: '#A78BFA',
+              back: '#9CA3AF',
+              conditional: '#FBBF24',
+              data: '#34D399'
+            };
+
+            // Build edges SVG
+            var edgesHtml = '';
+            for (var i = 0; i < this.edges.length; i++) {
+              var edge = this.edges[i];
+              var color = isDark ? (darkEdgeColors[edge.type] || store.connColor(edge.type)) : store.connColor(edge.type);
+              var dash = edge.type === 'redirect' ? '6 4' : edge.type === 'conditional' ? '4 2' : edge.type === 'data' ? '2 4' : 'none';
+              edgesHtml += '<g data-edge-id="' + edge.id + '">';
+              edgesHtml += '<path d="' + edge.path + '" fill="none" stroke="transparent" stroke-width="20" style="cursor:pointer"/>';
+              edgesHtml += '<path d="' + edge.path + '" fill="none" stroke="' + color + '" stroke-width="2"'
+                + (dash !== 'none' ? ' stroke-dasharray="' + dash + '"' : '')
+                + ' marker-end="url(#flow-arrowhead)" style="pointer-events:none"/>';
+              edgesHtml += '<text x="' + edge.labelX + '" y="' + edge.labelY + '" text-anchor="middle" dominant-baseline="central"'
+                + ' class="flow-label" fill="' + labelFill + '" font-size="11" data-label-edge="' + edge.id + '"'
+                + ' style="pointer-events:' + (store.editMode ? 'auto;cursor:pointer' : 'none') + '">'
+                + (edge.label || '').replace(/</g, '&lt;').replace(/>/g, '&gt;') + '</text>';
+              edgesHtml += '</g>';
+            }
+            this.$refs.edgesGroup.innerHTML = edgesHtml;
+
+            // Build nodes SVG (foreignObject with HTML content)
+            var nodesHtml = '';
+            for (var i = 0; i < this.nodes.length; i++) {
+              var node = this.nodes[i];
+              var displayName = store.edits.pageDisplayNames[node.id] || node.name;
+              var isAdding = self.addingConnection && self.addingConnection.sourceId === node.id;
+              var nodeClass = 'flow-node border-2 rounded-lg overflow-hidden shadow-sm h-full node-type-' + node.pageType;
+              if (isAdding) nodeClass += ' flow-node-adding ring-2 ring-blue-500';
+              var imgSrc = store.getScreenshotSrc(node.id, 'default');
+              nodesHtml += '<foreignObject x="' + node.x + '" y="' + node.y + '" width="' + self.nodeWidth + '" height="' + self.nodeHeight + '" data-node-id="' + node.id + '">';
+              nodesHtml += '<div xmlns="http://www.w3.org/1999/xhtml" class="' + nodeClass + '" style="cursor:pointer">';
+              nodesHtml += '<div class="bg-gray-100 dark:bg-gray-700 flex items-center justify-center" style="height:50px">';
+              nodesHtml += '<img src="' + imgSrc + '" loading="lazy" class="w-full h-full object-cover" style="max-height:50px" onerror="this.style.display=\'none\'"/>';
+              nodesHtml += '</div>';
+              nodesHtml += '<div class="px-2 py-1 text-xs text-center truncate dark:text-gray-200' + (store.editMode ? ' editable-hint' : '') + '"'
+                + ' data-name-node="' + node.id + '">'
+                + displayName.replace(/</g, '&lt;').replace(/>/g, '&gt;') + '</div>';
+              nodesHtml += '</div></foreignObject>';
+            }
+            this.$refs.nodesGroup.innerHTML = nodesHtml;
+          },
+
+          handleSvgClick: function(event) {
+            var target = event.target;
+            while (target && target !== this.$refs.flowSvg) {
+              if (target.dataset) {
+                if (target.dataset.edgeId) {
+                  event.stopPropagation();
+                  this.handleEdgeClick(target.dataset.edgeId);
+                  return;
+                }
+              }
+              if (target.closest) {
+                var nodeEl = target.closest('[data-node-id]');
+                if (nodeEl) {
+                  event.stopPropagation();
+                  this.handleNodeClick(nodeEl.dataset.nodeId);
+                  return;
+                }
+              }
+              target = target.parentElement;
+            }
+            this.selectedEdge = null;
+          },
+
+          handleSvgDblClick: function(event) {
+            if (!this.$store.review.editMode) return;
+            var target = event.target;
+            while (target && target !== this.$refs.flowSvg) {
+              if (target.dataset) {
+                if (target.dataset.labelEdge) {
+                  event.stopPropagation();
+                  this.startLabelEdit(target.dataset.labelEdge);
+                  return;
+                }
+              }
+              if (target.closest) {
+                var nameEl = target.closest('[data-name-node]');
+                if (nameEl) {
+                  event.stopPropagation();
+                  this.startNameEdit(nameEl.dataset.nameNode);
+                  return;
+                }
+              }
+              target = target.parentElement;
+            }
+          },
+
+          startLabelEdit: function(edgeId) {
+            this.editingLabel = edgeId;
+            var self = this;
+            var edge = null;
+            for (var i = 0; i < this.edges.length; i++) {
+              if (this.edges[i].id === edgeId) { edge = this.edges[i]; break; }
+            }
+            if (!edge) return;
+            setTimeout(function() {
+              var input = self.$refs.labelEditInput;
+              if (input) {
+                input.value = edge.label || '';
+                input.focus();
+                input.select();
+              }
+            }, 50);
+          },
+
+          saveLabelEdit: function(value) {
+            if (this.editingLabel) {
+              this.$store.review.updateEdit('connectionLabels', this.editingLabel, value);
+              this.editingLabel = null;
+              this.computeLayout();
+            }
+          },
+
+          startNameEdit: function(nodeId) {
+            this.editingNodeName = nodeId;
+            var self = this;
+            var node = null;
+            for (var i = 0; i < this.nodes.length; i++) {
+              if (this.nodes[i].id === nodeId) { node = this.nodes[i]; break; }
+            }
+            if (!node) return;
+            var displayName = this.$store.review.edits.pageDisplayNames[nodeId] || node.name;
+            setTimeout(function() {
+              var input = self.$refs.nameEditInput;
+              if (input) {
+                input.value = displayName;
+                input.focus();
+                input.select();
+              }
+            }, 50);
+          },
+
+          saveNameEdit: function(value) {
+            if (this.editingNodeName) {
+              this.$store.review.updateEdit('pageDisplayNames', this.editingNodeName, value);
+              this.editingNodeName = null;
+              this.computeLayout();
+            }
+          },
+
+          getOverlayStyle: function(id, overlayType) {
+            if (!id || !this.$refs.flowSvg) return 'display:none';
+            var svg = this.$refs.flowSvg;
+            var svgRect = svg.getBoundingClientRect();
+            var containerRect = svg.parentElement.getBoundingClientRect();
+            // Compute scale from viewBox to rendered size
+            var scaleX = svgRect.width / (this.svgWidth || 1);
+            var scaleY = svgRect.height / (this.svgHeight || 1);
+
+            if (overlayType === 'actionBar') {
+              var edge = null;
+              for (var i = 0; i < this.edges.length; i++) {
+                if (this.edges[i].id === id) { edge = this.edges[i]; break; }
+              }
+              if (!edge) return 'display:none';
+              var x = edge.labelX * scaleX + (svgRect.left - containerRect.left) - 90;
+              var y = edge.labelY * scaleY + (svgRect.top - containerRect.top) - 40;
+              return 'left:' + x + 'px;top:' + y + 'px';
+            }
+            if (overlayType === 'labelEdit') {
+              var edge = null;
+              for (var i = 0; i < this.edges.length; i++) {
+                if (this.edges[i].id === id) { edge = this.edges[i]; break; }
+              }
+              if (!edge) return 'display:none';
+              var x = edge.labelX * scaleX + (svgRect.left - containerRect.left) - 60;
+              var y = edge.labelY * scaleY + (svgRect.top - containerRect.top) - 12;
+              return 'left:' + x + 'px;top:' + y + 'px';
+            }
+            if (overlayType === 'nameEdit') {
+              var node = null;
+              for (var i = 0; i < this.nodes.length; i++) {
+                if (this.nodes[i].id === id) { node = this.nodes[i]; break; }
+              }
+              if (!node) return 'display:none';
+              var x = node.x * scaleX + (svgRect.left - containerRect.left);
+              var y = (node.y + 50) * scaleY + (svgRect.top - containerRect.top);
+              return 'left:' + x + 'px;top:' + y + 'px';
+            }
+            if (overlayType === 'addConn') {
+              var node = null;
+              for (var i = 0; i < this.nodes.length; i++) {
+                if (this.nodes[i].id === id) { node = this.nodes[i]; break; }
+              }
+              if (!node) return 'display:none';
+              var x = node.x * scaleX + (svgRect.left - containerRect.left);
+              var y = (node.y + this.nodeHeight + 4) * scaleY + (svgRect.top - containerRect.top);
+              return 'left:' + x + 'px;top:' + y + 'px';
+            }
+            return 'display:none';
+          },
+
+          edgePath: function(sx, sy, tx, ty) {
+            var x1 = sx + this.nodeWidth;
+            var y1 = sy + this.nodeHeight / 2;
+            var x2 = tx;
+            var y2 = ty + this.nodeHeight / 2;
+            var cpOffset = Math.abs(x2 - x1) * 0.4;
+            return 'M ' + x1 + ' ' + y1 + ' C ' + (x1 + cpOffset) + ' ' + y1 + ', ' + (x2 - cpOffset) + ' ' + y2 + ', ' + x2 + ' ' + y2;
+          },
+
+          updateViewBox: function() {
+            if (this.svgWidth === 0) return;
+            this.viewBox = '0 0 ' + (this.svgWidth / this.zoom) + ' ' + (this.svgHeight / this.zoom);
+          },
+
+          zoomIn: function() {
+            this.zoom = Math.min(3, this.zoom + 0.2);
+            this.updateViewBox();
+          },
+          zoomOut: function() {
+            this.zoom = Math.max(0.3, this.zoom - 0.2);
+            this.updateViewBox();
+          },
+          zoomReset: function() {
+            this.zoom = 1;
+            this.updateViewBox();
+          },
+
+          handleNodeClick: function(pageId) {
+            // Add-connection workflow intercepts node clicks
+            if (this.addingConnection) {
+              if (this.addingConnection.step === 'selectSource') {
+                this.addingConnection = { sourceId: pageId, step: 'selectTarget' };
+              } else if (this.addingConnection.step === 'selectTarget') {
+                if (pageId === this.addingConnection.sourceId) return; // cannot self-link
+                this.addingConnection = {
+                  sourceId: this.addingConnection.sourceId,
+                  targetId: pageId,
+                  step: 'confirmDialog'
+                };
+              }
+              return;
+            }
+            this.$store.review.view = 'detail';
+            setTimeout(function() {
+              var el = document.getElementById('page-card-' + pageId);
+              if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }, 100);
+          },
+
+          handleEdgeClick: function(edgeId) {
+            if (!this.$store.review.editMode) {
+              this.selectedEdge = null;
+              return;
+            }
+            this.selectedEdge = this.selectedEdge === edgeId ? null : edgeId;
+          },
+
+          deleteConnection: function(connId) {
+            this.$store.review.updateEdit('deletedConnections', connId, true);
+            this.selectedEdge = null;
+            this.computeLayout();
+          },
+
+          confirmNewConnection: function() {
+            var ac = this.addingConnection;
+            if (!ac || !ac.sourceId || !ac.targetId) return;
+            var typeEl = this.$refs.newConnType;
+            var labelEl = this.$refs.newConnLabel;
+            var connType = typeEl ? typeEl.value : 'navigation';
+            var connLabel = labelEl ? labelEl.value : '';
+            var newConn = {
+              id: 'conn-' + ac.sourceId + '--' + ac.targetId + '-' + Date.now(),
+              from: ac.sourceId,
+              to: ac.targetId,
+              type: connType,
+              label: connLabel
+            };
+            this.$store.review.updateEdit('newConnections', null, newConn);
+            this.addingConnection = null;
+            this.computeLayout();
+          },
+
+          getLinearConnections: function() {
+            var store = this.$store.review;
+            var pages = (store.data && store.data.pages) ? store.data.pages : [];
+            var connections = (store.data && store.data.connections) ? store.data.connections : [];
+            var pageMap = {};
+            for (var i = 0; i < pages.length; i++) {
+              pageMap[pages[i].id] = store.edits.pageDisplayNames[pages[i].id] || pages[i].name;
+            }
+            var result = [];
+            for (var i = 0; i < connections.length; i++) {
+              var c = connections[i];
+              if (store.edits.deletedConnections[c.id]) continue;
+              var label = store.getConnectionLabel ? store.getConnectionLabel(c.id) : (c.label || '');
+              var type = store.getConnectionType ? store.getConnectionType(c.id) : (c.type || 'navigation');
+              result.push({
+                id: c.id,
+                fromName: pageMap[c.from] || c.from,
+                toName: pageMap[c.to] || c.to,
+                label: label,
+                type: type
+              });
+            }
+            var newConns = store.edits.newConnections || [];
+            for (var i = 0; i < newConns.length; i++) {
+              var c = newConns[i];
+              result.push({
+                id: c.id,
+                fromName: pageMap[c.from] || c.from,
+                toName: pageMap[c.to] || c.to,
+                label: c.label || '',
+                type: c.type || 'navigation'
+              });
+            }
+            return result;
+          }
+        };
+      });
+
+      Alpine.data('detailView', function() {
+        return {
+          currentPageIndex: 0,
+          expandedFeatures: {},
+          openComments: {},
+          commentText: {},
+
+          init: function() {
+            var self = this;
+            var store = this.$store.review;
+            // Default all features expanded
+            if (store.data && store.data.pages) {
+              self._initExpanded(store.data.pages);
+            }
+            // Re-init if data loads after component (async path)
+            this.$watch('$store.review.data', function(newData) {
+              if (newData && newData.pages) {
+                self._initExpanded(newData.pages);
+              }
+            });
+          },
+
+          _initExpanded: function(pages) {
+            var expanded = {};
+            for (var i = 0; i < pages.length; i++) {
+              var features = pages[i].features || [];
+              for (var j = 0; j < features.length; j++) {
+                expanded[features[j].id] = true;
+              }
+            }
+            this.expandedFeatures = expanded;
+          },
+
+          isExpanded: function(featId) {
+            return this.expandedFeatures[featId] !== false;
+          },
+
+          toggleExpand: function(featId) {
+            var val = this.expandedFeatures[featId] !== false ? false : true;
+            this.expandedFeatures = Object.assign({}, this.expandedFeatures, (function() {
+              var o = {}; o[featId] = val; return o;
+            })());
+          },
+
+          expandAll: function() {
+            var expanded = {};
+            var store = this.$store.review;
+            if (store.data && store.data.pages) {
+              for (var i = 0; i < store.data.pages.length; i++) {
+                var feats = this.getEffectiveFeatures(store.data.pages[i].id);
+                for (var j = 0; j < feats.length; j++) {
+                  expanded[feats[j].id] = true;
+                }
+              }
+            }
+            this.expandedFeatures = expanded;
+          },
+
+          collapseAll: function() {
+            this.expandedFeatures = {};
+          },
+
+          getEffectiveFeatures: function(pageId) {
+            var store = this.$store.review;
+            if (!store.data || !store.data.pages) return [];
+            var page = store.data.pages.find(function(p) { return p.id === pageId; });
+            var original = (page && page.features) ? page.features.slice() : [];
+
+            // Filter out deleted
+            var deleted = store.edits.deletedFeatures[pageId] || {};
+            var filtered = original.filter(function(f) { return !deleted[f.id]; });
+
+            // Append new features
+            var added = store.edits.newFeatures[pageId] || [];
+            var merged = filtered.concat(added);
+
+            // Apply custom order if exists
+            var order = store.edits.featureOrder[pageId];
+            if (order && order.length > 0) {
+              var orderMap = {};
+              for (var i = 0; i < order.length; i++) {
+                orderMap[order[i]] = i;
+              }
+              merged.sort(function(a, b) {
+                var aIdx = orderMap[a.id] !== undefined ? orderMap[a.id] : 9999;
+                var bIdx = orderMap[b.id] !== undefined ? orderMap[b.id] : 9999;
+                return aIdx - bIdx;
+              });
+            }
+
+            return merged;
+          },
+
+          getFeatureScreenshot: function(pageId, featureId) {
+            return this.$store.review.getFeatureScreenshotSrc(pageId, featureId);
+          },
+
+          openLightbox: function(src) {
+            if (src) this.$store.review.openLightbox(src);
+          },
+
+          // --- Comment interaction methods (EDIT-DETAIL-10) ---
+
+          toggleComments: function(featId) {
+            var val = !this.openComments[featId];
+            this.openComments = Object.assign({}, this.openComments, (function() {
+              var o = {}; o[featId] = val; return o;
+            })());
+          },
+
+          isCommentsOpen: function(featId) {
+            return !!this.openComments[featId];
+          },
+
+          submitComment: function(pageId, featId) {
+            var text = this.commentText[featId] || '';
+            if (!text.trim()) return;
+            this.$store.review.addFeatureComment(pageId, featId, text);
+            this.commentText = Object.assign({}, this.commentText, (function() {
+              var o = {}; o[featId] = ''; return o;
+            })());
+          },
+
+          updateCommentText: function(featId, value) {
+            this.commentText = Object.assign({}, this.commentText, (function() {
+              var o = {}; o[featId] = value; return o;
+            })());
+          },
+
+          // --- Edit action methods (EDIT-DETAIL-06/07/08/05) ---
+
+          addFeature: function(pageId) {
+            var newFeat = {
+              id: 'new-' + generateId(),
+              name: '\u65B0\u529F\u80FD\u70B9',
+              description: '',
+              notes: '',
+            };
+            var existing = (this.$store.review.edits.newFeatures[pageId] || []).slice();
+            existing.push(newFeat);
+            this.$store.review.updateEdit('newFeatures', pageId, existing);
+            // Auto-expand the new feature
+            var exp = Object.assign({}, this.expandedFeatures);
+            exp[newFeat.id] = true;
+            this.expandedFeatures = exp;
+          },
+
+          deleteFeature: function(pageId, featureId) {
+            if (!confirm('\u786E\u5B9A\u5220\u9664\u6B64\u529F\u80FD\u70B9\uFF1F')) return;
+            var deleted = Object.assign({}, this.$store.review.edits.deletedFeatures[pageId] || {});
+            deleted[featureId] = true;
+            this.$store.review.updateEdit('deletedFeatures', pageId, deleted);
+          },
+
+          moveFeature: function(pageId, featureId, direction) {
+            var features = this.getEffectiveFeatures(pageId);
+            var ids = features.map(function(f) { return f.id; });
+            var idx = ids.indexOf(featureId);
+            if (idx < 0) return;
+            var newIdx = idx + direction;
+            if (newIdx < 0 || newIdx >= ids.length) return;
+            var temp = ids[idx];
+            ids[idx] = ids[newIdx];
+            ids[newIdx] = temp;
+            this.$store.review.updateEdit('featureOrder', pageId, ids);
+          },
+
+          handleFeatureScreenshotUpload: function(event, pageId, featureId) {
+            var file = event.target && event.target.files ? event.target.files[0] : null;
+            if (!file || file.type.indexOf('image/') !== 0) return;
+            this.$store.review._saveFeatureScreenshot(file, pageId, featureId);
+            event.target.value = '';
+          },
+
+          handleFeatureScreenshotDrop: function(event, pageId, featureId) {
+            event.preventDefault();
+            var file = event.dataTransfer && event.dataTransfer.files ? event.dataTransfer.files[0] : null;
+            if (!file || file.type.indexOf('image/') !== 0) return;
+            this.$store.review._saveFeatureScreenshot(file, pageId, featureId);
+          },
+        };
+      });
+
+      Alpine.data('journeyView', function() {
+        return {
+          openComments: {},
+          commentText: {},
+          addStepForm: null,
+          deletedJourneys: {},
+          editingDecisionPoint: null,
+
+          getJourneyName: function(journey, idx) {
+            var edits = this.$store.review.edits.journeys[idx];
+            return (edits && edits.name !== undefined) ? edits.name : (journey.name || '');
+          },
+
+          getJourneyGoal: function(journey, idx) {
+            var edits = this.$store.review.edits.journeys[idx];
+            return (edits && edits.goal !== undefined) ? edits.goal : (journey.goal || '');
+          },
+
+          getEffectiveJourneys: function() {
+            var store = this.$store.review;
+            var original = (store.data && store.data.journeys) ? store.data.journeys.slice() : [];
+            // Append new journeys from edits overlay
+            var journeyEditKeys = Object.keys(store.edits.journeys);
+            for (var i = 0; i < journeyEditKeys.length; i++) {
+              var jEdit = store.edits.journeys[journeyEditKeys[i]];
+              var jIdx = parseInt(journeyEditKeys[i], 10);
+              if (jEdit._isNew && !jEdit._deleted) {
+                // Pad array if needed
+                while (original.length <= jIdx) original.push(null);
+                original[jIdx] = { name: jEdit.name || '', goal: jEdit.goal || '', steps: jEdit.steps || [] };
+              }
+            }
+            return original.filter(function(j) { return j !== null; });
+          },
+
+          getEffectiveSteps: function(journey, idx) {
+            var edits = this.$store.review.edits.journeys[idx];
+            if (edits && edits.steps) return edits.steps;
+            return journey.steps || [];
+          },
+
+          getPageName: function(pageId) {
+            var s = this.$store.review;
+            if (s.edits.pageDisplayNames[pageId]) return s.edits.pageDisplayNames[pageId];
+            var pages = (s.data && s.data.pages) ? s.data.pages : [];
+            for (var i = 0; i < pages.length; i++) {
+              if (pages[i].id === pageId) return pages[i].name || pageId;
+            }
+            return pageId;
+          },
+
+          goToPage: function(pageId) {
+            this.$store.review.view = 'detail';
+            var target = document.getElementById('page-card-' + pageId);
+            if (target) setTimeout(function() { target.scrollIntoView({ behavior: 'smooth' }); }, 100);
+          },
+
+          isSharedStep: function(pageId, currentJourneyIdx) {
+            var journeys = this.$store.review.data.journeys || [];
+            for (var j = 0; j < journeys.length; j++) {
+              if (j === currentJourneyIdx) continue;
+              var steps = this.getEffectiveSteps(journeys[j], j);
+              for (var s = 0; s < steps.length; s++) {
+                if (steps[s].pageId === pageId) return true;
+              }
+            }
+            return false;
+          },
+
+          toggleComments: function(journeyIdx) {
+            var o = Object.assign({}, this.openComments);
+            o[journeyIdx] = !o[journeyIdx];
+            this.openComments = o;
+          },
+
+          isCommentsOpen: function(journeyIdx) {
+            return !!this.openComments[journeyIdx];
+          },
+
+          updateCommentText: function(journeyIdx, text) {
+            var ct = Object.assign({}, this.commentText);
+            ct[journeyIdx] = text;
+            this.commentText = ct;
+          },
+
+          submitComment: function(journeyIdx) {
+            var text = this.commentText[journeyIdx];
+            if (!text || !text.trim()) return;
+            this.$store.review.addJourneyComment(journeyIdx, text);
+            var ct = Object.assign({}, this.commentText);
+            ct[journeyIdx] = '';
+            this.commentText = ct;
+          },
+
+          // --- Journey edit operations ---
+
+          saveJourneyField: function(jIdx, field, value) {
+            var ex = Object.assign({}, this.$store.review.edits.journeys[jIdx] || {});
+            ex[field] = value;
+            this.$store.review.updateEdit('journeys', String(jIdx), ex);
+          },
+
+          saveStepField: function(jIdx, sIdx, field, value) {
+            var journey = this.$store.review.data.journeys[jIdx];
+            var steps = this.getEffectiveSteps(journey, jIdx).map(function(s) { return Object.assign({}, s); });
+            if (!steps[sIdx]) return;
+            steps[sIdx][field] = value;
+            var ex = Object.assign({}, this.$store.review.edits.journeys[jIdx] || {});
+            ex.steps = steps;
+            this.$store.review.updateEdit('journeys', String(jIdx), ex);
+          },
+
+          addStep: function(jIdx) {
+            var form = this.addStepForm;
+            if (!form || !form.pageId) return;
+            var journey = this.$store.review.data.journeys[jIdx];
+            var steps = this.getEffectiveSteps(journey, jIdx).map(function(s) { return Object.assign({}, s); });
+            steps.push({ pageId: form.pageId, action: form.action || '', result: form.result || '' });
+            var ex = Object.assign({}, this.$store.review.edits.journeys[jIdx] || {});
+            ex.steps = steps;
+            this.$store.review.updateEdit('journeys', String(jIdx), ex);
+            this.addStepForm = null;
+          },
+
+          deleteStep: function(jIdx, sIdx) {
+            if (!confirm('\u786E\u5B9A\u5220\u9664\u6B64\u6B65\u9AA4\uFF1F')) return;
+            var journey = this.$store.review.data.journeys[jIdx];
+            var steps = this.getEffectiveSteps(journey, jIdx).map(function(s) { return Object.assign({}, s); });
+            steps.splice(sIdx, 1);
+            var ex = Object.assign({}, this.$store.review.edits.journeys[jIdx] || {});
+            ex.steps = steps;
+            this.$store.review.updateEdit('journeys', String(jIdx), ex);
+          },
+
+          moveStep: function(jIdx, sIdx, direction) {
+            var journey = this.$store.review.data.journeys[jIdx];
+            var steps = this.getEffectiveSteps(journey, jIdx).map(function(s) { return Object.assign({}, s); });
+            var newIdx = sIdx + direction;
+            if (newIdx < 0 || newIdx >= steps.length) return;
+            var tmp = steps[sIdx];
+            steps[sIdx] = steps[newIdx];
+            steps[newIdx] = tmp;
+            var ex = Object.assign({}, this.$store.review.edits.journeys[jIdx] || {});
+            ex.steps = steps;
+            this.$store.review.updateEdit('journeys', String(jIdx), ex);
+          },
+
+          addJourney: function() {
+            var store = this.$store.review;
+            var baseLen = (store.data.journeys || []).length;
+            var journeyEditKeys = Object.keys(store.edits.journeys);
+            var newCount = 0;
+            for (var i = 0; i < journeyEditKeys.length; i++) {
+              if (store.edits.journeys[journeyEditKeys[i]]._isNew) newCount++;
+            }
+            var newIdx = baseLen + newCount;
+            var ex = { name: '\u65B0\u8DEF\u5F84', goal: '', steps: [], _isNew: true };
+            store.updateEdit('journeys', String(newIdx), ex);
+          },
+
+          deleteJourney: function(jIdx) {
+            if (!confirm('\u786E\u5B9A\u5220\u9664\u6B64\u8DEF\u5F84\uFF1F')) return;
+            var dj = Object.assign({}, this.deletedJourneys);
+            dj[jIdx] = true;
+            this.deletedJourneys = dj;
+            var ex = Object.assign({}, this.$store.review.edits.journeys[jIdx] || {});
+            ex._deleted = true;
+            this.$store.review.updateEdit('journeys', String(jIdx), ex);
+          },
+
+          isJourneyDeleted: function(jIdx) {
+            var edits = this.$store.review.edits.journeys[String(jIdx)];
+            return this.deletedJourneys[jIdx] || (edits && edits._deleted);
+          },
+
+          // --- Decision point CRUD ---
+
+          addDecisionPoint: function(jIdx, sIdx) {
+            var journey = this.$store.review.data.journeys[jIdx];
+            var steps = this.getEffectiveSteps(journey, jIdx).map(function(s) { return Object.assign({}, s); });
+            if (!steps[sIdx]) return;
+            steps[sIdx].decisionPoint = { condition: '\u6761\u4EF6', branches: [{ label: '\u5206\u652F1', targetPageId: '' }] };
+            var ex = Object.assign({}, this.$store.review.edits.journeys[jIdx] || {});
+            ex.steps = steps;
+            this.$store.review.updateEdit('journeys', String(jIdx), ex);
+          },
+
+          deleteDecisionPoint: function(jIdx, sIdx) {
+            if (!confirm('\u786E\u5B9A\u5220\u9664\u6B64\u51B3\u7B56\u70B9\uFF1F')) return;
+            var journey = this.$store.review.data.journeys[jIdx];
+            var steps = this.getEffectiveSteps(journey, jIdx).map(function(s) { return Object.assign({}, s); });
+            if (!steps[sIdx]) return;
+            delete steps[sIdx].decisionPoint;
+            var ex = Object.assign({}, this.$store.review.edits.journeys[jIdx] || {});
+            ex.steps = steps;
+            this.$store.review.updateEdit('journeys', String(jIdx), ex);
+          },
+
+          saveDecisionCondition: function(jIdx, sIdx, value) {
+            var journey = this.$store.review.data.journeys[jIdx];
+            var steps = this.getEffectiveSteps(journey, jIdx).map(function(s) { return Object.assign({}, s); });
+            if (!steps[sIdx] || !steps[sIdx].decisionPoint) return;
+            steps[sIdx].decisionPoint = Object.assign({}, steps[sIdx].decisionPoint, { condition: value });
+            var ex = Object.assign({}, this.$store.review.edits.journeys[jIdx] || {});
+            ex.steps = steps;
+            this.$store.review.updateEdit('journeys', String(jIdx), ex);
+          },
+
+          saveBranchLabel: function(jIdx, sIdx, bIdx, value) {
+            var journey = this.$store.review.data.journeys[jIdx];
+            var steps = this.getEffectiveSteps(journey, jIdx).map(function(s) { return Object.assign({}, s); });
+            if (!steps[sIdx] || !steps[sIdx].decisionPoint) return;
+            var branches = (steps[sIdx].decisionPoint.branches || []).map(function(b) { return Object.assign({}, b); });
+            if (branches[bIdx]) branches[bIdx].label = value;
+            steps[sIdx].decisionPoint = Object.assign({}, steps[sIdx].decisionPoint, { branches: branches });
+            var ex = Object.assign({}, this.$store.review.edits.journeys[jIdx] || {});
+            ex.steps = steps;
+            this.$store.review.updateEdit('journeys', String(jIdx), ex);
+          },
+
+          saveBranchTarget: function(jIdx, sIdx, bIdx, value) {
+            var journey = this.$store.review.data.journeys[jIdx];
+            var steps = this.getEffectiveSteps(journey, jIdx).map(function(s) { return Object.assign({}, s); });
+            if (!steps[sIdx] || !steps[sIdx].decisionPoint) return;
+            var branches = (steps[sIdx].decisionPoint.branches || []).map(function(b) { return Object.assign({}, b); });
+            if (branches[bIdx]) branches[bIdx].targetPageId = value;
+            steps[sIdx].decisionPoint = Object.assign({}, steps[sIdx].decisionPoint, { branches: branches });
+            var ex = Object.assign({}, this.$store.review.edits.journeys[jIdx] || {});
+            ex.steps = steps;
+            this.$store.review.updateEdit('journeys', String(jIdx), ex);
+          },
+
+          addBranch: function(jIdx, sIdx) {
+            var journey = this.$store.review.data.journeys[jIdx];
+            var steps = this.getEffectiveSteps(journey, jIdx).map(function(s) { return Object.assign({}, s); });
+            if (!steps[sIdx] || !steps[sIdx].decisionPoint) return;
+            var branches = (steps[sIdx].decisionPoint.branches || []).map(function(b) { return Object.assign({}, b); });
+            branches.push({ label: '\u65B0\u5206\u652F', targetPageId: '' });
+            steps[sIdx].decisionPoint = Object.assign({}, steps[sIdx].decisionPoint, { branches: branches });
+            var ex = Object.assign({}, this.$store.review.edits.journeys[jIdx] || {});
+            ex.steps = steps;
+            this.$store.review.updateEdit('journeys', String(jIdx), ex);
+          },
+
+          deleteBranch: function(jIdx, sIdx, bIdx) {
+            var journey = this.$store.review.data.journeys[jIdx];
+            var steps = this.getEffectiveSteps(journey, jIdx).map(function(s) { return Object.assign({}, s); });
+            if (!steps[sIdx] || !steps[sIdx].decisionPoint) return;
+            var branches = (steps[sIdx].decisionPoint.branches || []).map(function(b) { return Object.assign({}, b); });
+            branches.splice(bIdx, 1);
+            steps[sIdx].decisionPoint = Object.assign({}, steps[sIdx].decisionPoint, { branches: branches });
+            var ex = Object.assign({}, this.$store.review.edits.journeys[jIdx] || {});
+            ex.steps = steps;
+            this.$store.review.updateEdit('journeys', String(jIdx), ex);
+          },
+        };
+      });
+    });
+  </script>
+
+  <!-- ===== ZONE 9: Data Script + Footer ===== -->
+
+  <script id="map-data" type="application/json">
+    {
+  "metadata": {
+    "projectName": "章节列表页迭代 V1.6",
+    "generatedAt": "2026-03-12T16:00:00+08:00",
+    "prototypeType": "standard-vue",
+    "prototypePath": "02-prototypes/vue-apps/chapter-list-redesign/",
+    "prdPath": "01-prd/章节列表页迭代_V1.6.md",
+    "version": "2.0"
+  },
+  "pages": [
+    {
+      "id": "chapter-list-desktop",
+      "name": "章节列表（桌面端）",
+      "route": "/",
+      "screenshot": "desktop--preview-tab.png",
+      "viewport": "desktop",
+      "pageType": "entry",
+      "summary": "主页面，采用左右联动双栏布局：左侧章节目录树、右侧场景化资源卡片列表。支持 4 种学科模板的场景 Tab 切换、全量资源模式、滚动联动选中等核心交互。",
+      "features": [
+        {
+          "id": "dt-feat-01",
+          "name": "全局头部",
+          "selector": ".global-header",
+          "screenshot": "feat--dt-feat-01.png",
+          "description": "返回按钮 + 「教材同步」标题 + 教材版本选择器 + VIP升级入口",
+          "notes": "VIP 按钮在 <360px 下隐藏文字仅显示图标"
+        },
+        {
+          "id": "dt-feat-02",
+          "name": "场景 Tab 栏",
+          "selector": ".scene-tabs",
+          "screenshot": "feat--dt-feat-02.png",
+          "description": "固定「全部」按钮 + 分隔线 + 横向滚动场景 Tabs。理科解题型模板含预习/解题指导/刷题，语言文科型含预习/复习/日常积累，理科基础型含预习/复习，历史道法型含预习/复习。",
+          "notes": "4 种学科模板通过 sceneConfig.ts 映射，切换学科自动变更 Tab 组合"
+        },
+        {
+          "id": "dt-feat-03",
+          "name": "快捷入口栏",
+          "selector": ".function-bar",
+          "screenshot": "feat--dt-feat-03.png",
+          "description": "思维导图(2)、错题本(15)、收藏、设置四个快捷按钮，数字角标显示待处理数量",
+          "notes": "移动端折叠为「更多」菜单"
+        },
+        {
+          "id": "dt-feat-04",
+          "name": "章节目录树",
+          "selector": ".sidebar",
+          "screenshot": "feat--dt-feat-04.png",
+          "description": "递归树形结构：章→节→小节。节级显示进度（如 12/14），小节级可点击选中。选中状态高亮，NEW 红点标记新内容。",
+          "notes": "点击小节 → 右侧内容区滚动到对应位置，IntersectionObserver 反向联动"
+        },
+        {
+          "id": "dt-feat-05",
+          "name": "切换教材按钮",
+          "selector": ".switch-btn",
+          "screenshot": "feat--dt-feat-05.png",
+          "description": "位于侧边栏顶部章节标题旁，点击可打开教材切换弹窗",
+          "notes": ""
+        },
+        {
+          "id": "dt-feat-06",
+          "name": "学习方法指引",
+          "selector": ".learning-guide",
+          "screenshot": "feat--dt-feat-06.png",
+          "description": "可展开/收起的黄底卡片，根据当前场景 Tab 显示对应的学习建议文案",
+          "notes": "全量模式下显示通用指引"
+        },
+        {
+          "id": "dt-feat-07",
+          "name": "知识点视频卡片",
+          "selector": ".knowledge-card",
+          "screenshot": "feat--dt-feat-07.png",
+          "description": "横向布局：缩略图（播放按钮+时长标签）+ 标题/标签/难度星级/双进度条（视频10段+习题10段）。VIP锁定标记，NEW标记。",
+          "notes": "复习 Tab 下点击触发学习模式选择；有进度时点击触发内容选择弹窗"
+        },
+        {
+          "id": "dt-feat-08",
+          "name": "练习卡片",
+          "selector": ".practice-card",
+          "screenshot": "feat--dt-feat-08.png",
+          "description": "题目练习入口，显示难度标签（基础/中等/困难三色）和完成进度（已完成/总数）",
+          "notes": "仅在刷题Tab下出现，与学习指引卡片组成 50-50 并排布局"
+        },
+        {
+          "id": "dt-feat-09",
+          "name": "学习指引卡片",
+          "selector": ".guide-card",
+          "description": "PDF学案下载入口，显示文件图标、页数和下载按钮",
+          "notes": "与练习卡片配对使用。当前原型仅在英语/语文学科数据中定义，数学学科暂无此卡片渲染"
+        },
+        {
+          "id": "dt-feat-10",
+          "name": "AI总结笔记卡片",
+          "selector": ".summary-note-card",
+          "description": "绿色渐变底，含金色星标角标，显示笔记数量和「AI总结」标签",
+          "notes": "当前原型 mock 数据未包含此类型资源，组件已实现但不会渲染"
+        },
+        {
+          "id": "dt-feat-11",
+          "name": "VIP钩子卡片",
+          "selector": ".premium-hook-card",
+          "description": "金色渐变缩略图 + 「去加购」橙色按钮，用于引导付费内容购买",
+          "notes": "当前原型 mock 数据未包含此类型资源，组件已实现但不会渲染"
+        },
+        {
+          "id": "dt-feat-12",
+          "name": "章节底部导航",
+          "selector": ".chapter-footer",
+          "screenshot": "feat--dt-feat-12.png",
+          "description": "「上一章」「下一章」双按钮导航，显示目标章节标题",
+          "notes": "首章隐藏上一章，末章隐藏下一章"
+        },
+        {
+          "id": "dt-feat-13",
+          "name": "NEW 新内容标识",
+          "selector": ".new-badge",
+          "screenshot": "feat--dt-feat-13.png",
+          "description": "资源级显示红底白字 NEW 标签，章节级显示红点。7天内发布且未查看的内容标记为新。",
+          "notes": "isNewContent: firstPublishAt ≤ 7天 && 不在 readResources 集合中"
+        }
+      ],
+      "states": [
+        { "name": "预习Tab", "screenshot": "desktop--preview-tab.png", "description": "默认状态，显示预习场景下的知识点视频和练习资源", "trigger": "页面加载默认" },
+        { "name": "解题指导Tab", "screenshot": "desktop--second-tab.png", "description": "切换到解题指导场景，筛选展示解题相关资源", "trigger": "点击解题指导Tab" },
+        { "name": "刷题Tab", "screenshot": "desktop--third-tab.png", "description": "切换到刷题场景，筛选展示刷题练习和VIP付费内容", "trigger": "点击刷题Tab" },
+        { "name": "全部资源模式", "screenshot": "desktop--all-resources.png", "description": "全量资源展示，不按场景筛选", "trigger": "点击「全部」按钮" },
+        { "name": "VIP锁定状态", "screenshot": "desktop--vip-state.png", "description": "部分内容标记为VIP锁定", "trigger": "用户未购买VIP" },
+        { "name": "章节底部", "screenshot": "desktop--chapter-footer.png", "description": "滚动到底部显示上一章/下一章导航", "trigger": "内容滚动到底部" },
+        { "name": "英语预习", "screenshot": "desktop--english-preview.png", "description": "英语学科预习Tab，含朗读卡片和背单词入口", "trigger": "切换到英语学科" }
+      ]
+    },
+    {
+      "id": "chapter-list-mobile",
+      "name": "章节列表（移动端）",
+      "route": "/",
+      "screenshot": "mobile--default.png",
+      "viewport": "mobile",
+      "pageType": "entry",
+      "summary": "移动端自适应布局：侧边栏默认隐藏，通过左侧拉手按钮滑入。单栏显示资源列表。",
+      "features": [
+        { "id": "mb-feat-01", "name": "侧边栏拉手", "selector": ".mobile-toggle", "screenshot": "feat--mb-feat-01.png", "description": "位于页面左侧61.8%位置的竖条按钮，点击打开抽屉式侧边栏", "notes": "黄底圆角按钮，宽16px高80px" },
+        { "id": "mb-feat-02", "name": "抽屉式侧边栏", "selector": ".sidebar.is-open", "screenshot": "feat--mb-feat-02.png", "description": "从左侧滑入的侧边栏（宽80%，最大300px），含遮罩层。包含章节目录树和背单词入口。", "notes": "点击遮罩或选择小节后自动关闭" },
+        { "id": "mb-feat-03", "name": "移动端更多菜单", "selector": ".more-menu-wrapper", "screenshot": "feat--mb-feat-03.png", "description": "桌面端快捷入口栏在移动端折叠为「更多」按钮 → 下拉菜单", "notes": "菜单外点击自动关闭" }
+      ],
+      "states": [
+        { "name": "默认状态", "screenshot": "mobile--default.png", "description": "侧边栏隐藏，全屏显示资源列表", "trigger": "页面加载默认" },
+        { "name": "侧边栏展开", "screenshot": "mobile--sidebar-open.png", "description": "侧边栏从左侧滑入，背景显示半透明遮罩", "trigger": "点击拉手按钮" },
+        { "name": "向下滚动", "screenshot": "mobile--preview-scrolled.png", "description": "资源列表向下滚动后的状态", "trigger": "用户向下滚动" },
+        { "name": "解题指导Tab", "screenshot": "mobile--second-tab.png", "description": "移动端切换到解题指导场景", "trigger": "点击解题指导Tab" }
+      ]
+    },
+    {
+      "id": "settings-page",
+      "name": "设置页",
+      "route": "/settings",
+      "screenshot": "desktop--settings.png",
+      "viewport": "desktop",
+      "pageType": "normal",
+      "summary": "用户个性化设置：复习学习顺序、默认场景偏好、同步刷题难度筛选。即时生效并持久化到 localStorage。",
+      "features": [
+        { "id": "st-feat-01", "name": "复习学习顺序", "description": "三选一：先做题后看视频（推荐）/ 先看视频后做题 / 每次选择。影响复习Tab下点击卡片的行为。", "notes": "「每次选择」时弹出学习模式弹窗" },
+        { "id": "st-feat-02", "name": "默认场景选择", "description": "二选一：全部 / 上次选择（记住上次的场景Tab）", "notes": "" },
+        { "id": "st-feat-03", "name": "同步刷题难度", "description": "多选：基础（绿）/ 中等（黄）/ 困难（红），至少保留1个", "notes": "最后一个勾选项无法取消" }
+      ],
+      "states": []
+    },
+    {
+      "id": "textbook-modal",
+      "name": "教材切换弹窗",
+      "route": "/",
+      "screenshot": "desktop--textbook-modal.png",
+      "viewport": "desktop",
+      "pageType": "conditional",
+      "summary": "三列级联选择器：学科→版本→年级册别。支持10个学科、多个出版社版本。",
+      "features": [
+        { "id": "tb-feat-01", "name": "学科选择列", "screenshot": "feat--tb-modal.png", "description": "左列显示所有学科（数学/英语/语文/物理/化学/生物/历史/地理/政治）", "notes": "选中后右侧版本和年级联动更新" },
+        { "id": "tb-feat-02", "name": "版本选择列", "description": "中列显示教材版本（部编版/北师大版/苏教版等）", "notes": "" },
+        { "id": "tb-feat-03", "name": "年级册别选择列", "description": "右列显示年级学期，附2024新课标标签", "notes": "" },
+        { "id": "tb-feat-04", "name": "确认按钮", "description": "底部黄底确认按钮，切换教材并刷新章节数据", "notes": "" }
+      ],
+      "states": []
+    },
+    {
+      "id": "first-time-guide",
+      "name": "新手引导",
+      "route": "/",
+      "screenshot": "first-time-guide--step-1.png",
+      "viewport": "desktop",
+      "pageType": "conditional",
+      "summary": "首次访问的3步引导：60%半透明遮罩 + 居中引导卡片 + 步骤指示器 + 手势提示动画。",
+      "features": [
+        { "id": "fg-feat-01", "name": "步骤指示器", "screenshot": "feat--fg-step-indicator.png", "description": "3个点状指示器，当前步骤为主色胶囊形", "notes": "" },
+        { "id": "fg-feat-02", "name": "引导内容卡片", "screenshot": "feat--fg-guide-card.png", "description": "居中白色圆角卡片（最大340px），含图标、标题、描述", "notes": "" },
+        { "id": "fg-feat-03", "name": "手势提示动画", "description": "6秒无操作后自动弹出鼠标点击动画提示", "notes": "" },
+        { "id": "fg-feat-04", "name": "跳过/下一步", "description": "「跳过」灰色按钮 + 「下一步」/「开始学习」主色按钮", "notes": "最后一步文案变为「开始学习」" }
+      ],
+      "states": [
+        { "name": "第1步：选择教材", "screenshot": "first-time-guide--step-1.png", "description": "引导用户注意教材选择器", "trigger": "首次访问" },
+        { "name": "第2步：浏览章节", "screenshot": "first-time-guide--step-2.png", "description": "引导用户浏览章节目录树", "trigger": "点击下一步" },
+        { "name": "第3步：开始学习", "screenshot": "first-time-guide--step-3.png", "description": "引导用户点击资源开始学习", "trigger": "点击下一步" }
+      ]
+    },
+    {
+      "id": "learning-mode-modal",
+      "name": "学习模式弹窗",
+      "route": "/",
+      "screenshot": "desktop--preview-tab.png",
+      "viewport": "desktop",
+      "pageType": "conditional",
+      "summary": "复习场景下的模式选择器（设置为「每次选择」时触发）：先做题后看视频（推荐）/ 先看视频后做题。",
+      "features": [
+        { "id": "lm-feat-01", "name": "模式选项卡片", "description": "两张选项卡片，各含图标+标题+描述+单选指示器，第一项带「推荐」角标", "notes": "" },
+        { "id": "lm-feat-02", "name": "开始学习按钮", "description": "底部黄底确认按钮，进入对应学习路径", "notes": "" },
+        { "id": "lm-feat-03", "name": "设置提示", "description": "底部灰色文字「可在设置中修改默认选择」", "notes": "" }
+      ],
+      "states": []
+    },
+    {
+      "id": "content-choice-modal",
+      "name": "内容选择弹窗",
+      "route": "/",
+      "screenshot": "desktop--preview-tab.png",
+      "viewport": "desktop",
+      "pageType": "conditional",
+      "summary": "点击有进度的知识点卡片时弹出3种路径：继续看视频、做补充练习、看课堂笔记（条件显示）。",
+      "features": [
+        { "id": "cc-feat-01", "name": "继续看视频", "description": "PlayCircle图标 +「从上次断点继续播放」", "notes": "" },
+        { "id": "cc-feat-02", "name": "做补充练习", "description": "FileText图标 +「做该知识点的课后习题」", "notes": "" },
+        { "id": "cc-feat-03", "name": "看课堂笔记", "description": "BookOpen图标，仅当资源含笔记时显示", "notes": "v-if=\"hasNote\"" }
+      ],
+      "states": []
+    }
+  ],
+  "connections": [
+    { "id": "conn-01", "from": "chapter-list-desktop", "to": "settings-page", "type": "navigation", "label": "点击设置按钮" },
+    { "id": "conn-02", "from": "settings-page", "to": "chapter-list-desktop", "type": "back", "label": "点击返回" },
+    { "id": "conn-03", "from": "chapter-list-desktop", "to": "textbook-modal", "type": "navigation", "label": "点击教材选择器或切换按钮" },
+    { "id": "conn-04", "from": "textbook-modal", "to": "chapter-list-desktop", "type": "back", "label": "确认选择或关闭" },
+    { "id": "conn-05", "from": "chapter-list-desktop", "to": "first-time-guide", "type": "conditional", "label": "首次访问自动弹出", "condition": "isFirstVisit === true" },
+    { "id": "conn-06", "from": "first-time-guide", "to": "chapter-list-desktop", "type": "back", "label": "完成引导或跳过" },
+    { "id": "conn-07", "from": "chapter-list-desktop", "to": "learning-mode-modal", "type": "conditional", "label": "复习Tab + 每次选择模式", "condition": "currentTab === review && reviewLearningMode === ask-every-time" },
+    { "id": "conn-08", "from": "learning-mode-modal", "to": "chapter-list-desktop", "type": "back", "label": "选择模式后开始" },
+    { "id": "conn-09", "from": "chapter-list-desktop", "to": "content-choice-modal", "type": "conditional", "label": "点击有进度的视频卡片", "condition": "videoProgress > 0 && videoProgress < 100" },
+    { "id": "conn-10", "from": "content-choice-modal", "to": "chapter-list-desktop", "type": "back", "label": "选择内容后" },
+    { "id": "conn-11", "from": "chapter-list-desktop", "to": "chapter-list-mobile", "type": "data", "label": "响应式适配 (viewport < 768px)" }
+  ],
+  "journeys": [
+    {
+      "name": "用户首次学习",
+      "description": "新用户第一次打开章节列表页，从新手引导开始，到成功学习第一个知识点",
+      "goal": "完成新手引导，理解页面布局，成功点击第一个资源开始学习",
+      "steps": [
+        { "pageId": "chapter-list-desktop", "action": "进入章节列表页", "result": "页面加载完成，自动弹出新手引导" },
+        { "pageId": "first-time-guide", "action": "阅读第1步「选择教材」", "result": "了解教材选择器位置" },
+        { "pageId": "first-time-guide", "action": "点击下一步 → 第2步「浏览章节」", "result": "了解左侧目录树作用" },
+        { "pageId": "first-time-guide", "action": "点击「开始学习」完成引导", "result": "引导关闭，进入正常列表页" },
+        { "pageId": "chapter-list-desktop", "action": "浏览预习Tab下的资源", "result": "看到知识点视频、练习等卡片", "decisionPoint": { "condition": "用户是否为VIP？", "branches": [{ "label": "VIP → 直接点击", "targetPageId": "chapter-list-desktop" }, { "label": "非VIP → VIP锁定标记", "targetPageId": "chapter-list-desktop" }] } },
+        { "pageId": "chapter-list-desktop", "action": "点击第一个知识点视频卡片", "result": "跳转到视频播放页开始学习" }
+      ]
+    },
+    {
+      "name": "用户自主选择场景完成学习",
+      "description": "用户根据学习需求切换场景Tab和章节，完成个性化学习路径",
+      "goal": "找到适合自己的学习场景，在不同章节间自由导航并完成学习",
+      "steps": [
+        { "pageId": "chapter-list-desktop", "action": "进入页面（预习Tab默认）", "result": "显示当前章节预习资源" },
+        { "pageId": "chapter-list-desktop", "action": "切换场景Tab", "result": "资源列表按新场景过滤", "decisionPoint": { "condition": "选择哪个场景？", "branches": [{ "label": "预习 → 视频+练习+学案", "targetPageId": "chapter-list-desktop" }, { "label": "解题指导 → 解题视频", "targetPageId": "chapter-list-desktop" }, { "label": "刷题 → 练习+付费", "targetPageId": "chapter-list-desktop" }, { "label": "全部 → 所有资源", "targetPageId": "chapter-list-desktop" }] } },
+        { "pageId": "chapter-list-desktop", "action": "在目录树中点击其他小节", "result": "右侧内容平滑滚动到对应位置" },
+        { "pageId": "chapter-list-desktop", "action": "点击知识点视频卡片", "result": "进入学习", "decisionPoint": { "condition": "视频有进度？", "branches": [{ "label": "无 → 直接开始", "targetPageId": "chapter-list-desktop" }, { "label": "有 → 弹出选择", "targetPageId": "content-choice-modal" }] } },
+        { "pageId": "chapter-list-desktop", "action": "滚动到底部 → 点击「下一章」", "result": "章节切换，目录和资源刷新" },
+        { "pageId": "chapter-list-desktop", "action": "点击教材选择器", "result": "弹出教材切换弹窗" },
+        { "pageId": "textbook-modal", "action": "选择学科→版本→年级 → 确认", "result": "章节数据刷新，场景Tab可能变更" }
+      ]
+    },
+    {
+      "name": "用户调整功能设置",
+      "description": "用户根据学习习惯调整应用设置",
+      "goal": "个性化配置学习偏好，让应用更符合使用习惯",
+      "steps": [
+        { "pageId": "chapter-list-desktop", "action": "点击「设置」按钮", "result": "进入设置页" },
+        { "pageId": "settings-page", "action": "调整复习学习顺序", "result": "即时生效", "decisionPoint": { "condition": "选择哪种复习模式？", "branches": [{ "label": "先做题（推荐）", "targetPageId": "settings-page" }, { "label": "先看视频", "targetPageId": "settings-page" }, { "label": "每次选择 → 弹窗", "targetPageId": "settings-page" }] } },
+        { "pageId": "settings-page", "action": "设置默认场景偏好", "result": "下次进入按偏好展示" },
+        { "pageId": "settings-page", "action": "勾选刷题难度", "result": "至少保留1个，影响练习筛选" },
+        { "pageId": "settings-page", "action": "点击返回", "result": "返回列表页，设置即时生效" },
+        { "pageId": "chapter-list-desktop", "action": "验证设置效果", "result": "交互行为已按新设置调整" }
+      ]
+    }
+  ]
+}
+  </script>
+
+  <footer class="max-w-7xl mx-auto px-4 py-6 text-center text-sm text-gray-400 dark:text-gray-500 no-print">
+    由 review-map skill 自动生成 · v2.0 · 2026-03-12T16:00:00+08:00
+  </footer>
+
+</body>
+</html>

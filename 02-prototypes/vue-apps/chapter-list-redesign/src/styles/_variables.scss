@@ -1,0 +1,169 @@
+// ============================================
+// Design Tokens - 基于洋葱学园官方 Design Tokens
+// ============================================
+
+// ---------- 颜色系统 ----------
+
+// 主色（提示-橙）
+$primary: #FEA345;
+$primary-light: #FFF1E3;
+$primary-bg: #FFF1E3;
+
+// 次要色（品牌辅助-紫）
+$secondary: #845EFF;
+$secondary-light: #F0ECFF;
+$secondary-bg: #F0ECFF;
+
+// 品牌色（黄）
+$brand-yellow: #FFD633;
+$brand-yellow-light: #FFF9E0;
+
+// 成功色（正确-绿）
+$success: #92E066;
+$success-light: #EFFAE8;
+$success-bg: #EFFAE8;
+
+// 警告/品牌黄
+$warning: #FFD633;
+$warning-light: #FFF9E0;
+$warning-bg: #FFF9E0;
+
+// 错误色
+$error: #FA5A65;
+$error-light: #FEE6E8;
+
+// 链接色（蓝）
+$blue: #518AFF;
+$blue-light: #EAF2FF;
+
+// 提示色（橙，和主色一致）
+$orange: #FEA345;
+$orange-light: #FFF1E3;
+
+// 文字颜色
+$text-primary: #2E2E3A;
+$text-secondary: #848096;
+$text-tertiary: #B0ADBA;
+
+// 边框背景
+$border-color: #D4D2DC;
+$bg-white: #FFFFFF;
+$bg-secondary: #F5F4F8;
+$bg-tertiary: #F5F4F8;
+$overlay: rgba(0, 0, 0, 0.4);
+
+// VIP 渐变
+$vip-gradient: linear-gradient(135deg, #FFD633 0%, #FEA345 100%);
+$gold-gradient: linear-gradient(135deg, #FFD633 0%, #FEA345 100%);
+
+// ---------- 字体规格 ----------
+$font-family: "Alibaba PuHuiTi 2.0", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+
+$font-size-xl: 18px;
+$font-size-lg: 16px;
+$font-size-md: 14px;
+$font-size-sm: 13px;
+$font-size-xs: 12px;
+$font-size-xxs: 11px;
+$font-size-xxxs: 10px;
+
+$font-weight-normal: 400;
+$font-weight-medium: 500;
+$font-weight-semibold: 600;
+$font-weight-bold: 800;
+
+// ---------- 间距系统 ----------
+$spacing-xxs: 2px;
+$spacing-xs: 4px;
+$spacing-sm: 6px;
+$spacing-md: 8px;
+$spacing-lg: 10px;
+$spacing-xl: 12px;
+$spacing-xxl: 16px;
+$spacing-xxxl: 24px;
+
+// ---------- 圆角规格 ----------
+$radius-sm: 6px;
+$radius-md: 8px;
+$radius-lg: 14px;
+$radius-xl: 14px;
+$radius-pill: 999px;
+$radius-circle: 50%;
+
+// ---------- 阴影 ----------
+$shadow-card: 0 1px 1px rgba(18, 22, 38, 0.05), 0 3px 8px -1px rgba(18, 22, 38, 0.05);
+$shadow-dropdown: 0 4px 12px rgba(0, 0, 0, 0.15);
+$shadow-badge: -1px 1px 4px rgba(0, 0, 0, 0.1);
+
+// ---------- 过渡 ----------
+$transition-fast: 0.2s;
+$transition-normal: 0.3s;
+$transition-slow: 0.6s;
+
+// ---------- 响应式断点 ----------
+$breakpoint-mobile: 768px;
+$breakpoint-small-mobile: 600px;
+$breakpoint-tiny-mobile: 380px;
+$breakpoint-micro-mobile: 360px;
+
+// ---------- 布局尺寸 ----------
+$sidebar-width: 260px;
+$header-height: 40px;
+$function-bar-height: 44px;
+
+// ============================================
+// 响应式 Mixins
+// ============================================
+
+@mixin desktop {
+  @media (min-width: $breakpoint-mobile) {
+    @content;
+  }
+}
+
+@mixin mobile {
+  @media (max-width: #{$breakpoint-mobile - 1px}) {
+    @content;
+  }
+}
+
+@mixin small-mobile {
+  @media (max-width: #{$breakpoint-small-mobile - 1px}) {
+    @content;
+  }
+}
+
+@mixin tiny-mobile {
+  @media (max-width: #{$breakpoint-tiny-mobile - 1px}) {
+    @content;
+  }
+}
+
+@mixin micro-mobile {
+  @media (max-width: #{$breakpoint-micro-mobile - 1px}) {
+    @content;
+  }
+}
+
+// 折叠屏/平板竖屏
+@mixin tablet-portrait {
+  @media (min-width: 640px) and (min-height: 640px) {
+    @content;
+  }
+}
+
+// 手机横屏
+@mixin phone-landscape {
+  @media (max-height: 639px) {
+    @content;
+  }
+}
+
+// 平板横屏
+@mixin tablet-landscape {
+  @media (min-width: 1024px) {
+    @content;
+  }
+}
+
+

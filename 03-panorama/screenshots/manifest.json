@@ -1,0 +1,109 @@
+{
+  "capturedAt": "2026-03-12T00:08:45.672Z",
+  "prototypeType": "standard-vue",
+  "prototypePath": "02-prototypes/vue-apps/chapter-list-redesign/",
+  "screenshots": [
+    {
+      "file": "first-time-guide--step-1.png",
+      "captureId": "first-time-guide--step-1",
+      "description": "新手引导 - 第1步：选择你的教材",
+      "viewport": "desktop"
+    },
+    {
+      "file": "first-time-guide--step-2.png",
+      "captureId": "first-time-guide--step-2",
+      "description": "新手引导 - 第2步：浏览章节目录",
+      "viewport": "desktop"
+    },
+    {
+      "file": "first-time-guide--step-3.png",
+      "captureId": "first-time-guide--step-3",
+      "description": "新手引导 - 第3步：开始学习",
+      "viewport": "desktop"
+    },
+    {
+      "file": "desktop--preview-tab.png",
+      "captureId": "desktop--preview-tab",
+      "description": "桌面端 - 预习Tab（默认状态）",
+      "viewport": "desktop"
+    },
+    {
+      "file": "desktop--second-tab.png",
+      "captureId": "desktop--second-tab",
+      "description": "桌面端 - 解题指导Tab",
+      "viewport": "desktop"
+    },
+    {
+      "file": "desktop--third-tab.png",
+      "captureId": "desktop--third-tab",
+      "description": "桌面端 - 刷题Tab",
+      "viewport": "desktop"
+    },
+    {
+      "file": "desktop--all-resources.png",
+      "captureId": "desktop--all-resources",
+      "description": "桌面端 - 全部资源模式",
+      "viewport": "desktop"
+    },
+    {
+      "file": "desktop--textbook-modal.png",
+      "captureId": "desktop--textbook-modal",
+      "description": "桌面端 - 教材选择弹窗",
+      "viewport": "desktop"
+    },
+    {
+      "file": "desktop--settings.png",
+      "captureId": "desktop--settings",
+      "description": "桌面端 - 设置页",
+      "viewport": "desktop"
+    },
+    {
+      "file": "desktop--chapter-footer.png",
+      "captureId": "desktop--chapter-footer",
+      "description": "桌面端 - 章节底部导航（上一章/下一章）",
+      "viewport": "desktop"
+    },
+    {
+      "file": "desktop--vip-state.png",
+      "captureId": "desktop--vip-state",
+      "description": "桌面端 - VIP锁定状态卡片",
+      "viewport": "desktop"
+    },
+    {
+      "file": "desktop--english-preview.png",
+      "captureId": "desktop--english-preview",
+      "description": "桌面端 - 英语预习Tab（含朗读卡片）",
+      "viewport": "desktop"
+    },
+    {
+      "file": "desktop--vocab-entry.png",
+      "captureId": "desktop--vocab-entry",
+      "description": "桌面端 - 英语侧边栏（含背单词入口）",
+      "viewport": "desktop"
+    },
+    {
+      "file": "mobile--default.png",
+      "captureId": "mobile--default",
+      "description": "移动端 - 默认状态",
+      "viewport": "mobile"
+    },
+    {
+      "file": "mobile--sidebar-open.png",
+      "captureId": "mobile--sidebar-open",
+      "description": "移动端 - 侧边栏展开",
+      "viewport": "mobile"
+    },
+    {
+      "file": "mobile--preview-scrolled.png",
+      "captureId": "mobile--preview-scrolled",
+      "description": "移动端 - 预习Tab（向下滚动）",
+      "viewport": "mobile"
+    },
+    {
+      "file": "mobile--second-tab.png",
+      "captureId": "mobile--second-tab",
+      "description": "移动端 - 解题指导Tab",
+      "viewport": "mobile"
+    }
+  ]
+}

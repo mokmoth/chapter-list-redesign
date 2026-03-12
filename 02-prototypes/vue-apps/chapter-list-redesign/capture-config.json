@@ -1,0 +1,137 @@
+{
+  "version": "1.0",
+  "devServerUrl": "http://localhost:5173",
+  "viewports": {
+    "desktop": { "width": 1280, "height": 800 },
+    "mobile": { "width": 375, "height": 812 }
+  },
+  "captures": [
+    {
+      "id": "desktop--preview-tab",
+      "description": "桌面端 - 预习Tab（默认）",
+      "viewport": "desktop",
+      "route": "/",
+      "setup": [
+        { "action": "waitForSelector", "selector": ".page-container" },
+        { "action": "waitForTimeout", "ms": 800 }
+      ]
+    },
+    {
+      "id": "desktop--review-tab",
+      "description": "桌面端 - 复习Tab",
+      "viewport": "desktop",
+      "route": "/",
+      "setup": [
+        { "action": "waitForSelector", "selector": ".scroll-container" },
+        { "action": "click", "selector": ".scroll-container .tab-item:nth-child(2)" },
+        { "action": "waitForTimeout", "ms": 500 }
+      ]
+    },
+    {
+      "id": "desktop--extra-tab",
+      "description": "桌面端 - 加餐Tab",
+      "viewport": "desktop",
+      "route": "/",
+      "setup": [
+        { "action": "waitForSelector", "selector": ".scroll-container" },
+        { "action": "click", "selector": ".scroll-container .tab-item:nth-child(3)" },
+        { "action": "waitForTimeout", "ms": 500 }
+      ]
+    },
+    {
+      "id": "desktop--vip-unlocked",
+      "description": "桌面端 - VIP已解锁状态",
+      "viewport": "desktop",
+      "route": "/",
+      "setup": [
+        { "action": "waitForSelector", "selector": ".page-container" },
+        { "action": "evaluate", "expression": "document.querySelector('#app').__vue_app__.config.globalProperties.$pinia._s.get('chapter').isVip = true;" },
+        { "action": "click", "selector": ".scroll-container .tab-item:nth-child(2)" },
+        { "action": "waitForTimeout", "ms": 500 }
+      ]
+    },
+    {
+      "id": "desktop--textbook-modal",
+      "description": "桌面端 - 教材切换弹窗",
+      "viewport": "desktop",
+      "route": "/",
+      "setup": [
+        { "action": "waitForSelector", "selector": ".context-selector" },
+        { "action": "click", "selector": ".context-selector" },
+        { "action": "waitForTimeout", "ms": 500 },
+        { "action": "waitForSelector", "selector": ".textbook-modal" }
+      ]
+    },
+    {
+      "id": "desktop--settings",
+      "description": "桌面端 - 偏好设置页",
+      "viewport": "desktop",
+      "route": "/",
+      "setup": [
+        { "action": "waitForSelector", "selector": ".quick-actions" },
+        { "action": "click", "selector": ".quick-actions .action-btn.desktop-only:nth-of-type(4)" },
+        { "action": "waitForTimeout", "ms": 500 },
+        { "action": "waitForSelector", "selector": ".settings-page" }
+      ]
+    },
+    {
+      "id": "desktop--loading",
+      "description": "桌面端 - 加载状态",
+      "viewport": "desktop",
+      "route": "/",
+      "setup": [
+        { "action": "waitForSelector", "selector": ".page-container" },
+        { "action": "evaluate", "expression": "document.querySelector('#app').__vue_app__.config.globalProperties.$pinia._s.get('chapter').loading = true;" },
+        { "action": "waitForTimeout", "ms": 300 }
+      ]
+    },
+    {
+      "id": "desktop--learning-mode-modal",
+      "description": "桌面端 - 学习方式选择弹窗",
+      "viewport": "desktop",
+      "route": "/",
+      "setup": [
+        { "action": "waitForSelector", "selector": ".page-container" },
+        { "action": "evaluate", "expression": "document.querySelector('#app').__vue_app__.config.globalProperties.$pinia._s.get('chapter').appSettings.reviewLearningMode = 'ask-every-time';" },
+        { "action": "click", "selector": ".scroll-container .tab-item:nth-child(2)" },
+        { "action": "waitForTimeout", "ms": 500 },
+        { "action": "click", "selector": ".knowledge-card" },
+        { "action": "waitForTimeout", "ms": 500 },
+        { "action": "waitForSelector", "selector": ".modal-overlay" }
+      ]
+    },
+    {
+      "id": "mobile--default",
+      "description": "移动端 - 默认视图（目录关闭）",
+      "viewport": "mobile",
+      "route": "/",
+      "setup": [
+        { "action": "waitForSelector", "selector": ".page-container" },
+        { "action": "waitForTimeout", "ms": 800 }
+      ]
+    },
+    {
+      "id": "mobile--sidebar-open",
+      "description": "移动端 - 侧边栏抽屉展开",
+      "viewport": "mobile",
+      "route": "/",
+      "setup": [
+        { "action": "waitForSelector", "selector": ".mobile-toggle" },
+        { "action": "click", "selector": ".mobile-toggle" },
+        { "action": "waitForTimeout", "ms": 500 },
+        { "action": "waitForSelector", "selector": ".sidebar.is-open" }
+      ]
+    },
+    {
+      "id": "mobile--preview-tab",
+      "description": "移动端 - 预习Tab",
+      "viewport": "mobile",
+      "route": "/",
+      "setup": [
+        { "action": "waitForSelector", "selector": ".scroll-container" },
+        { "action": "click", "selector": ".scroll-container .tab-item:nth-child(1)" },
+        { "action": "waitForTimeout", "ms": 500 }
+      ]
+    }
+  ]
+}
