@@ -679,27 +679,32 @@
         {
           "pageId": "chapter-list-desktop",
           "action": "进入章节列表页",
-          "result": "页面加载完成，自动弹出新手引导"
+          "result": "页面加载完成，自动弹出新手引导",
+          "screenshot": "desktop--preview-tab.png"
         },
         {
           "pageId": "first-time-guide",
           "action": "阅读第1步「选择教材」",
-          "result": "了解教材选择器位置"
+          "result": "了解教材选择器位置",
+          "screenshot": "first-time-guide--step-1.png"
         },
         {
           "pageId": "first-time-guide",
           "action": "点击下一步 → 第2步「浏览章节」",
-          "result": "了解左侧目录树作用"
+          "result": "了解左侧目录树作用",
+          "screenshot": "first-time-guide--step-2.png"
         },
         {
           "pageId": "first-time-guide",
           "action": "点击「开始学习」完成引导",
-          "result": "引导关闭，进入正常列表页"
+          "result": "引导关闭，进入正常列表页",
+          "screenshot": "first-time-guide--step-3.png"
         },
         {
           "pageId": "chapter-list-desktop",
           "action": "浏览预习Tab下的资源",
           "result": "看到知识点视频、练习等卡片",
+          "screenshot": "desktop--vip-state.png",
           "decisionPoint": {
             "condition": "用户是否为VIP？",
             "branches": [
@@ -717,7 +722,8 @@
         {
           "pageId": "chapter-list-desktop",
           "action": "点击第一个知识点视频卡片",
-          "result": "跳转到视频播放页开始学习"
+          "result": "跳转到视频播放页开始学习",
+          "screenshot": "desktop--preview-tab.png"
         }
       ]
     },
@@ -729,12 +735,14 @@
         {
           "pageId": "chapter-list-desktop",
           "action": "进入页面（预习Tab默认）",
-          "result": "显示当前章节预习资源"
+          "result": "显示当前章节预习资源",
+          "screenshot": "desktop--preview-tab.png"
         },
         {
           "pageId": "chapter-list-desktop",
           "action": "切换场景Tab",
           "result": "资源列表按新场景过滤",
+          "screenshot": "desktop--second-tab.png",
           "decisionPoint": {
             "condition": "选择哪个场景？",
             "branches": [
@@ -760,12 +768,14 @@
         {
           "pageId": "chapter-list-desktop",
           "action": "在目录树中点击其他小节",
-          "result": "右侧内容平滑滚动到对应位置"
+          "result": "右侧内容平滑滚动到对应位置",
+          "screenshot": "feat--dt-feat-04.png"
         },
         {
           "pageId": "chapter-list-desktop",
           "action": "点击知识点视频卡片",
           "result": "进入学习",
+          "screenshot": "desktop--preview-tab.png",
           "decisionPoint": {
             "condition": "视频有进度？",
             "branches": [
@@ -783,17 +793,20 @@
         {
           "pageId": "chapter-list-desktop",
           "action": "滚动到底部 → 点击「下一章」",
-          "result": "章节切换，目录和资源刷新"
+          "result": "章节切换，目录和资源刷新",
+          "screenshot": "desktop--chapter-footer.png"
         },
         {
           "pageId": "chapter-list-desktop",
           "action": "点击教材选择器",
-          "result": "弹出教材切换弹窗"
+          "result": "弹出教材切换弹窗",
+          "screenshot": "feat--dt-feat-05.png"
         },
         {
           "pageId": "textbook-modal",
           "action": "选择学科→版本→年级 → 确认",
-          "result": "章节数据刷新，场景Tab可能变更"
+          "result": "章节数据刷新，场景Tab可能变更",
+          "screenshot": "desktop--textbook-modal.png"
         }
       ]
     },
@@ -805,12 +818,14 @@
         {
           "pageId": "chapter-list-desktop",
           "action": "点击「设置」按钮",
-          "result": "进入设置页"
+          "result": "进入设置页",
+          "screenshot": "feat--dt-feat-03.png"
         },
         {
           "pageId": "settings-page",
           "action": "调整复习学习顺序",
           "result": "即时生效",
+          "screenshot": "desktop--settings.png",
           "decisionPoint": {
             "condition": "选择哪种复习模式？",
             "branches": [
@@ -832,22 +847,26 @@
         {
           "pageId": "settings-page",
           "action": "设置默认场景偏好",
-          "result": "下次进入按偏好展示"
+          "result": "下次进入按偏好展示",
+          "screenshot": "desktop--settings.png"
         },
         {
           "pageId": "settings-page",
           "action": "勾选刷题难度",
-          "result": "至少保留1个，影响练习筛选"
+          "result": "至少保留1个，影响练习筛选",
+          "screenshot": "desktop--settings.png"
         },
         {
           "pageId": "settings-page",
           "action": "点击返回",
-          "result": "返回列表页，设置即时生效"
+          "result": "返回列表页，设置即时生效",
+          "screenshot": "desktop--settings.png"
         },
         {
           "pageId": "chapter-list-desktop",
           "action": "验证设置效果",
-          "result": "交互行为已按新设置调整"
+          "result": "交互行为已按新设置调整",
+          "screenshot": "desktop--preview-tab.png"
         }
       ]
     }
@@ -935,10 +954,14 @@
       .print-break { page-break-before: always; }
     }
 
-    /* Screenshot thumbnails */
+    /* Screenshot thumbnails — show full image, never crop */
     .screenshot-thumb {
-      object-fit: cover;
-      object-position: top;
+      object-fit: contain;
+      object-position: center;
+      background: #F3F4F6;
+    }
+    .dark .screenshot-thumb {
+      background: #1F2937;
     }
 
     /* Dark mode screenshot visibility */
@@ -1478,12 +1501,12 @@
                       <div x-show="!$store.review.editMode">
                         <template x-if="getFeatureScreenshot(page.id, feat.id)">
                           <img :src="getFeatureScreenshot(page.id, feat.id)"
-                               class="w-[120px] h-[80px] object-cover rounded cursor-pointer screenshot-thumb"
+                               class="w-[140px] max-h-[160px] object-contain rounded cursor-pointer screenshot-thumb"
                                @click="openLightbox(getFeatureScreenshot(page.id, feat.id))"
                                :alt="$store.review.getFeature(page.id, feat.id, 'name')">
                         </template>
                         <template x-if="!getFeatureScreenshot(page.id, feat.id)">
-                          <div class="w-[120px] h-[80px] border-2 border-dashed border-gray-200 rounded flex items-center justify-center">
+                          <div class="w-[140px] h-[80px] border-2 border-dashed border-gray-200 rounded flex items-center justify-center">
                             <svg class="w-6 h-6 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
                                     d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/>
@@ -1495,16 +1518,16 @@
                       </div>
                       <!-- Edit mode: click for file picker / drag to replace -->
                       <label x-show="$store.review.editMode"
-                             class="block cursor-pointer editable-hint relative w-[120px] h-[80px]"
+                             class="block cursor-pointer editable-hint relative w-[140px] max-h-[160px]"
                              @dragover.prevent="$el.classList.add('screenshot-drop-active')"
                              @dragleave="$el.classList.remove('screenshot-drop-active')"
                              @drop.prevent="$el.classList.remove('screenshot-drop-active'); handleFeatureScreenshotDrop($event, page.id, feat.id)">
                         <template x-if="getFeatureScreenshot(page.id, feat.id)">
                           <img :src="getFeatureScreenshot(page.id, feat.id)"
-                               class="w-full h-full object-cover rounded">
+                               class="w-full object-contain rounded screenshot-thumb">
                         </template>
                         <template x-if="!getFeatureScreenshot(page.id, feat.id)">
-                          <div class="w-full h-full border-2 border-dashed border-gray-300 rounded flex items-center justify-center">
+                          <div class="w-full h-[80px] border-2 border-dashed border-gray-300 rounded flex items-center justify-center">
                             <span class="text-xs text-gray-400 text-center px-1">点击添加截图</span>
                           </div>
                         </template>
@@ -1758,17 +1781,29 @@
             <template x-for="(step, sIdx) in getEffectiveSteps(journey, jIdx)" :key="sIdx">
               <div class="flex items-start flex-shrink-0">
                 <!-- Step card -->
-                <div class="w-48 border dark:border-gray-600 rounded-lg p-3 bg-gray-50 dark:bg-gray-700 relative"
+                <div class="w-52 border dark:border-gray-600 rounded-lg overflow-hidden bg-gray-50 dark:bg-gray-700 relative"
                      :class="isSharedStep(step.pageId, jIdx) ? 'ring-2 ring-blue-300' : ''">
                   <!-- Shared step indicator -->
                   <span x-show="isSharedStep(step.pageId, jIdx)"
-                        class="absolute -top-2 -right-2 w-5 h-5 bg-blue-500 text-white rounded-full text-xs flex items-center justify-center"
+                        class="absolute -top-2 -right-2 w-5 h-5 bg-blue-500 text-white rounded-full text-xs flex items-center justify-center z-10"
                         title="此步骤在其他路径中也出现">&#x2194;</span>
                   <!-- Delete step button (EDIT-JOURNEY-05 delete) -->
                   <button x-show="$store.review.editMode"
                           @click="deleteStep(jIdx, sIdx)"
-                          class="absolute top-1 right-1 text-red-400 hover:text-red-600 text-xs leading-none"
+                          class="absolute top-1 right-1 text-red-400 hover:text-red-600 text-xs leading-none z-10"
                           title="删除步骤">&times;</button>
+                  <!-- Step screenshot (from page or step-level override) -->
+                  <template x-if="$store.review.getStepScreenshotSrc(step)">
+                    <div class="bg-gray-100 dark:bg-gray-800 flex items-center justify-center cursor-pointer"
+                         style="height: 80px"
+                         @click="$store.review.openLightbox($store.review.getStepScreenshotSrc(step))">
+                      <img :src="$store.review.getStepScreenshotSrc(step)"
+                           class="w-full h-full object-contain screenshot-thumb"
+                           loading="lazy"
+                           onerror="this.parentElement.style.display='none'">
+                    </div>
+                  </template>
+                  <div class="p-3">
                   <!-- Page name (clickable link) -->
                   <a class="text-sm font-bold text-blue-600 hover:underline cursor-pointer block truncate"
                      @click="goToPage(step.pageId)"
@@ -1867,6 +1902,7 @@
                             class="w-5 h-5 flex items-center justify-center text-xs rounded transition-colors"
                             title="右移">&#x25B6;</button>
                   </div>
+                  </div><!-- /p-3 content wrapper -->
                 </div>
                 <!-- Arrow connector between steps (not after last) -->
                 <template x-if="sIdx < getEffectiveSteps(journey, jIdx).length - 1">
@@ -1894,13 +1930,26 @@
                 <div class="w-7 h-7 rounded-full bg-gray-200 dark:bg-gray-600 text-gray-600 dark:text-gray-300 text-xs font-bold flex items-center justify-center flex-shrink-0 mt-0.5"
                      x-text="sIdx + 1"></div>
                 <!-- Step content -->
-                <div class="flex-1 border dark:border-gray-600 rounded-lg p-3 bg-gray-50 dark:bg-gray-700 relative"
+                <div class="flex-1 border dark:border-gray-600 rounded-lg overflow-hidden bg-gray-50 dark:bg-gray-700 relative"
                      :class="isSharedStep(step.pageId, jIdx) ? 'ring-2 ring-blue-300' : ''">
                   <!-- Delete step button (mobile, edit mode) -->
                   <button x-show="$store.review.editMode"
                           @click="deleteStep(jIdx, sIdx)"
-                          class="absolute top-1 right-1 text-red-400 hover:text-red-600 text-xs leading-none"
+                          class="absolute top-1 right-1 text-red-400 hover:text-red-600 text-xs leading-none z-10"
                           title="删除步骤">&times;</button>
+                  <!-- Step screenshot (mobile) -->
+                  <template x-if="$store.review.getStepScreenshotSrc(step)">
+                    <div class="bg-gray-100 dark:bg-gray-800 flex items-center justify-center cursor-pointer"
+                         style="max-height: 120px"
+                         @click="$store.review.openLightbox($store.review.getStepScreenshotSrc(step))">
+                      <img :src="$store.review.getStepScreenshotSrc(step)"
+                           class="w-full object-contain screenshot-thumb"
+                           style="max-height: 120px"
+                           loading="lazy"
+                           onerror="this.parentElement.style.display='none'">
+                    </div>
+                  </template>
+                  <div class="p-3">
                   <a class="text-sm font-bold text-blue-600 hover:underline cursor-pointer"
                      @click="goToPage(step.pageId)"
                      x-text="getPageName(step.pageId)"></a>
@@ -1992,6 +2041,7 @@
                             class="w-5 h-5 flex items-center justify-center text-xs rounded transition-colors"
                             title="右移">&#x25B6;</button>
                   </div>
+                  </div><!-- /p-3 mobile content wrapper -->
                 </div>
               </div>
             </template>
@@ -2715,6 +2765,22 @@
             ? page.features.find(function(f) { return f.id === featureId; })
             : null;
           return feat && feat.screenshot ? 'screenshots/' + feat.screenshot : '';
+        },
+
+        // --- Journey step screenshot accessor ---
+        // Priority: step.screenshot > step.featureId match > page default screenshot
+        getStepScreenshotSrc(step) {
+          if (!step) return '';
+          // 1. Step-level explicit screenshot
+          if (step.screenshot) return 'screenshots/' + step.screenshot;
+          // 2. If step has a featureId, use the feature screenshot
+          if (step.featureId && step.pageId) {
+            var featSrc = this.getFeatureScreenshotSrc(step.pageId, step.featureId);
+            if (featSrc) return featSrc;
+          }
+          // 3. Fallback to page default screenshot
+          if (step.pageId) return this.getScreenshotSrc(step.pageId, 'default');
+          return '';
         },
 
         // --- Feature comment count accessor ---
@@ -3580,7 +3646,7 @@
               nodesHtml += '<foreignObject x="' + node.x + '" y="' + node.y + '" width="' + self.nodeWidth + '" height="' + self.nodeHeight + '" data-node-id="' + node.id + '">';
               nodesHtml += '<div xmlns="http://www.w3.org/1999/xhtml" class="' + nodeClass + '" style="cursor:pointer">';
               nodesHtml += '<div class="bg-gray-100 dark:bg-gray-700 flex items-center justify-center" style="height:50px">';
-              nodesHtml += '<img src="' + imgSrc + '" loading="lazy" class="w-full h-full object-cover" style="max-height:50px" onerror="this.style.display=\'none\'"/>';
+              nodesHtml += '<img src="' + imgSrc + '" loading="lazy" class="w-full h-full object-contain screenshot-thumb" style="max-height:50px" onerror="this.style.display=\'none\'"/>';
               nodesHtml += '</div>';
               nodesHtml += '<div class="px-2 py-1 text-xs text-center truncate dark:text-gray-200' + (store.editMode ? ' editable-hint' : '') + '"'
                 + ' data-name-node="' + node.id + '">'
@@ -4966,27 +5032,32 @@
         {
           "pageId": "chapter-list-desktop",
           "action": "进入章节列表页",
-          "result": "页面加载完成，自动弹出新手引导"
+          "result": "页面加载完成，自动弹出新手引导",
+          "screenshot": "desktop--preview-tab.png"
         },
         {
           "pageId": "first-time-guide",
           "action": "阅读第1步「选择教材」",
-          "result": "了解教材选择器位置"
+          "result": "了解教材选择器位置",
+          "screenshot": "first-time-guide--step-1.png"
         },
         {
           "pageId": "first-time-guide",
           "action": "点击下一步 → 第2步「浏览章节」",
-          "result": "了解左侧目录树作用"
+          "result": "了解左侧目录树作用",
+          "screenshot": "first-time-guide--step-2.png"
         },
         {
           "pageId": "first-time-guide",
           "action": "点击「开始学习」完成引导",
-          "result": "引导关闭，进入正常列表页"
+          "result": "引导关闭，进入正常列表页",
+          "screenshot": "first-time-guide--step-3.png"
         },
         {
           "pageId": "chapter-list-desktop",
           "action": "浏览预习Tab下的资源",
           "result": "看到知识点视频、练习等卡片",
+          "screenshot": "desktop--vip-state.png",
           "decisionPoint": {
             "condition": "用户是否为VIP？",
             "branches": [
@@ -5004,7 +5075,8 @@
         {
           "pageId": "chapter-list-desktop",
           "action": "点击第一个知识点视频卡片",
-          "result": "跳转到视频播放页开始学习"
+          "result": "跳转到视频播放页开始学习",
+          "screenshot": "desktop--preview-tab.png"
         }
       ]
     },
@@ -5016,12 +5088,14 @@
         {
           "pageId": "chapter-list-desktop",
           "action": "进入页面（预习Tab默认）",
-          "result": "显示当前章节预习资源"
+          "result": "显示当前章节预习资源",
+          "screenshot": "desktop--preview-tab.png"
         },
         {
           "pageId": "chapter-list-desktop",
           "action": "切换场景Tab",
           "result": "资源列表按新场景过滤",
+          "screenshot": "desktop--second-tab.png",
           "decisionPoint": {
             "condition": "选择哪个场景？",
             "branches": [
@@ -5047,12 +5121,14 @@
         {
           "pageId": "chapter-list-desktop",
           "action": "在目录树中点击其他小节",
-          "result": "右侧内容平滑滚动到对应位置"
+          "result": "右侧内容平滑滚动到对应位置",
+          "screenshot": "feat--dt-feat-04.png"
         },
         {
           "pageId": "chapter-list-desktop",
           "action": "点击知识点视频卡片",
           "result": "进入学习",
+          "screenshot": "desktop--preview-tab.png",
           "decisionPoint": {
             "condition": "视频有进度？",
             "branches": [
@@ -5070,17 +5146,20 @@
         {
           "pageId": "chapter-list-desktop",
           "action": "滚动到底部 → 点击「下一章」",
-          "result": "章节切换，目录和资源刷新"
+          "result": "章节切换，目录和资源刷新",
+          "screenshot": "desktop--chapter-footer.png"
         },
         {
           "pageId": "chapter-list-desktop",
           "action": "点击教材选择器",
-          "result": "弹出教材切换弹窗"
+          "result": "弹出教材切换弹窗",
+          "screenshot": "feat--dt-feat-05.png"
         },
         {
           "pageId": "textbook-modal",
           "action": "选择学科→版本→年级 → 确认",
-          "result": "章节数据刷新，场景Tab可能变更"
+          "result": "章节数据刷新，场景Tab可能变更",
+          "screenshot": "desktop--textbook-modal.png"
         }
       ]
     },
@@ -5092,12 +5171,14 @@
         {
           "pageId": "chapter-list-desktop",
           "action": "点击「设置」按钮",
-          "result": "进入设置页"
+          "result": "进入设置页",
+          "screenshot": "feat--dt-feat-03.png"
         },
         {
           "pageId": "settings-page",
           "action": "调整复习学习顺序",
           "result": "即时生效",
+          "screenshot": "desktop--settings.png",
           "decisionPoint": {
             "condition": "选择哪种复习模式？",
             "branches": [
@@ -5119,22 +5200,26 @@
         {
           "pageId": "settings-page",
           "action": "设置默认场景偏好",
-          "result": "下次进入按偏好展示"
+          "result": "下次进入按偏好展示",
+          "screenshot": "desktop--settings.png"
         },
         {
           "pageId": "settings-page",
           "action": "勾选刷题难度",
-          "result": "至少保留1个，影响练习筛选"
+          "result": "至少保留1个，影响练习筛选",
+          "screenshot": "desktop--settings.png"
         },
         {
           "pageId": "settings-page",
           "action": "点击返回",
-          "result": "返回列表页，设置即时生效"
+          "result": "返回列表页，设置即时生效",
+          "screenshot": "desktop--settings.png"
         },
         {
           "pageId": "chapter-list-desktop",
           "action": "验证设置效果",
-          "result": "交互行为已按新设置调整"
+          "result": "交互行为已按新设置调整",
+          "screenshot": "desktop--preview-tab.png"
         }
       ]
     }

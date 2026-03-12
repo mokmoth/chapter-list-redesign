@@ -515,12 +515,12 @@
       "description": "新用户第一次打开章节列表页，从新手引导开始，到成功学习第一个知识点",
       "goal": "完成新手引导，理解页面布局，成功点击第一个资源开始学习",
       "steps": [
-        { "pageId": "chapter-list-desktop", "action": "进入章节列表页", "result": "页面加载完成，自动弹出新手引导" },
-        { "pageId": "first-time-guide", "action": "阅读第1步「选择教材」", "result": "了解教材选择器位置" },
-        { "pageId": "first-time-guide", "action": "点击下一步 → 第2步「浏览章节」", "result": "了解左侧目录树作用" },
-        { "pageId": "first-time-guide", "action": "点击「开始学习」完成引导", "result": "引导关闭，进入正常列表页" },
-        { "pageId": "chapter-list-desktop", "action": "浏览预习Tab下的资源", "result": "看到知识点视频、练习等卡片", "decisionPoint": { "condition": "用户是否为VIP？", "branches": [{ "label": "VIP → 直接点击", "targetPageId": "chapter-list-desktop" }, { "label": "非VIP → VIP锁定标记", "targetPageId": "chapter-list-desktop" }] } },
-        { "pageId": "chapter-list-desktop", "action": "点击第一个知识点视频卡片", "result": "跳转到视频播放页开始学习" }
+        { "pageId": "chapter-list-desktop", "action": "进入章节列表页", "result": "页面加载完成，自动弹出新手引导", "screenshot": "desktop--preview-tab.png" },
+        { "pageId": "first-time-guide", "action": "阅读第1步「选择教材」", "result": "了解教材选择器位置", "screenshot": "first-time-guide--step-1.png" },
+        { "pageId": "first-time-guide", "action": "点击下一步 → 第2步「浏览章节」", "result": "了解左侧目录树作用", "screenshot": "first-time-guide--step-2.png" },
+        { "pageId": "first-time-guide", "action": "点击「开始学习」完成引导", "result": "引导关闭，进入正常列表页", "screenshot": "first-time-guide--step-3.png" },
+        { "pageId": "chapter-list-desktop", "action": "浏览预习Tab下的资源", "result": "看到知识点视频、练习等卡片", "screenshot": "desktop--vip-state.png", "decisionPoint": { "condition": "用户是否为VIP？", "branches": [{ "label": "VIP → 直接点击", "targetPageId": "chapter-list-desktop" }, { "label": "非VIP → VIP锁定标记", "targetPageId": "chapter-list-desktop" }] } },
+        { "pageId": "chapter-list-desktop", "action": "点击第一个知识点视频卡片", "result": "跳转到视频播放页开始学习", "screenshot": "desktop--preview-tab.png" }
       ]
     },
     {
@@ -528,13 +528,13 @@
       "description": "用户根据学习需求切换场景Tab和章节，完成个性化学习路径",
       "goal": "找到适合自己的学习场景，在不同章节间自由导航并完成学习",
       "steps": [
-        { "pageId": "chapter-list-desktop", "action": "进入页面（预习Tab默认）", "result": "显示当前章节预习资源" },
-        { "pageId": "chapter-list-desktop", "action": "切换场景Tab", "result": "资源列表按新场景过滤", "decisionPoint": { "condition": "选择哪个场景？", "branches": [{ "label": "预习 → 视频+练习+学案", "targetPageId": "chapter-list-desktop" }, { "label": "解题指导 → 解题视频", "targetPageId": "chapter-list-desktop" }, { "label": "刷题 → 练习+付费", "targetPageId": "chapter-list-desktop" }, { "label": "全部 → 所有资源", "targetPageId": "chapter-list-desktop" }] } },
-        { "pageId": "chapter-list-desktop", "action": "在目录树中点击其他小节", "result": "右侧内容平滑滚动到对应位置" },
-        { "pageId": "chapter-list-desktop", "action": "点击知识点视频卡片", "result": "进入学习", "decisionPoint": { "condition": "视频有进度？", "branches": [{ "label": "无 → 直接开始", "targetPageId": "chapter-list-desktop" }, { "label": "有 → 弹出选择", "targetPageId": "content-choice-modal" }] } },
-        { "pageId": "chapter-list-desktop", "action": "滚动到底部 → 点击「下一章」", "result": "章节切换，目录和资源刷新" },
-        { "pageId": "chapter-list-desktop", "action": "点击教材选择器", "result": "弹出教材切换弹窗" },
-        { "pageId": "textbook-modal", "action": "选择学科→版本→年级 → 确认", "result": "章节数据刷新，场景Tab可能变更" }
+        { "pageId": "chapter-list-desktop", "action": "进入页面（预习Tab默认）", "result": "显示当前章节预习资源", "screenshot": "desktop--preview-tab.png" },
+        { "pageId": "chapter-list-desktop", "action": "切换场景Tab", "result": "资源列表按新场景过滤", "screenshot": "desktop--second-tab.png", "decisionPoint": { "condition": "选择哪个场景？", "branches": [{ "label": "预习 → 视频+练习+学案", "targetPageId": "chapter-list-desktop" }, { "label": "解题指导 → 解题视频", "targetPageId": "chapter-list-desktop" }, { "label": "刷题 → 练习+付费", "targetPageId": "chapter-list-desktop" }, { "label": "全部 → 所有资源", "targetPageId": "chapter-list-desktop" }] } },
+        { "pageId": "chapter-list-desktop", "action": "在目录树中点击其他小节", "result": "右侧内容平滑滚动到对应位置", "screenshot": "feat--dt-feat-04.png" },
+        { "pageId": "chapter-list-desktop", "action": "点击知识点视频卡片", "result": "进入学习", "screenshot": "desktop--preview-tab.png", "decisionPoint": { "condition": "视频有进度？", "branches": [{ "label": "无 → 直接开始", "targetPageId": "chapter-list-desktop" }, { "label": "有 → 弹出选择", "targetPageId": "content-choice-modal" }] } },
+        { "pageId": "chapter-list-desktop", "action": "滚动到底部 → 点击「下一章」", "result": "章节切换，目录和资源刷新", "screenshot": "desktop--chapter-footer.png" },
+        { "pageId": "chapter-list-desktop", "action": "点击教材选择器", "result": "弹出教材切换弹窗", "screenshot": "feat--dt-feat-05.png" },
+        { "pageId": "textbook-modal", "action": "选择学科→版本→年级 → 确认", "result": "章节数据刷新，场景Tab可能变更", "screenshot": "desktop--textbook-modal.png" }
       ]
     },
     {
@@ -542,12 +542,12 @@
       "description": "用户根据学习习惯调整应用设置",
       "goal": "个性化配置学习偏好，让应用更符合使用习惯",
       "steps": [
-        { "pageId": "chapter-list-desktop", "action": "点击「设置」按钮", "result": "进入设置页" },
-        { "pageId": "settings-page", "action": "调整复习学习顺序", "result": "即时生效", "decisionPoint": { "condition": "选择哪种复习模式？", "branches": [{ "label": "先做题（推荐）", "targetPageId": "settings-page" }, { "label": "先看视频", "targetPageId": "settings-page" }, { "label": "每次选择 → 弹窗", "targetPageId": "settings-page" }] } },
-        { "pageId": "settings-page", "action": "设置默认场景偏好", "result": "下次进入按偏好展示" },
-        { "pageId": "settings-page", "action": "勾选刷题难度", "result": "至少保留1个，影响练习筛选" },
-        { "pageId": "settings-page", "action": "点击返回", "result": "返回列表页，设置即时生效" },
-        { "pageId": "chapter-list-desktop", "action": "验证设置效果", "result": "交互行为已按新设置调整" }
+        { "pageId": "chapter-list-desktop", "action": "点击「设置」按钮", "result": "进入设置页", "screenshot": "feat--dt-feat-03.png" },
+        { "pageId": "settings-page", "action": "调整复习学习顺序", "result": "即时生效", "screenshot": "desktop--settings.png", "decisionPoint": { "condition": "选择哪种复习模式？", "branches": [{ "label": "先做题（推荐）", "targetPageId": "settings-page" }, { "label": "先看视频", "targetPageId": "settings-page" }, { "label": "每次选择 → 弹窗", "targetPageId": "settings-page" }] } },
+        { "pageId": "settings-page", "action": "设置默认场景偏好", "result": "下次进入按偏好展示", "screenshot": "desktop--settings.png" },
+        { "pageId": "settings-page", "action": "勾选刷题难度", "result": "至少保留1个，影响练习筛选", "screenshot": "desktop--settings.png" },
+        { "pageId": "settings-page", "action": "点击返回", "result": "返回列表页，设置即时生效", "screenshot": "desktop--settings.png" },
+        { "pageId": "chapter-list-desktop", "action": "验证设置效果", "result": "交互行为已按新设置调整", "screenshot": "desktop--preview-tab.png" }
       ]
     }
   ]
