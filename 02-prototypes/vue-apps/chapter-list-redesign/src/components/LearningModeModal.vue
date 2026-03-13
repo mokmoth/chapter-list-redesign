@@ -200,7 +200,7 @@ function handleConfirm() {
   gap: $spacing-lg;
   padding: $spacing-xl;
   border: 2px solid $border-color;
-  border-radius: $radius-xl;
+  border-radius: $radius-md;
   background: $bg-white;
   cursor: pointer;
   transition: all $transition-fast;
@@ -233,10 +233,10 @@ function handleConfirm() {
   justify-content: center;
   background: $bg-secondary;
   color: $text-secondary;
-  border-radius: $radius-lg;
+  border-radius: $radius-md;
   flex-shrink: 0;
   transition: all $transition-fast;
-  
+
   // 推荐选项的图标 - 始终保持橙色调
   .option-card.recommended & {
     background: $primary-light;
@@ -315,7 +315,7 @@ function handleConfirm() {
   color: $bg-white;
   font-size: $font-size-md;
   font-weight: $font-weight-semibold;
-  border-radius: $radius-xl;
+  border-radius: $radius-md;
   transition: all $transition-fast;
   
   &:hover:not(:disabled) {

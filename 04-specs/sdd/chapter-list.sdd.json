@@ -1,65 +1,67 @@
 {
-  "$schema": "https://pm-workflow.io/sdd-schema/v1.0.0",
   "meta": {
     "name": "chapter-list-redesign",
-    "version": "1.0.0",
-    "description": "章节列表页迭代 - 场景化学习资源整合",
-    "created": "2025-12-31",
-    "source": "prototype-reverse-engineering"
+    "version": "2.0.0",
+    "extractedFrom": "02-prototypes/vue-apps/chapter-list-redesign/",
+    "extractedAt": "2026-03-13T00:00:00Z",
+    "prdVersion": "V1.6"
   },
   "tech_stack": {
     "framework": "Vue 3",
-    "language": "TypeScript 5.x",
-    "state_management": "Pinia 2.x",
-    "build_tool": "Vite 5.x",
-    "css_preprocessor": "SCSS",
-    "icon_library": "Lucide Vue Next"
+    "language": "TypeScript",
+    "build_tool": "Vite",
+    "state_management": "Pinia",
+    "styling": "SCSS (scoped)",
+    "icon_library": "lucide-vue-next",
+    "css_features": ["container-queries", "css-grid", "flexbox", "teleport-modals"],
+    "persistence": "localStorage"
   },
   "design_tokens": {
     "colors": {
       "primary": "#FEA345",
-      "primary_light": "#FFF0E6",
-      "primary_bg": "#FFF9F2",
+      "primary_light": "#FFF1E3",
+      "primary_bg": "#FFF1E3",
       "secondary": "#845EFF",
-      "secondary_light": "#EBF3FF",
-      "secondary_bg": "#F0F7FF",
+      "secondary_light": "#F0ECFF",
+      "secondary_bg": "#F0ECFF",
+      "brand_yellow": "#FFD633",
+      "brand_yellow_light": "#FFF9E0",
       "success": "#92E066",
-      "success_light": "#E8F5E9",
-      "success_bg": "#F1F8F4",
+      "success_light": "#EFFAE8",
+      "success_bg": "#EFFAE8",
       "warning": "#FFD633",
-      "warning_light": "#FFF5E6",
-      "warning_bg": "#FFFBF0",
+      "warning_light": "#FFF9E0",
+      "warning_bg": "#FFF9E0",
       "error": "#FA5A65",
+      "error_light": "#FEE6E8",
+      "blue": "#518AFF",
+      "blue_light": "#EAF2FF",
+      "orange": "#FEA345",
+      "orange_light": "#FFF1E3",
       "text_primary": "#2E2E3A",
       "text_secondary": "#848096",
-      "text_tertiary": "#999999",
-      "border": "#D4D2DC",
-      "background": "#FFFFFF",
-      "background_secondary": "#F5F4F8",
-      "background_tertiary": "#FAFAFA",
+      "text_tertiary": "#B0ADBA",
+      "border_color": "#D4D2DC",
+      "bg_white": "#FFFFFF",
+      "bg_secondary": "#F5F4F8",
+      "bg_tertiary": "#F5F4F8",
       "overlay": "rgba(0, 0, 0, 0.4)",
-      "vip_gradient_start": "rgba(255, 197, 97, 1)",
-      "vip_gradient_end": "rgba(245, 117, 117, 1)",
-      "gold_gradient_start": "#FFD700",
-      "gold_gradient_end": "#FFAA00"
+      "vip_gradient": "linear-gradient(135deg, #FFD633 0%, #FEA345 100%)",
+      "gold_gradient": "linear-gradient(135deg, #FFD633 0%, #FEA345 100%)"
     },
     "typography": {
-      "font_family": "'Alibaba PuHuiTi 2.0', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif",
-      "sizes": {
-        "xl": "18px",
-        "lg": "16px",
-        "md": "14px",
-        "sm": "13px",
-        "xs": "12px",
-        "xxs": "11px",
-        "xxxs": "10px"
-      },
-      "weights": {
-        "normal": 400,
-        "medium": 500,
-        "semibold": 600,
-        "bold": 800
-      }
+      "font_family": "\"Alibaba PuHuiTi 2.0\", -apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, Helvetica, Arial, sans-serif",
+      "font_size_xl": "18px",
+      "font_size_lg": "16px",
+      "font_size_md": "14px",
+      "font_size_sm": "13px",
+      "font_size_xs": "12px",
+      "font_size_xxs": "11px",
+      "font_size_xxxs": "10px",
+      "font_weight_normal": 400,
+      "font_weight_medium": 500,
+      "font_weight_semibold": 600,
+      "font_weight_bold": 800
     },
     "spacing": {
       "xxs": "2px",
@@ -71,16 +73,16 @@
       "xxl": "16px",
       "xxxl": "24px"
     },
-    "radii": {
+    "radius": {
       "sm": "6px",
       "md": "8px",
-      "lg": "14px",
-      "xl": "14px",
+      "lg": "10px",
+      "xl": "12px",
       "pill": "999px",
       "circle": "50%"
     },
     "shadows": {
-      "card": "0 2px 8px rgba(0, 0, 0, 0.04)",
+      "card": "0 1px 1px rgba(18, 22, 38, 0.05), 0 3px 8px -1px rgba(18, 22, 38, 0.05)",
       "dropdown": "0 4px 12px rgba(0, 0, 0, 0.15)",
       "badge": "-1px 1px 4px rgba(0, 0, 0, 0.1)"
     },
@@ -93,496 +95,549 @@
       "mobile": "768px",
       "small_mobile": "600px",
       "tiny_mobile": "380px",
-      "micro_mobile": "360px"
+      "micro_mobile": "360px",
+      "tablet_portrait_min": "640px",
+      "phone_landscape_max_height": "639px",
+      "tablet_landscape_min": "1024px"
+    },
+    "layout": {
+      "sidebar_width": "260px",
+      "header_height": "40px",
+      "function_bar_height": "44px",
+      "mobile_sidebar_width": "80%",
+      "mobile_sidebar_max_width": "300px",
+      "cover_width": "120px",
+      "cover_height": "75px",
+      "bottom_safe_area_height": "80px"
     }
   },
   "data_models": {
     "Resource": {
-      "fields": {
-        "id": { "type": "string", "required": true },
-        "type": { "type": "ResourceType", "required": true },
-        "title": { "type": "string", "required": true },
-        "tags": { "type": "string[]", "required": true },
-        "isFree": { "type": "boolean", "required": true },
-        "scenes": { "type": "SceneType[]", "required": false },
-        "subType": { "type": "'vocab' | 'text'", "required": false },
-        "subject": { "type": "string", "required": false },
-        "isPremium": { "type": "boolean", "required": false },
-        "premiumStatus": { "type": "'locked' | 'unlocked'", "required": false },
-        "isTrial": { "type": "boolean", "required": false },
-        "duration": { "type": "number", "required": false, "unit": "minutes" },
-        "questionCount": { "type": "number", "required": false },
-        "completedCount": { "type": "number", "required": false },
-        "totalCount": { "type": "number", "required": false },
-        "difficultyLevels": { "type": "string[]", "required": false },
-        "category": { "type": "'概念课' | '解题课' | '实验课' | '总结课'", "required": false },
-        "valueTag": { "type": "'新中考' | '重难点' | '易错点' | '考点'", "required": false },
-        "difficulty": { "type": "1 | 2 | 3", "required": false },
-        "coverUrl": { "type": "string", "required": false },
-        "subsectionTitle": { "type": "string", "required": false }
-      }
+      "fields": [
+        { "name": "id", "type": "string", "required": true, "description": "Unique resource identifier" },
+        { "name": "type", "type": "ResourceType", "required": true, "description": "Type of resource (video, practice, guide, etc.)" },
+        { "name": "title", "type": "string", "required": true, "description": "Resource display title" },
+        { "name": "tags", "type": "string[]", "required": true, "description": "Tags for categorization and filtering" },
+        { "name": "isFree", "type": "boolean", "required": true, "description": "Whether the resource is free (non-VIP)" },
+        { "name": "scenes", "type": "SceneType[]", "required": false, "description": "Applicable scenes (preview, review, etc.)" },
+        { "name": "subject", "type": "SubjectType", "required": false, "description": "Subject for subject-specific resource filtering" },
+        { "name": "isTrial", "type": "boolean", "required": false, "description": "Whether the resource is available as a free trial" },
+        { "name": "duration", "type": "number", "required": false, "description": "Video duration in minutes" },
+        { "name": "questionCount", "type": "number", "required": false, "description": "Number of in-class quiz questions" },
+        { "name": "category", "type": "CourseCategory", "required": false, "description": "Course category (concept, problem-solving, experiment, summary)" },
+        { "name": "valueTag", "type": "ValueTag", "required": false, "description": "Value tag (exam key point, difficulty, etc.)" },
+        { "name": "difficulty", "type": "1 | 2 | 3", "required": false, "description": "Difficulty level (1=easy, 2=medium, 3=hard)" },
+        { "name": "coverUrl", "type": "string", "required": false, "description": "Cover image URL for video resources" },
+        { "name": "completedCount", "type": "number", "required": false, "description": "Number of completed practice questions" },
+        { "name": "totalCount", "type": "number", "required": false, "description": "Total number of practice questions" },
+        { "name": "difficultyLevels", "type": "string[]", "required": false, "description": "Available difficulty levels (e.g., ['basic', 'medium', 'hard'])" },
+        { "name": "subsectionTitle", "type": "string", "required": false, "description": "Subsection title for practice display" },
+        { "name": "pageCount", "type": "number", "required": false, "description": "Number of pages in a guide resource" },
+        { "name": "downloadUrl", "type": "string", "required": false, "description": "Download URL for guide resources" },
+        { "name": "paragraphCount", "type": "number", "required": false, "description": "Number of paragraphs in read_text resources" },
+        { "name": "estimatedTime", "type": "number", "required": false, "description": "Estimated reading time in minutes" },
+        { "name": "noteCount", "type": "number", "required": false, "description": "Number of summary notes" },
+        { "name": "hookType", "type": "'重难点' | '拔高' | '竞赛'", "required": false, "description": "Premium hook type for premium_hook resources" },
+        { "name": "targetCourse", "type": "string", "required": false, "description": "Target course name for premium hook" },
+        { "name": "firstPublishAt", "type": "string", "required": false, "description": "First publish timestamp (ISO8601) for NEW badge calculation" },
+        { "name": "videoTimepoint", "type": "number", "required": false, "description": "Video playback progress in seconds for resume" },
+        { "name": "isContainNote", "type": "boolean", "required": false, "description": "Whether the resource contains class notes" },
+        { "name": "isPremium", "type": "boolean", "required": false, "description": "Whether the resource is premium (paid) content" }
+      ]
     },
     "Chapter": {
-      "fields": {
-        "id": { "type": "string", "required": true },
-        "title": { "type": "string", "required": true },
-        "level": { "type": "'chapter' | 'section' | 'subsection'", "required": true },
-        "children": { "type": "Chapter[]", "required": false },
-        "resources": { "type": "Resource[]", "required": false },
-        "progress": { "type": "{ completed: number; total: number }", "required": false },
-        "isExpanded": { "type": "boolean", "required": false }
-      }
+      "fields": [
+        { "name": "id", "type": "string", "required": true, "description": "Unique chapter/section/subsection identifier" },
+        { "name": "title", "type": "string", "required": true, "description": "Display title" },
+        { "name": "level", "type": "ChapterLevel", "required": true, "description": "Hierarchy level: chapter, section, or subsection" },
+        { "name": "children", "type": "Chapter[]", "required": false, "description": "Nested child chapters/sections/subsections" },
+        { "name": "resources", "type": "Resource[]", "required": false, "description": "Resources attached to this node (subsection-level)" },
+        { "name": "progress", "type": "{ completed: number; total: number }", "required": false, "description": "Section-level progress (completed/total)" },
+        { "name": "isExpanded", "type": "boolean", "required": false, "description": "Whether the tree node is expanded" },
+        { "name": "isHaveNew", "type": "boolean", "required": false, "description": "Whether this node contains NEW content (bubble-up marker)" },
+        { "name": "scene", "type": "string", "required": false, "description": "Scene marker for the chapter" },
+        { "name": "firstPublishAt", "type": "string", "required": false, "description": "First publish timestamp (ISO8601) for sidebar NEW dot" }
+      ]
+    },
+    "TextbookConfig": {
+      "fields": [
+        { "name": "id", "type": "string", "required": true, "description": "Unique textbook configuration identifier" },
+        { "name": "stageId", "type": "number", "required": true, "description": "Education stage ID (e.g., 2=junior high, 3=senior high)" },
+        { "name": "subjectId", "type": "number", "required": true, "description": "Subject ID (e.g., 2=math, 3=English)" },
+        { "name": "publisherId", "type": "number", "required": true, "description": "Publisher/edition ID (e.g., 2=PEP/Renjiaoban)" },
+        { "name": "semesterId", "type": "number", "required": true, "description": "Semester ID (upper/lower volume)" },
+        { "name": "subject", "type": "SubjectType", "required": true, "description": "Subject name" },
+        { "name": "version", "type": "string", "required": true, "description": "Edition name (e.g., Renjiaoban, Beishida)" },
+        { "name": "grade", "type": "string", "required": true, "description": "Grade level (e.g., 7th grade)" },
+        { "name": "semester", "type": "string", "required": true, "description": "Semester (e.g., upper volume, lower volume)" },
+        { "name": "displayName", "type": "string", "required": true, "description": "Full display name for the textbook" }
+      ]
     },
     "UserProgress": {
-      "fields": {
-        "nodeId": { "type": "string", "required": true },
-        "status": { "type": "'not_started' | 'in_progress' | 'completed'", "required": true },
-        "percentage": { "type": "number", "required": true, "range": [0, 100] },
-        "lastUpdateTime": { "type": "string", "required": true, "format": "ISO8601" }
-      }
+      "fields": [
+        { "name": "nodeId", "type": "string", "required": true, "description": "Resource/node ID this progress belongs to" },
+        { "name": "status", "type": "ProgressStatus", "required": true, "description": "Progress status (not_started, in_progress, completed)" },
+        { "name": "percentage", "type": "number", "required": true, "description": "Completion percentage (0-100)" },
+        { "name": "lastUpdateTime", "type": "string", "required": true, "description": "Last update timestamp in ISO8601 format" }
+      ]
+    },
+    "AppSettings": {
+      "fields": [
+        { "name": "reviewLearningMode", "type": "ReviewLearningMode", "required": true, "description": "Review scene learning order preference: quiz-first, video-first, or ask-every-time" },
+        { "name": "defaultSceneTab", "type": "DefaultSceneTab", "required": true, "description": "Default scene tab on page load: 'all' or 'last-selected'" },
+        { "name": "practiceDifficulties", "type": "DifficultyLevel[]", "required": true, "description": "Default practice difficulty levels (multi-select: basic, medium, hard)" },
+        { "name": "lastSelectedTab", "type": "SceneType | 'all'", "required": true, "description": "Last selected scene tab (persisted for 'last-selected' mode)" }
+      ]
+    },
+    "TabConfig": {
+      "fields": [
+        { "name": "key", "type": "SceneType", "required": true, "description": "Scene type key used for filtering" },
+        { "name": "label", "type": "string", "required": true, "description": "Display label for the tab" }
+      ]
+    },
+    "ChapterLevelEntry": {
+      "fields": [
+        { "name": "type", "type": "'mind_map' | 'error_book' | 'recite'", "required": true, "description": "Type of chapter-level resource entry" },
+        { "name": "title", "type": "string", "required": true, "description": "Display title" },
+        { "name": "icon", "type": "string", "required": true, "description": "Icon identifier" },
+        { "name": "count", "type": "number", "required": false, "description": "Count (e.g., number of error questions)" },
+        { "name": "isAvailable", "type": "boolean", "required": true, "description": "Whether available for the current subject" }
+      ]
     }
   },
   "enums": {
-    "SceneType": ["preview", "review", "extra"],
-    "ResourceType": [
-      "video", "exercise", "paper", "guide", "exam", "recite",
-      "mind_map", "quick_review", "ai_solve", "note", "error_book",
-      "quick_memorize", "practice", "premium_video"
-    ],
+    "SceneType": ["preview", "review", "extra", "problem_solving", "drill", "accumulation"],
+    "SubjectType": ["数学", "英语", "语文", "历史", "地理", "政治", "物理", "化学", "生物"],
+    "ResourceType": ["video", "practice", "guide", "read_text", "summary_note", "premium_hook", "recite", "mind_map", "error_book"],
     "ChapterLevel": ["chapter", "section", "subsection"],
-    "ProgressStatus": ["not_started", "in_progress", "completed"]
+    "ProgressStatus": ["not_started", "in_progress", "completed"],
+    "CourseCategory": ["概念课", "解题课", "实验课", "总结课"],
+    "ValueTag": ["新中考", "重难点", "易错点", "考点", "必看"],
+    "ReviewLearningMode": ["quiz-first", "video-first", "ask-every-time"],
+    "DefaultSceneTab": ["all", "last-selected"],
+    "DifficultyLevel": ["basic", "medium", "hard"],
+    "LearningMode": ["quiz-first", "video-first"],
+    "ContentChoice": ["video", "practice", "note"]
   },
-  "state_machine": {
-    "page_state": {
-      "initial": "loading",
-      "states": {
-        "loading": {
-          "on": { "LOAD_SUCCESS": "idle", "LOAD_ERROR": "error" }
-        },
-        "idle": {
-          "on": { "REFRESH": "loading" }
-        },
-        "error": {
-          "on": { "RETRY": "loading" }
-        }
-      }
+  "scene_config": {
+    "SCIENCE_PROBLEM": {
+      "description": "Science problem-solving subjects with drill and problem-solving scenes",
+      "subjects": ["数学", "物理", "化学"],
+      "tabs": [
+        { "key": "preview", "label": "预习" },
+        { "key": "problem_solving", "label": "解题指导" },
+        { "key": "drill", "label": "刷题" }
+      ]
     },
-    "sidebar_state": {
-      "initial": "closed",
-      "context": "mobile_only",
-      "states": {
-        "closed": {
-          "on": { "TOGGLE": "open" }
-        },
-        "open": {
-          "on": { "TOGGLE": "closed", "SELECT_NODE": "closed", "OVERLAY_CLICK": "closed" }
-        }
-      }
+    "LANGUAGE": {
+      "description": "Language/liberal arts subjects with review and accumulation scenes",
+      "subjects": ["语文", "英语"],
+      "tabs": [
+        { "key": "preview", "label": "预习" },
+        { "key": "review", "label": "复习" },
+        { "key": "accumulation", "label": "日常积累" }
+      ]
     },
-    "guide_state": {
-      "initial": "expanded",
-      "states": {
-        "expanded": {
-          "on": { "TOGGLE": "collapsed" }
-        },
-        "collapsed": {
-          "on": { "TOGGLE": "expanded" }
-        }
-      }
+    "SCIENCE_BASIC": {
+      "description": "Basic science subjects with fewer scenes",
+      "subjects": ["生物", "地理"],
+      "tabs": [
+        { "key": "preview", "label": "预习" },
+        { "key": "review", "label": "复习" }
+      ]
+    },
+    "HISTORY": {
+      "description": "History/politics subjects (scene filtering not yet launched)",
+      "subjects": ["历史", "政治"],
+      "tabs": [
+        { "key": "preview", "label": "预习" },
+        { "key": "review", "label": "复习" }
+      ]
     }
   },
   "store": {
     "name": "chapter",
-    "state": {
-      "loading": { "type": "boolean", "default": false },
-      "currentTab": { "type": "SceneType", "default": "preview" },
-      "chapters": { "type": "Chapter[]", "default": [] },
-      "selectedNodeId": { "type": "string", "default": "" },
-      "isScrollingByClick": { "type": "boolean", "default": false },
-      "progressMap": { "type": "Record<string, UserProgress>", "default": {} },
-      "isVip": { "type": "boolean", "default": false },
-      "currentSubject": { "type": "string", "default": "数学" },
-      "hasPremiumAccess": { "type": "boolean", "default": false }
-    },
-    "getters": {
-      "currentGuide": {
-        "returns": "string",
-        "logic": "guideContent[currentTab]"
-      },
-      "allSubsections": {
-        "returns": "Chapter[]",
-        "logic": "递归遍历 chapters，收集所有 level === 'subsection' 的节点"
-      }
-    },
-    "actions": {
-      "fetchChapters": {
-        "async": true,
-        "logic": "加载章节数据，更新 chapters 和 progressMap"
-      },
-      "selectNode": {
-        "params": ["id: string"],
-        "logic": "更新 selectedNodeId"
-      },
-      "toggleExpand": {
-        "params": ["chapterId: string"],
-        "logic": "切换指定章节的 isExpanded 状态"
-      },
-      "switchTab": {
-        "params": ["tab: SceneType"],
-        "async": true,
-        "logic": "更新 currentTab，重新调用 fetchChapters"
-      },
-      "unlockVip": {
-        "logic": "模拟购买流程，将 isVip 设置为 true"
-      }
-    }
+    "framework": "Pinia (composition API / setup store)",
+    "state": [
+      { "name": "loading", "type": "boolean", "default": false, "description": "Loading state for data fetching" },
+      { "name": "currentTab", "type": "SceneType", "default": "preview", "description": "Currently selected scene tab" },
+      { "name": "chapters", "type": "Chapter[]", "default": "[]", "description": "Chapter tree data" },
+      { "name": "selectedNodeId", "type": "string", "default": "''", "description": "Currently selected subsection ID" },
+      { "name": "isScrollingByClick", "type": "boolean", "default": false, "description": "Lock flag preventing IntersectionObserver conflict during click-to-scroll" },
+      { "name": "progressMap", "type": "Record<string, UserProgress>", "default": "{}", "description": "Resource progress lookup map" },
+      { "name": "isVip", "type": "boolean", "default": false, "description": "User VIP status" },
+      { "name": "currentTextbook", "type": "TextbookConfig", "default": "textbookConfigs[0]", "description": "Currently selected textbook configuration" },
+      { "name": "availableTextbooks", "type": "TextbookConfig[]", "default": "textbookConfigs", "description": "All available textbook configurations" },
+      { "name": "isAllResourcesOpen", "type": "boolean", "default": false, "description": "Whether the 'all resources' drawer is open" },
+      { "name": "reviewLearningMode", "type": "'quiz-first' | 'video-first' | null", "default": null, "description": "Legacy review learning mode preference" },
+      { "name": "rememberReviewMode", "type": "boolean", "default": false, "description": "Legacy flag for remembering review mode" },
+      { "name": "appSettings", "type": "AppSettings", "default": "DEFAULT_SETTINGS", "description": "Application settings (persisted to localStorage)" },
+      { "name": "isFirstVisit", "type": "boolean", "default": "!localStorage.getItem('guide_completed')", "description": "Whether this is the user's first visit (controls first-time guide)" },
+      { "name": "readResources", "type": "Set<string>", "default": "loadReadResources()", "description": "Set of resource IDs the user has already read (for NEW badge)" }
+    ],
+    "getters": [
+      { "name": "currentSubject", "type": "SubjectType", "description": "Derived from currentTextbook.subject" },
+      { "name": "sceneTabs", "type": "TabConfig[]", "description": "Scene tabs for the current subject from SCENE_CONFIG" },
+      { "name": "isEnglish", "type": "boolean", "description": "Whether current subject is English (controls vocab entry)" },
+      { "name": "isLiberalArts", "type": "boolean", "description": "Whether current subject is liberal arts (controls read_text visibility)" },
+      { "name": "currentGuide", "type": "string", "description": "Learning method guide text for current subject + scene combination" },
+      { "name": "allSubsections", "type": "Chapter[]", "description": "Flattened list of all subsection-level nodes (for scroll observation)" },
+      { "name": "currentChapterTitle", "type": "string", "description": "Title of the first top-level chapter" },
+      { "name": "chapterStats", "type": "{ mindMapCount: number; errorBookCount: number; vocabWordCount: number }", "description": "Chapter-level resource statistics for the current subject" },
+      { "name": "adjacentChapters", "type": "{ prev: Chapter | null; next: Chapter | null }", "description": "Previous and next chapters for footer navigation" }
+    ],
+    "actions": [
+      { "name": "fetchChapters", "params": [], "description": "Load chapter data for the current textbook (async with simulated delay)" },
+      { "name": "switchTextbook", "params": ["textbookId: string"], "description": "Switch textbook and reload chapters; resets tab if current tab is invalid for new subject" },
+      { "name": "selectNode", "params": ["id: string"], "description": "Select a subsection node by ID" },
+      { "name": "toggleExpand", "params": ["chapterId: string"], "description": "Toggle the expanded state of a chapter/section node" },
+      { "name": "switchTab", "params": ["tab: SceneType"], "description": "Switch the active scene tab; auto-closes all-resources drawer" },
+      { "name": "unlockVip", "params": [], "description": "Set VIP status to true (simulated purchase)" },
+      { "name": "getProgress", "params": ["resourceId: string"], "description": "Get UserProgress for a resource" },
+      { "name": "updateProgress", "params": ["resourceId: string", "percentage: number"], "description": "Update progress for a resource (auto-derives status from percentage)" },
+      { "name": "setScrollingByClick", "params": ["value: boolean"], "description": "Set the scroll-lock flag to prevent observer conflicts" },
+      { "name": "toggleAllResources", "params": ["isOpen: boolean"], "description": "Toggle the all-resources drawer" },
+      { "name": "loadReviewModePreference", "params": [], "description": "Load review learning mode preference from localStorage" },
+      { "name": "saveReviewModePreference", "params": ["mode: 'quiz-first' | 'video-first'", "remember: boolean"], "description": "Save review learning mode preference to localStorage" },
+      { "name": "shouldShowLearningModeModal", "params": [], "description": "Returns true if the learning mode modal should be shown (when set to ask-every-time)" },
+      { "name": "updateAppSettings", "params": ["updates: Partial<AppSettings>"], "description": "Merge partial settings update and persist to localStorage" },
+      { "name": "recordLastSelectedTab", "params": ["tab: SceneType | 'all'"], "description": "Record the last selected tab for 'last-selected' default mode" },
+      { "name": "restorePosition", "params": ["urlParams?: { chapterId?: string; topicId?: string }"], "description": "Restore scroll position via priority chain: URL params > server API > localStorage > default first subsection" },
+      { "name": "markAsRead", "params": ["nodeId: string"], "description": "Mark a resource as read (removes NEW badge)" },
+      { "name": "completeGuide", "params": [], "description": "Mark the first-time guide as completed, persists to localStorage" },
+      { "name": "isNewContent", "params": ["item: { id: string; firstPublishAt?: string }"], "description": "Check if a resource qualifies as NEW (published within 7 days and not yet read)" }
+    ]
   },
-  "components": {
-    "App": {
+  "components": [
+    {
+      "name": "App",
       "path": "src/App.vue",
-      "description": "应用入口",
-      "children": ["ChapterList"]
+      "props": [],
+      "events": [],
+      "children": ["ChapterList"],
+      "description": "Root application shell, renders ChapterList as the sole view"
     },
-    "ChapterList": {
+    {
+      "name": "ChapterList",
       "path": "src/views/ChapterList.vue",
-      "description": "主页面布局",
-      "children": ["GlobalHeader", "FunctionBar", "SceneTabs", "ChapterTree", "ResourceList"],
-      "local_state": {
-        "isSidebarOpen": { "type": "boolean", "default": false }
-      },
-      "layout": {
-        "type": "flex-column",
-        "areas": ["top-area", "main-layout"],
-        "responsive": {
-          "desktop": { "sidebar": "fixed", "width": "260px" },
-          "mobile": { "sidebar": "drawer", "width": "80%" }
-        }
-      }
+      "props": [],
+      "events": [],
+      "children": ["GlobalHeader", "FunctionBar", "ChapterTree", "ResourceList", "SettingsPage", "FirstTimeGuide"],
+      "description": "Main page view with sidebar + content layout. Manages sidebar toggle, settings view, and first-time guide overlay. Initializes data on mount."
     },
-    "GlobalHeader": {
+    {
+      "name": "GlobalHeader",
       "path": "src/components/GlobalHeader.vue",
-      "description": "全局顶部导航",
-      "slots": ["default"],
-      "elements": {
-        "back_btn": { "icon": "ChevronLeft", "size": 24, "action": "goBack" },
-        "header_center": { "slot": true },
-        "upgrade_entry": {
-          "icon": "Crown",
-          "size": 14,
-          "text_vip": "已升级",
-          "text_non_vip": "去升级",
-          "action": "handleUpgradeClick"
-        }
-      },
-      "style": {
-        "height": "40px",
-        "padding": "0 12px",
-        "background": "#fff"
-      }
+      "props": [],
+      "events": [],
+      "children": ["ContextSelector"],
+      "description": "Top header bar with back button, branded title, textbook context selector, and VIP upgrade entry"
     },
-    "FunctionBar": {
+    {
+      "name": "FunctionBar",
       "path": "src/components/FunctionBar.vue",
-      "description": "功能栏",
-      "local_state": {
-        "isMoreMenuOpen": { "type": "boolean", "default": false }
-      },
-      "elements": {
-        "context_selector": {
-          "display": "{subject} {version}{grade}",
-          "icon": "ChevronDown",
-          "action": "openSelector"
-        },
-        "quick_actions": {
-          "desktop": ["学霸笔记", "错题", "收藏"],
-          "mobile": "收纳到更多菜单"
-        }
-      },
-      "style": {
-        "height": "44px",
-        "padding": "0 16px",
-        "border_bottom": "1px solid #f5f5f5"
-      },
-      "responsive": {
-        "breakpoint": "600px",
-        "desktop": "展示全部快捷入口",
-        "mobile": "收纳到更多菜单"
-      }
-    },
-    "SceneTabs": {
-      "path": "src/components/SceneTabs.vue",
-      "description": "场景切换Tab",
-      "props": {
-        "embedded": { "type": "boolean", "default": false }
-      },
-      "tabs": [
-        { "key": "preview", "label": "预习" },
-        { "key": "review", "label": "复习" },
-        { "key": "extra", "label": "加餐" }
+      "props": [],
+      "events": [
+        { "name": "open-settings", "payload": "void", "description": "Emitted when user clicks the settings button" }
       ],
-      "modes": {
-        "default": {
-          "layout": "flex-row-equal",
-          "indicator": "bottom-line",
-          "indicator_color": "#FEA345"
-        },
-        "embedded": {
-          "layout": "flex-row-gap",
-          "indicator": "background-pill",
-          "active_bg": "#FFF0E6",
-          "active_color": "#FEA345"
-        }
-      }
+      "children": ["SceneTabs"],
+      "description": "Function bar below header containing scene tabs (left) and quick action entries (right): mind map, error book, favorites, settings. Desktop shows all actions; mobile collapses into a dropdown menu."
     },
-    "ChapterTree": {
+    {
+      "name": "ContextSelector",
+      "path": "src/components/ContextSelector.vue",
+      "props": [
+        { "name": "compact", "type": "boolean", "required": false, "default": false, "description": "Compact mode shows only subject name instead of full textbook info" }
+      ],
+      "events": [],
+      "children": [],
+      "description": "Textbook context selector with pill button trigger and a 3-column modal (subject, edition, grade/semester). Teleported to body."
+    },
+    {
+      "name": "SceneTabs",
+      "path": "src/components/SceneTabs.vue",
+      "props": [
+        { "name": "embedded", "type": "boolean", "required": false, "default": false, "description": "Embedded mode uses pill-style tabs without bottom border; non-embedded uses sticky header with indicator" }
+      ],
+      "events": [],
+      "children": [],
+      "description": "Scene tab switcher with a fixed 'All Resources' tab on the left, a divider, and scrollable scene-specific tabs. Tabs are driven by store.sceneTabs (subject-dependent)."
+    },
+    {
+      "name": "ChapterTree",
       "path": "src/components/ChapterTree.vue",
-      "description": "章节目录树（递归）",
-      "props": {
-        "chapters": { "type": "Chapter[]", "required": true }
-      },
+      "props": [
+        { "name": "chapters", "type": "Chapter[]", "required": true, "description": "Array of chapter nodes to render" }
+      ],
+      "events": [
+        { "name": "node-click", "payload": "string (nodeId)", "description": "Emitted when a subsection node is clicked" }
+      ],
+      "children": ["ChapterTree", "NewBadge"],
       "recursive": true,
-      "node_styles": {
-        "section": {
-          "font_weight": 600,
-          "color": "#2E2E3A",
-          "padding_top": "12px",
-          "clickable": false
-        },
-        "subsection": {
-          "font_size": "13px",
-          "padding_left": "24px",
-          "clickable": true,
-          "hover_bg": "#f5f5f5",
-          "selected_bg": "#FFF0E6",
-          "selected_color": "#FEA345"
-        }
-      },
-      "interactions": {
-        "click_subsection": {
-          "set": "store.isScrollingByClick = true",
-          "update": "store.selectedNodeId = item.id",
-          "scroll": "document.getElementById('subsection-{id}').scrollIntoView",
-          "timeout": "600ms → store.isScrollingByClick = false"
-        }
-      }
+      "description": "Recursive chapter tree for the sidebar. Only subsection-level nodes are clickable. Click triggers scroll-lock, node selection, and smooth scrolling to the corresponding resource section. Shows NEW dot badges on subsection/section nodes."
     },
-    "LearningGuide": {
-      "path": "src/components/LearningGuide.vue",
-      "description": "学习方法指南",
-      "local_state": {
-        "isExpanded": { "type": "boolean", "default": true }
-      },
-      "content_source": "store.currentGuide",
-      "style": {
-        "background": "#FFF9F2",
-        "border_radius": "8px",
-        "margin": "12px 16px",
-        "padding": "0 12px"
-      },
-      "animation": {
-        "type": "expand",
-        "duration": "0.3s",
-        "timing": "ease"
-      }
-    },
-    "ResourceList": {
+    {
+      "name": "ResourceList",
       "path": "src/components/ResourceList.vue",
-      "description": "资源列表容器",
-      "children": ["LearningGuide", "所有卡片组件"],
-      "filter_logic": {
-        "scene_filter": "resource.scenes.includes(currentTab)",
-        "default_scenes": ["preview", "review"],
-        "subject_filter": {
-          "quick_memorize": "['地理', '历史', '政治', '生物', '化学']"
-        }
-      },
-      "scroll_observer": {
-        "root": "containerRef",
-        "threshold": [0, 0.1, 0.2],
-        "rootMargin": "-10% 0px -85% 0px",
-        "on_intersecting": "更新 store.selectedNodeId"
-      },
-      "watch": {
-        "currentTab": "滚动到顶部，重新设置观察者",
-        "allSubsections": "重新设置观察者"
-      }
+      "props": [
+        { "name": "mode", "type": "'scene' | 'all'", "required": false, "default": "scene", "description": "Display mode: 'scene' filters by current tab, 'all' shows all resources" }
+      ],
+      "events": [
+        { "name": "scroll-to-node", "payload": "string (nodeId)", "description": "Emitted when a node scroll event occurs" }
+      ],
+      "children": ["LearningGuide", "KnowledgeCard", "PracticeCard", "GuideCard", "ReadTextCard", "SummaryNoteCard", "PremiumHookCard", "LearningModeModal", "ContentChoiceModal", "ChapterFooter"],
+      "description": "Main content area rendering resources grouped by subsection. Uses IntersectionObserver for scroll-to-highlight sync. Supports practice+guide pair layout (50/50 side-by-side). Filters resources by scene and subject. Manages LearningModeModal and ContentChoiceModal states."
     },
-    "KnowledgeCard": {
+    {
+      "name": "LearningGuide",
+      "path": "src/components/LearningGuide.vue",
+      "props": [],
+      "events": [],
+      "children": [],
+      "description": "Collapsible learning method guide panel at the top of the resource list. Shows subject+scene-specific guidance text. Uses warm orange background."
+    },
+    {
+      "name": "KnowledgeCard",
       "path": "src/components/KnowledgeCard.vue",
-      "description": "知识点视频卡片",
-      "props": { "resource": { "type": "Resource", "required": true } },
-      "layout": "horizontal",
-      "elements": {
-        "cover": { "width": "100px", "height": "60px", "radius": "8px" },
-        "title": { "font_size": "14px", "font_weight": 600, "max_lines": 2 },
-        "tags": ["category", "valueTag", "difficulty"],
-        "meta": "tags 数组",
-        "progress": { "type": "bar", "height": "4px" },
-        "badge": { "position": "top-right", "variants": ["lock", "unlocked", "trial"] }
-      },
-      "vip_logic": {
-        "locked": "!resource.isFree && !store.isVip",
-        "on_click_locked": "confirm() → store.unlockVip()"
-      }
+      "props": [
+        { "name": "resource", "type": "Resource", "required": true, "description": "Video resource data to display" }
+      ],
+      "events": [
+        { "name": "request-learning-mode", "payload": "Resource", "description": "Emitted when user clicks in review scene with ask-every-time setting" },
+        { "name": "request-content-choice", "payload": "Resource", "description": "Emitted when user clicks a video with partial progress (0 < progress < 100)" }
+      ],
+      "children": ["NewBadge"],
+      "description": "Video knowledge point card with cover image, title, category/value/difficulty tags, VIP badge (lock/trial/unlocked priority), NEW badge, and dual segment-bar progress (video + quiz). Handles review scene learning mode and content choice modal triggers."
     },
-    "MindMapCard": {
-      "path": "src/components/MindMapCard.vue",
-      "description": "思维导图卡片",
-      "props": { "resource": { "type": "Resource", "required": true } },
-      "layout": "horizontal",
-      "elements": {
-        "icon_area": { "width": "100px", "height": "60px", "bg": "#F0F7FF", "icon": "BrainCircuit" },
-        "title": { "font_size": "14px", "font_weight": 600 },
-        "subtitle": "知识脉络一目了然",
-        "action": { "text": "查看", "icon": "ChevronRight" }
-      }
-    },
-    "ReciteCard": {
-      "path": "src/components/ReciteCard.vue",
-      "description": "背诵卡片",
-      "props": { "resource": { "type": "Resource", "required": true } },
-      "variants": {
-        "vocab": { "icon": "Languages", "color": "#FEA345", "bg": "#FFF9F5", "label": "背单词" },
-        "text": { "icon": "BookOpenCheck", "color": "#92E066", "bg": "#F6FFF7", "label": "读课文" }
-      }
-    },
-    "QuickReviewCard": {
-      "path": "src/components/QuickReviewCard.vue",
-      "description": "极速复习卡片",
-      "props": { "resource": { "type": "Resource", "required": true } },
-      "layout": "compact",
-      "elements": {
-        "icon_area": { "size": "40px", "shape": "circle", "bg": "#FFFBF0", "icon": "Zap", "badge": "Camera" },
-        "subtitle": "拍照关联知识点视频"
-      }
-    },
-    "AISolveCard": {
-      "path": "src/components/AISolveCard.vue",
-      "description": "AI拍题精学卡片",
-      "props": { "resource": { "type": "Resource", "required": true } },
-      "layout": "compact",
-      "elements": {
-        "icon_area": { "size": "40px", "shape": "circle", "bg": "#F0F7FF", "icon": "Sparkles", "badge": "Camera" },
-        "subtitle": "拍照获得AI讲解"
-      }
-    },
-    "NoteCard": {
-      "path": "src/components/NoteCard.vue",
-      "description": "学霸笔记卡片",
-      "props": { "resource": { "type": "Resource", "required": true } },
-      "layout": "compact",
-      "elements": {
-        "icon_area": { "size": "40px", "shape": "circle", "bg": "#FFFBF0", "icon": "NotebookPen" }
-      }
-    },
-    "ErrorBookCard": {
-      "path": "src/components/ErrorBookCard.vue",
-      "description": "错题本卡片",
-      "props": { "resource": { "type": "Resource", "required": true } },
-      "layout": "compact",
-      "elements": {
-        "icon_area": { "size": "40px", "shape": "circle", "bg": "#FFF0E6", "icon": "BookX" }
-      }
-    },
-    "QuickMemorizeCard": {
-      "path": "src/components/QuickMemorizeCard.vue",
-      "description": "快背卡片",
-      "props": { "resource": { "type": "Resource", "required": true } },
-      "layout": "compact",
-      "display_condition": "resource.subject in liberalArtsSubjects",
-      "elements": {
-        "icon_area": { "size": "40px", "shape": "circle", "bg": "#F1F8F4", "icon": "Brain" },
-        "subtitle": "快速识记知识卡片"
-      }
-    },
-    "PracticeCard": {
+    {
+      "name": "PracticeCard",
       "path": "src/components/PracticeCard.vue",
-      "description": "同步刷题卡片",
-      "props": { "resource": { "type": "Resource", "required": true } },
-      "layout": "horizontal",
-      "elements": {
-        "cover": { "type": "svg_icon", "bg": "#F0F7FF", "label": "同步刷题" },
-        "title": "resource.subsectionTitle || resource.title",
-        "difficulty_levels": "resource.difficultyLevels.join(' ')",
-        "progress": { "type": "bar", "text": "{completed}/{total}题" }
-      }
+      "props": [
+        { "name": "resource", "type": "Resource", "required": true, "description": "Practice resource data to display" }
+      ],
+      "events": [],
+      "children": ["NewBadge"],
+      "description": "Practice/drill card with icon, title, difficulty level indicators (segmented underlines), and progress display (completed/total). Supports paired layout mode (50% width alongside GuideCard) with container queries for responsive tiers."
     },
-    "PremiumKnowledgeCard": {
-      "path": "src/components/PremiumKnowledgeCard.vue",
-      "description": "培优课视频卡片",
-      "props": { "resource": { "type": "Resource", "required": true } },
-      "layout": "horizontal",
-      "badge_variants": {
-        "locked": { "text": "去加购", "icon": "Crown", "bg": "vip_gradient" },
-        "unlocked": { "text": "培优课", "icon": "Crown", "bg": "gold_gradient" }
-      },
-      "premium_logic": {
-        "locked": "resource.premiumStatus === 'locked' || (!store.hasPremiumAccess && resource.isPremium)",
-        "on_click_locked": "confirm('购买培优课') → 跳转加购页"
-      }
+    {
+      "name": "GuideCard",
+      "path": "src/components/GuideCard.vue",
+      "props": [
+        { "name": "resource", "type": "Resource", "required": true, "description": "Guide (study plan) resource data to display" }
+      ],
+      "events": [],
+      "children": [],
+      "description": "Study guide card with blue gradient icon, title, page count, and download action. Supports paired layout mode alongside PracticeCard."
+    },
+    {
+      "name": "ReadTextCard",
+      "path": "src/components/ReadTextCard.vue",
+      "props": [
+        { "name": "resource", "type": "Resource", "required": true, "description": "Read-text resource data to display" }
+      ],
+      "events": [],
+      "children": [],
+      "description": "Read-aloud card for liberal arts subjects. Warm gradient background with paragraph count, estimated time, and microphone action button."
+    },
+    {
+      "name": "SummaryNoteCard",
+      "path": "src/components/SummaryNoteCard.vue",
+      "props": [
+        { "name": "resource", "type": "Resource", "required": true, "description": "Summary note resource data to display" }
+      ],
+      "events": [],
+      "children": [],
+      "description": "AI-generated summary note card with green gradient background, note count, AI badge (sparkle icon)."
+    },
+    {
+      "name": "PremiumHookCard",
+      "path": "src/components/PremiumHookCard.vue",
+      "props": [
+        { "name": "resource", "type": "Resource", "required": true, "description": "Premium hook resource data to display" }
+      ],
+      "events": [],
+      "children": [],
+      "description": "Premium/advanced course hook card with gold gradient cover, category tag, difficulty stars, question count, and purchase button. Only shown in the 'extra' scene."
+    },
+    {
+      "name": "NewBadge",
+      "path": "src/components/NewBadge.vue",
+      "props": [
+        { "name": "id", "type": "string", "required": true, "description": "Resource or node ID for read-status lookup" },
+        { "name": "firstPublishAt", "type": "string", "required": false, "description": "First publish timestamp (ISO8601) for freshness calculation" },
+        { "name": "size", "type": "'resource' | 'dot'", "required": false, "default": "resource", "description": "Display size: 'resource' shows 'NEW' pill badge, 'dot' shows a small red dot" }
+      ],
+      "events": [],
+      "children": [],
+      "description": "NEW content badge indicator. Shows 'NEW' pill or red dot based on size prop. Visible when firstPublishAt is within 7 days and user has not read the resource."
+    },
+    {
+      "name": "ChapterFooter",
+      "path": "src/components/ChapterFooter.vue",
+      "props": [],
+      "events": [],
+      "children": [],
+      "description": "Bottom navigation for previous/next chapter. Shows chapter titles with arrow icons. Navigates to the first subsection of the target chapter on click."
+    },
+    {
+      "name": "ContentChoiceModal",
+      "path": "src/components/ContentChoiceModal.vue",
+      "props": [
+        { "name": "visible", "type": "boolean", "required": true, "description": "Controls modal visibility" },
+        { "name": "resourceTitle", "type": "string", "required": true, "description": "Title of the resource being acted upon" },
+        { "name": "hasNote", "type": "boolean", "required": true, "description": "Whether to show the 'view class notes' option (requires isContainNote)" }
+      ],
+      "events": [
+        { "name": "close", "payload": "void", "description": "Emitted when modal is dismissed" },
+        { "name": "select", "payload": "ContentChoice ('video' | 'practice' | 'note')", "description": "Emitted when user selects a learning content option" }
+      ],
+      "children": [],
+      "description": "Modal for choosing learning content when a video has partial progress. Options: continue video, do supplementary practice, view class notes (conditional). Teleported to body with bottom-sheet animation."
+    },
+    {
+      "name": "LearningModeModal",
+      "path": "src/components/LearningModeModal.vue",
+      "props": [
+        { "name": "visible", "type": "boolean", "required": true, "description": "Controls modal visibility" },
+        { "name": "resourceTitle", "type": "string", "required": false, "description": "Title of the resource being acted upon" }
+      ],
+      "events": [
+        { "name": "close", "payload": "void", "description": "Emitted when modal is dismissed" },
+        { "name": "confirm", "payload": "LearningMode ('quiz-first' | 'video-first')", "description": "Emitted when user confirms their learning mode selection" }
+      ],
+      "children": [],
+      "description": "Modal for selecting review learning mode (quiz-first recommended, or video-first). Shown in review scene when appSettings.reviewLearningMode is 'ask-every-time'. Defaults to quiz-first. Teleported to body."
+    },
+    {
+      "name": "FirstTimeGuide",
+      "path": "src/components/FirstTimeGuide.vue",
+      "props": [
+        { "name": "visible", "type": "boolean", "required": true, "description": "Controls guide overlay visibility" }
+      ],
+      "events": [
+        { "name": "complete", "payload": "void", "description": "Emitted when user finishes or skips the guide" }
+      ],
+      "children": [],
+      "description": "3-step onboarding guide overlay. Steps: 1) Select textbook, 2) Choose chapter, 3) Click subsection to learn. Shows step indicators, gesture animation placeholder, and skip/next buttons. Persists completion to localStorage. Teleported to body."
+    },
+    {
+      "name": "SettingsPage",
+      "path": "src/views/SettingsPage.vue",
+      "props": [],
+      "events": [
+        { "name": "back", "payload": "void", "description": "Emitted when user clicks the back button to return to the chapter list" }
+      ],
+      "children": [],
+      "description": "Full-page settings view with 3 sections: review learning order (radio: quiz-first/video-first/ask-every-time), default scene tab (radio: all/last-selected), practice difficulty (checkbox: basic/medium/hard, min 1). Auto-saves to localStorage."
     }
-  },
-  "api_mock": {
-    "guide_content": {
-      "preview": "预习建议：重点关注相交线中的对顶角与邻补角定义，尝试画出简单的三线八角图。",
-      "review": "复习建议：总结平行线的三个判定定理与性质定理的区别，熟练掌握子弹图、猪手图的辅助线添加方法。",
-      "extra": "加餐建议：挑战平行线的复杂证明题，尝试用多种方法证明同一结论。"
+  ],
+  "responsive_rules": [
+    {
+      "name": "desktop",
+      "breakpoint": "min-width: 768px",
+      "behavior": "Sidebar always visible at 260px. Action buttons shown inline in FunctionBar. Context selector shows full textbook info. Textbook modal centered with border-radius."
     },
-    "liberal_arts_subjects": ["地理", "历史", "政治", "生物", "化学"]
-  },
-  "responsive_rules": {
-    "sidebar": {
-      "desktop": { "min_width": "768px", "mode": "fixed", "width": "260px" },
-      "mobile": { "max_width": "767px", "mode": "drawer", "width": "80%" }
+    {
+      "name": "mobile",
+      "breakpoint": "max-width: 767px",
+      "behavior": "Sidebar hidden off-screen (translateX -100%), toggled via pull-handle button at 61.8% vertical position. Overlay shown when sidebar is open. Content area takes full width with pan-y touch action."
     },
-    "function_bar_actions": {
-      "desktop": { "min_width": "600px", "mode": "inline" },
-      "mobile": { "max_width": "599px", "mode": "dropdown" }
+    {
+      "name": "small_mobile",
+      "breakpoint": "max-width: 599px",
+      "behavior": "FunctionBar quick actions collapse into a dropdown menu. Scene tabs reduce padding/gap. Context selector truncates text. Textbook modal selector columns stack vertically."
     },
-    "scene_tabs_embedded": {
-      "tiny": { "max_width": "380px", "padding": "6px 10px", "font_size": "13px" }
+    {
+      "name": "tiny_mobile",
+      "breakpoint": "max-width: 379px",
+      "behavior": "Scene tabs further reduce padding and font size."
     },
-    "vip_badge_text": {
-      "micro": { "max_width": "360px", "display": "none" }
+    {
+      "name": "micro_mobile",
+      "breakpoint": "max-width: 359px",
+      "behavior": "VIP upgrade button hides text label, shows icon only."
+    },
+    {
+      "name": "tablet_portrait",
+      "breakpoint": "min-width: 640px and min-height: 640px",
+      "behavior": "Foldable/tablet portrait optimizations (reserved)."
+    },
+    {
+      "name": "phone_landscape",
+      "breakpoint": "max-height: 639px",
+      "behavior": "Vocab entry compresses padding and switches to horizontal layout."
+    },
+    {
+      "name": "container_query_pair_row",
+      "breakpoint": "container pair-row max-width: 350px / 300px",
+      "behavior": "PracticeCard+GuideCard paired layout. Tier 1 (<=350px): icons shrink to 24px, type label smaller. Tier 2 (<=300px): type label hidden, subtitle promoted to primary title, icons shrink to 20px."
     }
-  },
+  ],
   "scroll_sync": {
     "click_to_scroll": {
-      "trigger": "点击左侧目录小节",
-      "lock": "isScrollingByClick = true",
-      "action": "右侧滚动到对应小节",
-      "unlock_delay": "600ms"
+      "description": "When user clicks a subsection in the sidebar tree, the content area scrolls smoothly to the corresponding resource group",
+      "lock_duration_ms": 600,
+      "scroll_behavior": "smooth",
+      "mechanism": "Sets isScrollingByClick=true before scrolling, resets after 600ms to prevent IntersectionObserver from overriding the selection during the scroll animation"
     },
     "scroll_to_highlight": {
-      "trigger": "右侧滚动",
-      "condition": "!isScrollingByClick",
-      "observer": "IntersectionObserver",
-      "root_margin": "-10% 0px -85% 0px",
-      "action": "更新 selectedNodeId",
-      "follow": "左侧目录滚动到对应项"
+      "description": "When user scrolls the resource list, the sidebar tree automatically highlights the currently visible subsection",
+      "observer_config": {
+        "root": "containerRef (resource-list-container)",
+        "threshold": [0, 0.1, 0.2],
+        "rootMargin": "-10% 0px -85% 0px"
+      },
+      "mechanism": "IntersectionObserver watches all .subsection-group elements. When a subsection enters the detection zone (top 10%-15% of viewport), its ID is used to update selectedNodeId. Skipped when isScrollingByClick is true."
     }
   },
+  "vip_logic": {
+    "state_source": "store.isVip",
+    "badge_priority": ["badge-lock", "badge-trial", "badge-unlocked"],
+    "badge_new_interaction": "When badge-unlocked and content is NEW, hide badge-unlocked to let NEW badge show. When badge-lock is active, hide NEW badge.",
+    "locked_behavior": "Non-free resources show lock badge and trigger VIP purchase confirmation on click",
+    "trial_behavior": "isTrial resources show 'free trial' badge and allow access regardless of VIP status",
+    "upgrade_entry": "GlobalHeader contains VIP upgrade button with gold gradient. Changes to gray when isVip=true."
+  },
+  "new_badge_logic": {
+    "window_days": 7,
+    "calculation": "Resource qualifies as NEW when: (1) firstPublishAt is defined, (2) user has not read it (not in readResources set), (3) days since firstPublishAt <= 7",
+    "display_sizes": {
+      "resource": "Red pill badge with 'NEW' text on resource cards",
+      "dot": "Small 8px red dot on sidebar tree nodes (subsection/section level)"
+    },
+    "read_tracking": "readResources Set<string> persisted to localStorage key 'read_resources'",
+    "mark_as_read": "store.markAsRead(nodeId) adds to set and persists"
+  },
+  "position_restore_logic": {
+    "priority_chain": [
+      { "priority": 1, "source": "URL parameters", "params": "chapterId, topicId" },
+      { "priority": 2, "source": "Server API", "status": "TODO (V5.x phase)" },
+      { "priority": 3, "source": "localStorage", "key_pattern": "last_position_{textbookId}" },
+      { "priority": 4, "source": "Default", "behavior": "First subsection of first chapter" }
+    ]
+  },
+  "resource_layout": {
+    "single_row": "Most resource cards take full width of the content area",
+    "pair_row": "Adjacent practice + guide resources are laid out side-by-side (50/50) in a .resource-pair-row container with container queries for responsive adaptation",
+    "scene_filtering": "Resources without scenes default to preview/review. read_text only shows for liberal arts subjects."
+  },
+  "localStorage_keys": [
+    { "key": "appSettings", "type": "AppSettings JSON", "description": "Persisted application settings" },
+    { "key": "reviewLearningMode", "type": "{ mode, remember } JSON", "description": "Legacy review mode preference" },
+    { "key": "guide_completed", "type": "'true'", "description": "First-time guide completion flag" },
+    { "key": "read_resources", "type": "string[] JSON", "description": "Array of read resource IDs for NEW badge tracking" },
+    { "key": "last_position_{textbookId}", "type": "{ nodeId } JSON", "description": "Last scroll position per textbook" }
+  ],
   "changelog": [
     {
       "version": "1.0.0",
       "date": "2025-12-31",
-      "changes": [
-        "基于可交互原型反向工程生成 SDD",
-        "完整覆盖 50 个功能点",
-        "包含 10 种资源卡片组件规格"
-      ]
+      "changes": "Initial SDD from V1.0 prototype: basic chapter tree, video cards, scene tabs, sidebar scroll sync"
     },
     {
-      "version": "1.1.0",
-      "date": "2026-03-09",
-      "changes": [
-        "同步官方设计令牌 (onion-tokens)：颜色、字体、圆角",
-        "进度条从实心条改为分段式 (10段)",
-        "VIP角标文字从 VIP 改为 会员，背景从渐变改为珊瑚色 #FA5A65",
-        "更多菜单图标从 ... (MoreHorizontal) 改为 ≡ (Menu) 汉堡图标",
-        "刷题卡片难度展示从胶囊 pill 改为文字标签 + 彩色分段下划线",
-        "全部 tab 使用描边胶囊边框样式"
-      ]
+      "version": "2.0.0",
+      "date": "2026-03-13",
+      "changes": "Complete rewrite for V1.6: 4 scene templates (SCIENCE_PROBLEM, LANGUAGE, SCIENCE_BASIC, HISTORY), 9 resource types (video, practice, guide, read_text, summary_note, premium_hook, recite, mind_map, error_book), ContentChoiceModal, LearningModeModal, FirstTimeGuide 3-step onboarding, ChapterFooter prev/next navigation, ContextSelector 3-column textbook modal, NEW badge system (7-day window + read tracking), VIP badge priority logic, AppSettings persistence, practice+guide paired layout with container queries, position restore priority chain, responsive rules for 7 breakpoints"
     }
   ]
 }
-

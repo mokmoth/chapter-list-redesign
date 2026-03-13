@@ -19,7 +19,7 @@
 
     模板变量（由 AI 在生成时替换）：
     - 章节列表页迭代 V1.6 — 项目名称
-    - 2026-03-12T18:00:00+08:00 — 生成时间
+    - 2026-03-13 16:40 — 生成时间
     - {
   "metadata": {
     "projectName": "章节列表页迭代 V1.6",
@@ -996,6 +996,27 @@
       outline-offset: -2px;
     }
 
+    /* Screenshot paste target indicator */
+    .screenshot-paste-target {
+      outline: 2px solid #22C55E;
+      outline-offset: -2px;
+      position: relative;
+    }
+    .screenshot-paste-target::after {
+      content: '⌘V';
+      position: absolute;
+      top: 4px;
+      right: 4px;
+      background: #22C55E;
+      color: white;
+      font-size: 10px;
+      font-weight: 600;
+      padding: 1px 5px;
+      border-radius: 3px;
+      pointer-events: none;
+      z-index: 10;
+    }
+
     /* Editable field hover */
     .editable-hint {
       cursor: pointer;
@@ -1413,6 +1434,8 @@
               </div>
               <label x-show="$store.review.editMode"
                      class="block cursor-pointer editable-hint relative"
+                     @mouseenter="$store.review.setPasteTarget('page', page.id, 'default'); $el.classList.add('screenshot-paste-target')"
+                     @mouseleave="$store.review.clearPasteTarget(); $el.classList.remove('screenshot-paste-target')"
                      @dragover.prevent="$el.classList.add('screenshot-drop-active')"
                      @dragleave="$el.classList.remove('screenshot-drop-active')"
                      @drop.prevent="$el.classList.remove('screenshot-drop-active'); $store.review.handleScreenshotDrop($event, page.id, 'default')">
@@ -1420,7 +1443,7 @@
                      class="w-full rounded shadow-sm screenshot-thumb"
                      :alt="page.name">
                 <div class="absolute inset-0 bg-black/40 rounded flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity">
-                  <span class="text-white text-xs">点击替换截图</span>
+                  <span class="text-white text-xs">粘贴 / 拖拽 / 点击替换</span>
                 </div>
                 <input type="file" accept="image/*" class="hidden"
                        @change="$store.review.handleScreenshotUpload($event, page.id, 'default')">
@@ -1516,9 +1539,11 @@
                           </div>
                         </template>
                       </div>
-                      <!-- Edit mode: click for file picker / drag to replace -->
+                      <!-- Edit mode: click for file picker / drag / paste to replace -->
                       <label x-show="$store.review.editMode"
                              class="block cursor-pointer editable-hint relative w-[140px] max-h-[160px]"
+                             @mouseenter="$store.review.setPasteTarget('feature', page.id, feat.id); $el.classList.add('screenshot-paste-target')"
+                             @mouseleave="$store.review.clearPasteTarget(); $el.classList.remove('screenshot-paste-target')"
                              @dragover.prevent="$el.classList.add('screenshot-drop-active')"
                              @dragleave="$el.classList.remove('screenshot-drop-active')"
                              @drop.prevent="$el.classList.remove('screenshot-drop-active'); handleFeatureScreenshotDrop($event, page.id, feat.id)">
@@ -1528,11 +1553,11 @@
                         </template>
                         <template x-if="!getFeatureScreenshot(page.id, feat.id)">
                           <div class="w-full h-[80px] border-2 border-dashed border-gray-300 rounded flex items-center justify-center">
-                            <span class="text-xs text-gray-400 text-center px-1">点击添加截图</span>
+                            <span class="text-xs text-gray-400 text-center px-1">粘贴 / 点击添加</span>
                           </div>
                         </template>
                         <div class="absolute inset-0 bg-black/40 rounded flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity">
-                          <span class="text-white text-xs">替换截图</span>
+                          <span class="text-white text-xs">粘贴 / 拖拽 / 点击替换</span>
                         </div>
                         <input type="file" accept="image/*" class="hidden"
                                @change="handleFeatureScreenshotUpload($event, page.id, feat.id)">
@@ -2369,6 +2394,7 @@
         _key: '',
         _toastTimer: null,
         darkMode: document.documentElement.classList.contains('dark'),
+        _pasteTarget: null,
 
         toggleDarkMode() {
           this.darkMode = !this.darkMode;
@@ -2441,6 +2467,39 @@
           this._key = 'reviewMapEdits_' + (this.data.metadata.projectName || 'default');
           this._loadEdits();
           this._detectStorage();
+          this._registerPasteListener();
+        },
+
+        // --- Clipboard paste support for screenshot replacement ---
+        setPasteTarget(type, id1, id2) {
+          this._pasteTarget = { type: type, id1: id1, id2: id2 || null };
+        },
+        clearPasteTarget() {
+          this._pasteTarget = null;
+        },
+        _registerPasteListener() {
+          var self = this;
+          document.addEventListener('paste', function(event) {
+            if (!self.editMode || !self._pasteTarget) return;
+            var items = event.clipboardData && event.clipboardData.items;
+            if (!items) return;
+            var imageFile = null;
+            for (var i = 0; i < items.length; i++) {
+              if (items[i].type.indexOf('image/') === 0) {
+                imageFile = items[i].getAsFile();
+                break;
+              }
+            }
+            if (!imageFile) return;
+            event.preventDefault();
+            var target = self._pasteTarget;
+            if (target.type === 'page') {
+              self._saveScreenshotBlob(imageFile, target.id1, target.id2 || 'default');
+            } else if (target.type === 'feature') {
+              self._saveFeatureScreenshot(imageFile, target.id1, target.id2);
+            }
+            self.showToast('\u2705 \u5DF2\u7C98\u8D34\u622A\u56FE');
+          });
         },
 
         // --- Load edits from localStorage, merge with defaults ---
@@ -5228,7 +5287,7 @@
   </script>
 
   <footer class="max-w-7xl mx-auto px-4 py-6 text-center text-sm text-gray-400 dark:text-gray-500 no-print">
-    由 review-map skill 自动生成 · v2.0 · 2026-03-12T18:00:00+08:00
+    由 review-map skill 自动生成 · v2.0 · 2026-03-13 16:40
   </footer>
 
 </body>

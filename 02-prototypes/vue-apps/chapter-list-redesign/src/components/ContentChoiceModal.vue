@@ -173,7 +173,7 @@ function handleSelect(choice: ContentChoice) {
   gap: $spacing-lg;
   padding: $spacing-xl;
   border: 1px solid $border-color;
-  border-radius: $radius-xl;
+  border-radius: $radius-md;
   background: $bg-white;
   cursor: pointer;
   transition: all $transition-fast;
@@ -195,7 +195,7 @@ function handleSelect(choice: ContentChoice) {
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: $radius-lg;
+  border-radius: $radius-md;
   flex-shrink: 0;
 
   &--video {

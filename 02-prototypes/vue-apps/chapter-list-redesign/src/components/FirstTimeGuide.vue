@@ -155,7 +155,7 @@ onUnmounted(() => {
 
 .guide-card {
   background: $bg-white;
-  border-radius: $radius-pill;
+  border-radius: $radius-xl;
   padding: $spacing-xxl;
   max-width: 340px;
   width: 100%;
@@ -246,7 +246,7 @@ onUnmounted(() => {
   color: $text-secondary;
   font-size: $font-size-sm;
   font-weight: $font-weight-medium;
-  border-radius: $radius-xl;
+  border-radius: $radius-md;
   transition: all $transition-fast;
 
   &:hover {
@@ -261,7 +261,7 @@ onUnmounted(() => {
   color: $bg-white;
   font-size: $font-size-sm;
   font-weight: $font-weight-semibold;
-  border-radius: $radius-xl;
+  border-radius: $radius-md;
   transition: all $transition-fast;
 
   &:hover {
