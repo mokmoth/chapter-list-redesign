@@ -6,11 +6,11 @@
 
 | 字段 | 值 |
 |---|---|
-| 文档版本 | 2.0.0 |
+| 文档版本 | 3.0.0 |
 | 项目代号 | chapter-list-redesign |
 | 原型版本 | V1.6 |
 | 提取来源 | `02-prototypes/vue-apps/chapter-list-redesign/src/` |
-| 提取时间 | 2026-03-13 |
+| 提取时间 | 2026-03-17 |
 | 产品 | 洋葱学园 (Onion Academy) -- 教材同步模块 |
 
 ---
@@ -230,6 +230,10 @@ interface Resource {
   videoTimepoint?: number       // 视频播放进度 (秒)
   isContainNote?: boolean       // 是否含课堂笔记
   isPremium?: boolean           // 是否为付费内容
+
+  // --- V3.0 标签筛选字段 ---
+  contentTags?: string[]        // 内容标签
+  sceneTags?: string[]          // 场景标签
 }
 ```
 
@@ -314,6 +318,60 @@ interface AppSettings {
 }
 ```
 
+### 4.9 ResourceTag
+
+资源标签，区分内容标签与场景标签。
+
+```typescript
+interface ResourceTag {
+  id: string
+  name: string
+  type: 'content' | 'scene'  // 内容标签 | 场景标签
+}
+```
+
+### 4.10 SceneFilterRule
+
+场景筛选规则，支持双维度过滤。
+
+```typescript
+interface SceneFilterRule {
+  contentTags?: string[]    // 内容标签组 (组内 OR)
+  sceneTags?: string[]      // 场景标签组 (组内 OR)
+  operator: 'AND' | 'OR'    // 组间关系 (默认 AND)
+}
+```
+
+### 4.11 SubjectSceneConfig
+
+学段×学科维度的场景配置。
+
+```typescript
+interface SubjectSceneConfig {
+  stage: 'elementary' | 'middle' | 'high'  // 学段
+  subject: SubjectType
+  templateType: 'science_problem' | 'language' | 'science_basic' | 'elementary_science'
+  scenes: SceneDefinition[]
+  isLaunched: boolean  // 是否上线
+}
+```
+
+### 4.12 SceneDefinition
+
+场景定义，描述单个 Tab 的完整配置。
+
+```typescript
+interface SceneDefinition {
+  key: SceneType
+  label: string
+  description: string           // 定位说明
+  cardTypes: ResourceType[]     // 包含卡片类型
+  filterRules: SceneFilterRule[]  // 筛选条件组 (组间 OR)
+  hiddenTags: string[]          // 前台隐藏标签
+  useTagFilter: boolean         // false = 按资源类型聚合（如"加餐"场景）
+}
+```
+
 ---
 
 ## 5. 枚举定义
@@ -340,6 +398,26 @@ type SubjectType = '数学' | '英语' | '语文' | '历史' | '地理' | '政�
 ```
 
 文科学科常量: `liberalArtsSubjects = ['语文', '历史', '地理', '政治']`
+
+### 5.2b StageType
+
+```typescript
+type StageType = 'elementary' | 'middle' | 'high'  // 小学 | 初中 | 高中
+```
+
+### 5.2c TemplateType
+
+```typescript
+type TemplateType = 'science_problem' | 'language' | 'science_basic' | 'elementary_science'
+```
+
+### 5.2d StageSubjectKey
+
+学段×学科的复合键，用于精确匹配场景配置。
+
+```typescript
+type StageSubjectKey = `${StageType}_${SubjectType}`
+```
 
 ### 5.3 ResourceType
 
@@ -682,26 +760,41 @@ graph TD
 
 ### 8.1 四种 Tab 模板
 
-| 模板常量 | Tab 组合 | 适用学科 |
-|---|---|---|
-| `SCIENCE_PROBLEM_TABS` | 预习 / 解题指导 / 刷题 | 数学, 物理, 化学 |
-| `LANGUAGE_TABS` | 预习 / 复习 / 日常积累 | 语文, 英语 |
-| `SCIENCE_BASIC_TABS` | 预习 / 复习 | 生物, 地理 |
-| `HISTORY_TABS` | 预习 / 复习 | 历史, 政治 |
+| 模板名称 | 常量名 | 适用学科 | Tab 组合 |
+|---|---|---|---|
+| 理科解题型 | `SCIENCE_PROBLEM_TABS` | 初中数理化、高中数理化生 | 预习 → 解题指导 / 复习 → 刷题 / 加餐 |
+| 文科语言型 | `LANGUAGE_TABS` | 初/高中语英、小学语英 | 预习 → 复习 → 日常积累 → 加餐 |
+| 小四门基础型 | `SCIENCE_BASIC_TABS` | 初/高中生物地理历史政治道法 | 预习 → 复习 |
+| 小学理科型 | `ELEMENTARY_SCIENCE_TABS` | 小学数学 | 预习 → 复习 → 加餐 |
 
-### 8.2 学科映射表
+### 8.2 学科映射表 (学段×学科维度)
 
 ```typescript
-SCENE_CONFIG: Record<SubjectType, TabConfig[]> = {
-  '数学': SCIENCE_PROBLEM_TABS,
-  '物理': SCIENCE_PROBLEM_TABS,
-  '化学': SCIENCE_PROBLEM_TABS,
-  '语文': LANGUAGE_TABS,
-  '英语': LANGUAGE_TABS,
-  '生物': SCIENCE_BASIC_TABS,
-  '地理': SCIENCE_BASIC_TABS,
-  '历史': HISTORY_TABS,
-  '政治': HISTORY_TABS
+SCENE_CONFIG: Record<StageSubjectKey, SubjectSceneConfig> = {
+  // --- 初中 ---
+  'middle_数学': { templateType: 'science_problem', isLaunched: true },
+  'middle_物理': { templateType: 'science_problem', isLaunched: true },
+  'middle_化学': { templateType: 'science_problem', isLaunched: true },
+  'middle_语文': { templateType: 'language', isLaunched: true },
+  'middle_英语': { templateType: 'language', isLaunched: true },
+  'middle_生物': { templateType: 'science_basic', isLaunched: true },
+  'middle_地理': { templateType: 'science_basic', isLaunched: true },
+  'middle_历史': { templateType: 'science_basic', isLaunched: false },  // 暂不上线
+  'middle_政治': { templateType: 'science_basic', isLaunched: false },  // 暂不上线 (道法)
+  // --- 高中 ---
+  'high_数学': { templateType: 'science_problem', isLaunched: true },
+  'high_物理': { templateType: 'science_problem', isLaunched: true },
+  'high_化学': { templateType: 'science_problem', isLaunched: true },
+  'high_生物': { templateType: 'science_problem', isLaunched: true },
+  'high_语文': { templateType: 'language', isLaunched: true },
+  'high_英语': { templateType: 'language', isLaunched: true },
+  'high_地理': { templateType: 'science_basic', isLaunched: false },  // 暂不上线
+  'high_历史': { templateType: 'science_basic', isLaunched: false },  // 暂不上线
+  'high_政治': { templateType: 'science_basic', isLaunched: false },  // 暂不上线
+  // --- 小学 ---
+  'elementary_数学': { templateType: 'elementary_science', isLaunched: true },
+  'elementary_语文': { templateType: 'language', isLaunched: true },
+  'elementary_英语': { templateType: 'language', isLaunched: true },
 }
 ```
 
@@ -711,13 +804,34 @@ SCENE_CONFIG: Record<SubjectType, TabConfig[]> = {
 DEFAULT_SCENE_TABS = SCIENCE_PROBLEM_TABS
 ```
 
-当 `SCENE_CONFIG[currentSubject]` 未命中时使用此默认值。
+当 `SCENE_CONFIG[stageSubjectKey]` 未命中时使用此默认值。
 
 ### 8.4 Tab 切换时的数据联动
 
 - `switchTextbook()` 执行后检查当前 Tab 是否在新学科的 `SCENE_CONFIG` 中有效
 - 若无效，自动回退到新学科的第一个 Tab
 - 切换 Tab 后自动关闭全部资源抽屉 (`isAllResourcesOpen = false`)
+
+### 8.5 标签筛选引擎
+
+场景资源过滤采用双维度标签筛选机制，数据来源为团队确认的《场景划分与标签筛选逻辑汇总》。
+
+**筛选维度:**
+
+- **内容标签 (contentTags)**: 描述资源的内容属性 (如"概念课"、"解题课")
+- **场景标签 (sceneTags)**: 描述资源的使用场景 (如"预习"、"复习")
+
+**筛选逻辑:**
+
+1. **组内 OR**: 同一标签组内的多个标签取并集。例如 `contentTags: ['概念课', '解题课']` 表示匹配"概念课"或"解题课"
+2. **组间 AND**: `contentTags` 与 `sceneTags` 两组之间取交集。即资源需同时满足内容标签和场景标签的筛选条件
+3. **多条件组 OR**: 一个场景可配置多组 `SceneFilterRule`，组间取并集。满足任意一组规则的资源均展示
+
+**特殊规则:**
+
+- **隐藏标签 (hiddenTags)**: 指定的标签参与后端筛选逻辑，但在前端 UI 不展示给用户
+- **"加餐"场景**: 设置 `useTagFilter: false`，不走标签筛选，改为按资源类型 (ResourceType) 聚合展示
+- **暂不上线学科**: 初中历史/道法、高中地理/历史/政治，配置中 `isLaunched: false`，前端不展示对应场景 Tab
 
 ---
 
@@ -942,7 +1056,7 @@ src/
 ### 14.1 数据层
 
 - [ ] `TextbookConfig` 字段完整性 (id/stageId/subjectId/publisherId/semesterId/subject/version/grade/semester/displayName)
-- [ ] `Resource` 接口 -- 必填字段 4 个 + 可选字段 20 个
+- [ ] `Resource` 接口 -- 必填字段 4 个 + 可选字段 22 个 (含 contentTags/sceneTags)
 - [ ] `Chapter` 三级递归结构 (chapter > section > subsection)
 - [ ] 9 个 `SceneType` / 9 个 `SubjectType` / 9 个 `ResourceType` 枚举值
 - [ ] `AppSettings` 四项设置: reviewLearningMode / defaultSceneTab / practiceDifficulties / lastSelectedTab
@@ -957,10 +1071,14 @@ src/
 
 ### 14.3 场景配置
 
-- [ ] 4 个 Tab 模板常量: SCIENCE_PROBLEM_TABS / LANGUAGE_TABS / SCIENCE_BASIC_TABS / HISTORY_TABS
-- [ ] SCENE_CONFIG 映射 9 个学科
+- [ ] 4 个 Tab 模板常量: SCIENCE_PROBLEM_TABS / LANGUAGE_TABS / SCIENCE_BASIC_TABS / ELEMENTARY_SCIENCE_TABS
+- [ ] SCENE_CONFIG 映射学段×学科维度 (StageSubjectKey)
 - [ ] DEFAULT_SCENE_TABS 指向 SCIENCE_PROBLEM_TABS
 - [ ] Tab 切换联动: 验证有效性 + 自动回退
+- [ ] 标签筛选引擎: 双维度 (contentTags × sceneTags)，组内 OR、组间 AND、多条件组 OR
+- [ ] 隐藏标签规则: hiddenTags 参与筛选但前台不展示
+- [ ] "加餐"场景: useTagFilter=false，按资源类型聚合
+- [ ] 暂不上线学科标记: isLaunched=false (初中历史/道法、高中地理/历史/政治)
 
 ### 14.4 组件
 
@@ -1000,4 +1118,14 @@ src/
 
 | 版本 | 日期 | 变更 |
 |---|---|---|
+| 3.0.0 | 2026-03-17 | 场景模板体系重构 + 标签筛选引擎 (详见下方) |
 | 2.0.0 | 2026-03-13 | 从 V1.6 原型完整提取，覆盖全部 22 个组件、状态管理、场景配置、联动机制、响应式规则 |
+
+### v3.0.0 (2026-03-17)
+- 场景模板体系重构：新增"小学理科型"模板，模板适用范围调整为学段×学科维度
+- 新增标签筛选引擎：双维度（内容标签×场景标签）过滤，支持组内OR、组间AND、多条件组OR
+- 新增标签隐藏规则：指定标签参与后端筛选但前台不展示
+- 新增"加餐"场景按资源类型聚合逻辑（不走标签筛选）
+- Resource 模型新增 contentTags / sceneTags 字段
+- 标记暂不上线学科：初中历史/道法、高中地理/历史/政治
+- 数据来源：团队确认的《场景划分与标签筛选逻辑汇总》

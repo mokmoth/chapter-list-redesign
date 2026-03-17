@@ -2,8 +2,8 @@
 
 | 项目 | 值 |
 |------|------|
-| 文档版本 | V2.0 |
-| 日期 | 2026-03-13 |
+| 文档版本 | V3.0 |
+| 日期 | 2026-03-17 |
 | 关联原型 | chapter-list-redesign V1.6 |
 | 涉及组件 | `ResourceList.vue`、`KnowledgeCard.vue`、`PracticeCard.vue`、`GuideCard.vue`、`ReadTextCard.vue`、`SummaryNoteCard.vue`、`PremiumHookCard.vue`、`NewBadge.vue` |
 | 状态 | Draft |
@@ -24,23 +24,52 @@
 
 ---
 
-## 2. 场景筛选逻辑
+## 2. 场景筛选逻辑（V3.0 标签引擎）
 
-资源根据当前激活的 Tab（场景）进行过滤：
+资源筛选已从简单的 `scenes[]` 匹配升级为双维度标签筛选引擎。
+
+**Resource 模型扩展**：
 
 ```typescript
-const filterByScene = (
-  resource: Resource,
-  currentTab: SceneType
-): boolean => {
-  // 资源声明了 scenes 字段 → 精确匹配
-  if (resource.scenes && resource.scenes.length > 0) {
-    return resource.scenes.includes(currentTab)
-  }
-  // 未声明 scenes → 默认在 预习/复习 中展示
-  return currentTab === 'preview' || currentTab === 'review'
+interface Resource {
+  // ... existing fields ...
+  contentTags?: string[]   // 内容标签（概念课、解题课等）
+  sceneTags?: string[]     // 场景标签（课前预习、课后巩固等）
 }
 ```
+
+**筛选流程**：
+
+```typescript
+// 1. 卡片类型过滤
+const typeFiltered = resources.filter(r => scene.cardTypes.includes(r.type))
+
+// 2. 标签筛选（"加餐"场景跳过此步）
+if (!scene.useTagFilter) return typeFiltered
+
+// 3. 双维度标签匹配
+const tagFiltered = typeFiltered.filter(resource =>
+  scene.filterRules.some(rule => {
+    const contentOk = !rule.contentTags?.length ||
+      rule.contentTags.some(t => resource.contentTags?.includes(t))
+    const sceneOk = !rule.sceneTags?.length ||
+      rule.sceneTags.some(t => resource.sceneTags?.includes(t))
+    return contentOk && sceneOk  // 组间 AND
+  })
+)
+```
+
+**标签显示规则**：
+
+每个场景配置了 `hiddenTags: string[]`，这些标签参与后端筛选但不在前台展示：
+
+```typescript
+const visibleTags = allTags.filter(t => !scene.hiddenTags.includes(t))
+```
+
+卡片上的标签渲染应使用过滤后的 `visibleTags` 而非原始标签。
+
+> 详细的分学段分学科筛选规则见 `02-scene-system.md` Section 3。
 
 ---
 
@@ -719,16 +748,21 @@ const isNewContent = (firstPublishAt: string | null): boolean => {
 | # | 检查项 | 状态 | 备注 |
 |---|--------|------|------|
 | 1 | 9 种资源类型 → 7 个卡片组件映射是否完整 | ✅ | 含 fallback 逻辑 |
-| 2 | 场景筛选逻辑 (scenes 字段) 是否明确 | ✅ | 有 scenes → 精确匹配；无 → preview/review |
-| 3 | getCardComponent 动态组件选择是否定义 | ✅ | Record 映射 + fallback |
-| 4 | KnowledgeCard 所有子元素规格是否完整 | ✅ | 封面/标题/标签/难度/进度/VIP |
-| 5 | VIP 锁定 4 种状态是否区分 | ✅ | locked/unlocked/trial/free |
-| 6 | PracticeCard 难度 3 级颜色是否标注 | ✅ | 绿/橙/红分段条 |
-| 7 | GuideCard 下载图标交互是否定义 | ✅ | hover 变色 |
-| 8 | ReadTextCard 渐变背景 + action pill 是否完整 | ✅ | #FFF1E3→#FFF9E0 |
-| 9 | SummaryNoteCard Sparkles 徽章位置是否标注 | ✅ | 右上角绝对定位 |
-| 10 | PremiumHookCard 金色渐变 + 去加购按钮是否定义 | ✅ | #FFD633→#FEA345 |
-| 11 | NewBadge 两种尺寸 (resource/dot) 是否区分 | ✅ | pill vs 8px 圆点 |
-| 12 | isNewContent 7 天判定逻辑是否明确 | ✅ | diffDays <= 7 |
-| 13 | ContentChoiceModal 触发条件是否说明 | ✅ | isContainNote === true |
-| 14 | 卡片通用混入 (card-base / card-title) 是否提供 | ✅ | SCSS mixin |
+| 2 | 二维标签筛选体系（contentTags + sceneTags）是否明确 | ✅ | 规则组内 OR，组间 AND，多规则 OR |
+| 3 | SceneFilterRule / SceneDefinition 接口是否定义 | ✅ | 含 useTagFilter / cardTypes / filterRules / hiddenTags |
+| 4 | "加餐"场景特殊逻辑是否说明 | ✅ | useTagFilter: false，仅按 cardTypes 聚合 |
+| 5 | 隐藏标签（hiddenTags）显示规则是否定义 | ✅ | 参与筛选但前端不渲染，按场景独立配置 |
+| 6 | getCardComponent 动态组件选择是否定义 | ✅ | Record 映射 + fallback |
+| 7 | KnowledgeCard 所有子元素规格是否完整 | ✅ | 封面/标题/标签/难度/进度/VIP |
+| 8 | VIP 锁定 4 种状态是否区分 | ✅ | locked/unlocked/trial/free |
+| 9 | PracticeCard 难度 3 级颜色是否标注 | ✅ | 绿/橙/红分段条 |
+| 10 | GuideCard 下载图标交互是否定义 | ✅ | hover 变色 |
+| 11 | ReadTextCard 渐变背景 + action pill 是否完整 | ✅ | #FFF1E3→#FFF9E0 |
+| 12 | SummaryNoteCard Sparkles 徽章位置是否标注 | ✅ | 右上角绝对定位 |
+| 13 | PremiumHookCard 金色渐变 + 去加购按钮是否定义 | ✅ | #FFD633→#FEA345 |
+| 14 | NewBadge 两种尺寸 (resource/dot) 是否区分 | ✅ | pill vs 8px 圆点 |
+| 15 | isNewContent 7 天判定逻辑是否明确 | ✅ | diffDays <= 7 |
+| 16 | ContentChoiceModal 触发条件是否说明 | ✅ | isContainNote === true |
+| 17 | 卡片通用混入 (card-base / card-title) 是否提供 | ✅ | SCSS mixin |
+| 18 | V3.0 双维度标签筛选引擎是否完整 | ✅ | contentTags + sceneTags，卡片类型过滤 → 标签匹配两步流程 |
+| 19 | hiddenTags 隐藏标签显示规则是否定义 | ✅ | 参与筛选但前端不渲染，visibleTags 过滤 |

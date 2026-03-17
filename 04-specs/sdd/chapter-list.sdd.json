@@ -1,9 +1,9 @@
 {
   "meta": {
     "name": "chapter-list-redesign",
-    "version": "2.0.0",
+    "version": "3.0.0",
     "extractedFrom": "02-prototypes/vue-apps/chapter-list-redesign/",
-    "extractedAt": "2026-03-13T00:00:00Z",
+    "extractedAt": "2026-03-17",
     "prdVersion": "V1.6"
   },
   "tech_stack": {
@@ -142,7 +142,9 @@
         { "name": "firstPublishAt", "type": "string", "required": false, "description": "First publish timestamp (ISO8601) for NEW badge calculation" },
         { "name": "videoTimepoint", "type": "number", "required": false, "description": "Video playback progress in seconds for resume" },
         { "name": "isContainNote", "type": "boolean", "required": false, "description": "Whether the resource contains class notes" },
-        { "name": "isPremium", "type": "boolean", "required": false, "description": "Whether the resource is premium (paid) content" }
+        { "name": "isPremium", "type": "boolean", "required": false, "description": "Whether the resource is premium (paid) content" },
+        { "name": "contentTags", "type": "string[]", "required": false, "note": "内容标签（概念课、解题课等）" },
+        { "name": "sceneTags", "type": "string[]", "required": false, "note": "场景标签（课前预习、课后巩固等）" }
       ]
     },
     "Chapter": {
@@ -203,6 +205,39 @@
         { "name": "count", "type": "number", "required": false, "description": "Count (e.g., number of error questions)" },
         { "name": "isAvailable", "type": "boolean", "required": true, "description": "Whether available for the current subject" }
       ]
+    },
+    "ResourceTag": {
+      "fields": [
+        { "name": "id", "type": "string", "required": true },
+        { "name": "name", "type": "string", "required": true },
+        { "name": "type", "type": "'content' | 'scene'", "required": true, "note": "内容标签 | 场景标签" }
+      ]
+    },
+    "SceneFilterRule": {
+      "fields": [
+        { "name": "contentTags", "type": "string[]", "required": false, "note": "内容标签组，组内 OR" },
+        { "name": "sceneTags", "type": "string[]", "required": false, "note": "场景标签组，组内 OR" }
+      ]
+    },
+    "SceneDefinition": {
+      "fields": [
+        { "name": "key", "type": "SceneType", "required": true },
+        { "name": "label", "type": "string", "required": true },
+        { "name": "description", "type": "string", "required": true, "note": "定位说明" },
+        { "name": "cardTypes", "type": "ResourceType[]", "required": true },
+        { "name": "filterRules", "type": "SceneFilterRule[]", "required": true, "note": "筛选条件组，组间 OR" },
+        { "name": "hiddenTags", "type": "string[]", "required": true, "note": "前台隐藏标签" },
+        { "name": "useTagFilter", "type": "boolean", "required": true, "note": "false = 按资源类型聚合" }
+      ]
+    },
+    "SubjectSceneConfig": {
+      "fields": [
+        { "name": "stage", "type": "'elementary' | 'middle' | 'high'", "required": true },
+        { "name": "subject", "type": "SubjectType", "required": true },
+        { "name": "templateType", "type": "TemplateType", "required": true },
+        { "name": "scenes", "type": "SceneDefinition[]", "required": true },
+        { "name": "isLaunched", "type": "boolean", "required": true }
+      ]
     }
   },
   "enums": {
@@ -217,43 +252,57 @@
     "DefaultSceneTab": ["all", "last-selected"],
     "DifficultyLevel": ["basic", "medium", "hard"],
     "LearningMode": ["quiz-first", "video-first"],
-    "ContentChoice": ["video", "practice", "note"]
+    "ContentChoice": ["video", "practice", "note"],
+    "StageType": ["elementary", "middle", "high"],
+    "TemplateType": ["science_problem", "language", "science_basic", "elementary_science"]
   },
   "scene_config": {
-    "SCIENCE_PROBLEM": {
-      "description": "Science problem-solving subjects with drill and problem-solving scenes",
-      "subjects": ["数学", "物理", "化学"],
-      "tabs": [
-        { "key": "preview", "label": "预习" },
-        { "key": "problem_solving", "label": "解题指导" },
-        { "key": "drill", "label": "刷题" }
-      ]
+    "templates": {
+      "science_problem": {
+        "name": "理科解题型",
+        "tabs": ["preview", "problem_solving", "drill"],
+        "subjects": {
+          "middle": ["math", "physics", "chemistry"],
+          "high": ["math", "physics", "chemistry", "biology"]
+        }
+      },
+      "language": {
+        "name": "文科语言型",
+        "tabs": ["preview", "review", "accumulation"],
+        "subjects": {
+          "elementary": ["chinese", "english"],
+          "middle": ["chinese", "english"],
+          "high": ["chinese", "english"]
+        }
+      },
+      "science_basic": {
+        "name": "小四门基础型",
+        "tabs": ["preview", "review"],
+        "subjects": {
+          "middle": ["biology", "geography", "history", "politics"],
+          "high": ["geography", "history", "politics"]
+        }
+      },
+      "elementary_science": {
+        "name": "小学理科型",
+        "tabs": ["preview", "review"],
+        "subjects": {
+          "elementary": ["math"]
+        }
+      }
     },
-    "LANGUAGE": {
-      "description": "Language/liberal arts subjects with review and accumulation scenes",
-      "subjects": ["语文", "英语"],
-      "tabs": [
-        { "key": "preview", "label": "预习" },
-        { "key": "review", "label": "复习" },
-        { "key": "accumulation", "label": "日常积累" }
-      ]
+    "tag_filter_engine": {
+      "tag_types": ["content", "scene"],
+      "intra_group_operator": "OR",
+      "inter_group_operator": "AND",
+      "multi_condition_operator": "OR",
+      "hidden_tags_behavior": "participate_in_backend_filter_hidden_from_frontend",
+      "extra_scene_behavior": "aggregate_by_resource_type_no_tag_filter"
     },
-    "SCIENCE_BASIC": {
-      "description": "Basic science subjects with fewer scenes",
-      "subjects": ["生物", "地理"],
-      "tabs": [
-        { "key": "preview", "label": "预习" },
-        { "key": "review", "label": "复习" }
-      ]
-    },
-    "HISTORY": {
-      "description": "History/politics subjects (scene filtering not yet launched)",
-      "subjects": ["历史", "政治"],
-      "tabs": [
-        { "key": "preview", "label": "预习" },
-        { "key": "review", "label": "复习" }
-      ]
-    }
+    "not_launched": [
+      { "stage": "middle", "subjects": ["history", "politics"] },
+      { "stage": "high", "subjects": ["geography", "history", "politics"] }
+    ]
   },
   "store": {
     "name": "chapter",
@@ -638,6 +687,11 @@
       "version": "2.0.0",
       "date": "2026-03-13",
       "changes": "Complete rewrite for V1.6: 4 scene templates (SCIENCE_PROBLEM, LANGUAGE, SCIENCE_BASIC, HISTORY), 9 resource types (video, practice, guide, read_text, summary_note, premium_hook, recite, mind_map, error_book), ContentChoiceModal, LearningModeModal, FirstTimeGuide 3-step onboarding, ChapterFooter prev/next navigation, ContextSelector 3-column textbook modal, NEW badge system (7-day window + read tracking), VIP badge priority logic, AppSettings persistence, practice+guide paired layout with container queries, position restore priority chain, responsive rules for 7 breakpoints"
+    },
+    {
+      "version": "3.0.0",
+      "date": "2026-03-17",
+      "changes": ["场景模板体系重构：新增小学理科型模板，适用范围调整为学段×学科维度", "新增标签筛选引擎：双维度过滤（内容标签×场景标签），组内OR、组间AND、多条件组OR", "新增标签隐藏规则", "新增加餐场景按资源类型聚合逻辑", "Resource模型新增contentTags/sceneTags字段", "标记暂不上线学科"]
     }
   ]
 }
