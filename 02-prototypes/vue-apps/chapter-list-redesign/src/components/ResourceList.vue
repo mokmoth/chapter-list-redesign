@@ -25,7 +25,7 @@
       
       <!-- 资源卡片列表（支持 practice+guide 并排布局） -->
       <div class="resource-cards">
-        <template v-for="(row, idx) in getLayoutRows(subsection.resources)" :key="'row-' + idx">
+        <template v-for="(row, idx) in getLayoutRows(subsection.resources ?? [])" :key="'row-' + idx">
           <!-- 单卡片行（100% 宽度） -->
           <component
             v-if="row.type === 'single'"
